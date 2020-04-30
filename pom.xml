@@ -17,9 +17,13 @@
 
 	<properties>
 		<java.version>1.8</java.version>
+		
+		<version.webjars-locator>0.30</version.webjars-locator>
+		<version.jquery>3.1.1</version.jquery>
 	</properties>
 
 	<dependencies>
+		<!-- Spring Boot -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -28,13 +32,28 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		
+		<!-- WebJars -->
+		<dependency>
+   			<groupId>org.webjars</groupId>
+    		<artifactId>webjars-locator</artifactId>
+    		<version>${version.webjars-locator}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.webjars</groupId>
+		    <artifactId>jquery</artifactId>
+		    <version>${version.jquery}</version>
+		</dependency>
 
+		<!-- Dev tools -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+		
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
