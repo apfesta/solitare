@@ -1,4 +1,4 @@
-package com.andrewfesta.doublesolitare;
+package com.andrewfesta.doublesolitare.model;
 
 import java.util.Iterator;
 

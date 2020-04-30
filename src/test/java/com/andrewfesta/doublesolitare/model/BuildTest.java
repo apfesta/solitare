@@ -1,11 +1,14 @@
-package com.andrewfesta.doublesolitare;
+package com.andrewfesta.doublesolitare.model;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.andrewfesta.doublesolitare.Build.Sequence;
+import com.andrewfesta.doublesolitare.model.Build;
+import com.andrewfesta.doublesolitare.model.Card;
+import com.andrewfesta.doublesolitare.model.Suit;
+import com.andrewfesta.doublesolitare.model.Build.Sequence;
 
 public class BuildTest {
 

@@ -1,9 +1,9 @@
-package com.andrewfesta.doublesolitare;
+package com.andrewfesta.doublesolitare.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.andrewfesta.doublesolitare.Build.Sequence;
+import com.andrewfesta.doublesolitare.model.Build.Sequence;
 
 public class Foundation {
 

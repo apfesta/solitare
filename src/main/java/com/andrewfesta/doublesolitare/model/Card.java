@@ -1,6 +1,6 @@
-package com.andrewfesta.doublesolitare;
+package com.andrewfesta.doublesolitare.model;
 
-import com.andrewfesta.doublesolitare.Suit.Color;
+import com.andrewfesta.doublesolitare.model.Suit.Color;
 
 public class Card {
 	
