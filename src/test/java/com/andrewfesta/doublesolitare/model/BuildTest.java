@@ -20,13 +20,15 @@ public class BuildTest {
 		
 		Card c2 = new Card(9, Suit.CLUBS);
 		Card c3 = new Card(9, Suit.HEARTS); //wrong color
-		Card c4 = new Card(Card.JACK, Suit.HEARTS); //wrong value
+		Card c4 = new Card(Card.JACK, Suit.SPADES); //out of sequence
 		Card c5 = new Card(8, Suit.HEARTS); //wrong value
+		Card c6 = new Card(8, Suit.CLUBS); //out of sequence
 		
 		assertTrue(build.canPush(c2));
 		assertFalse(build.canPush(c3));
 		assertFalse(build.canPush(c4));
 		assertFalse(build.canPush(c5));
+		assertFalse(build.canPush(c6));
 		
 		build.push(c2);
 	}
@@ -50,11 +52,16 @@ public class BuildTest {
 	
 	@Test
 	public void testCanPushRank() {
-		Card c1 = new Card(10, Suit.HEARTS);
-		Build build = new Build(Sequence.RANK);
-		build.push(c1);
 		
-		Card c2 = new Card(Card.JACK, Suit.HEARTS); 
+		//Empty build
+		Build build = new Build(Sequence.RANK);
+		Card c1 = new Card(Card.ACE, Suit.HEARTS); 
+		Card c2 = new Card(2, Suit.HEARTS); 
+		assertTrue(build.canPush(c1));
+		assertFalse(build.canPush(c2)); //Not ACE
+		build.push(c1);
+				
+		//Stack next		
 		Card c3= new Card(Card.JACK, Suit.CLUBS); //wrong suit
 		Card c4 = new Card(Card.QUEEN, Suit.HEARTS); //wrong value
 		
@@ -62,7 +69,6 @@ public class BuildTest {
 		assertFalse(build.canPush(c3));
 		assertFalse(build.canPush(c4));
 		
-		build.push(c2);
 	}
 	
 }

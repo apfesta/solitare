@@ -18,10 +18,7 @@ public class Tableau {
 	}
 	
 	
-	public Pile setup() {
-		Deck d = Deck.getInstance();
-//		d.shuffle();
-		
+	public Pile setup(Deck d) {	
 		//Deal out Tableau
 		for (int j =0; j<7; j++) {
 			for (int i =j; i<7; i++) {

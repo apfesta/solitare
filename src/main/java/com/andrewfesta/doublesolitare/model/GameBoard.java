@@ -1,5 +1,8 @@
 package com.andrewfesta.doublesolitare.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class GameBoard {
 
 	final Integer gameId;
@@ -7,17 +10,29 @@ public class GameBoard {
 	Pile stockPile;
 	Foundation foundation;
 	
+	private Map<Integer, Card> cards = new HashMap<>(); //card by ID
+	
 	public GameBoard(Integer gameId) {
 		super();
 		this.gameId = gameId;
 	}
 
 	public void setup() {
+		Deck d = Deck.getInstance();
+//		d.shuffle();
+		for (Card c: d.cards) {
+			cards.put(c.getUnicodeInt(), c);
+		}
+		
 		tableau = new Tableau();
-		stockPile = tableau.setup();
+		stockPile = tableau.setup(d);
 		foundation = new Foundation();
 		
 		tableau.prettyPrint();
+	}
+	
+	public Card lookupCard(Integer cardId) {
+		return cards.get(cardId);
 	}
 
 	public Integer getGameId() {

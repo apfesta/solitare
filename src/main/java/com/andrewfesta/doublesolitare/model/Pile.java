@@ -41,6 +41,9 @@ public class Pile {
 		return new ArrayList<Card>(cards);
 	}
 	
+	public boolean contains(Object o) {
+		return cards.contains(o);
+	}
 	public Collection<Card> getCards() {
 		return Collections.unmodifiableCollection(cards);
 	}

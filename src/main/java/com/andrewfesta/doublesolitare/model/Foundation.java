@@ -11,16 +11,12 @@ public class Foundation {
 
 	public Foundation() {
 		super();
-		pile = new ArrayList<>();
-	}
-	
-	public void newFoundationPile(Card c) {
-		if (c.getValue()==Card.ACE) {
-			Build b = new Build(Sequence.RANK);
-			b.push(c);
+		pile = new ArrayList<>(4);
+		for (int i=0; i<4; i++) {
+			pile.add(new Build(Sequence.RANK));
 		}
 	}
-
+	
 	public List<Build> getPile() {
 		return pile;
 	}

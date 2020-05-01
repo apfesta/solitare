@@ -25,7 +25,7 @@ public class Build extends Pile {
 			Card top = cards.peek();
 			if (Sequence.ALTERNATE_COLOR.equals(sequence)) {
 				if (!top.getColor().equals(card.getColor())) {
-					return (top.getValue() > card.getValue());
+					return (top.getValue()-1 == card.getValue());
 				}
 			} else {
 				if (top.getSuit().equals(card.getSuit())) {
@@ -34,7 +34,8 @@ public class Build extends Pile {
 			}
 			return false;
 		}
-		return true;
+		return Sequence.ALTERNATE_COLOR.equals(sequence) || 
+				Sequence.RANK.equals(sequence) && card.getValue()==Card.ACE;
 	}
 	
 	public boolean canPush(Build build) {
