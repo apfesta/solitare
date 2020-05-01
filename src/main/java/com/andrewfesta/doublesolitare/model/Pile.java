@@ -37,6 +37,12 @@ public class Pile {
 	public Card peekFromBottom(int index) {
 		return asList().get(cards.size()-1-index);
 	}
+	public Card peek() {
+		return cards.peek();
+	}
+	public boolean isEmpty() {
+		return cards.isEmpty();
+	}
 	List<Card> asList() {
 		return new ArrayList<Card>(cards);
 	}

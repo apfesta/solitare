@@ -1,6 +1,7 @@
 package com.andrewfesta.doublesolitare.model;
 
 import com.andrewfesta.doublesolitare.model.Suit.Color;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Card {
 	
@@ -11,6 +12,8 @@ public class Card {
 
 	final private Suit suit;
 	final private int value;
+	
+	private Build currentLocation;
 	
 	public Card(int value, Suit suit) {
 		super();
@@ -81,6 +84,15 @@ public class Card {
 		default:
 			return String.valueOf(value);
 		}
+	}
+	
+	void setCurrentLocation(Build currentLocation) {
+		this.currentLocation = currentLocation;
+	}
+	
+	@JsonIgnore
+	Build getCurrentLocation() {
+		return this.currentLocation;
 	}
 	
 	@Override

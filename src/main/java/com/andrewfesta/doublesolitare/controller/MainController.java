@@ -1,7 +1,6 @@
 package com.andrewfesta.doublesolitare.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -11,10 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.andrewfesta.doublesolitare.model.Build;
 import com.andrewfesta.doublesolitare.model.Card;
 import com.andrewfesta.doublesolitare.model.GameBoard;
-import com.andrewfesta.doublesolitare.model.Pile;
+import com.andrewfesta.doublesolitare.model.GameBoard.CanPush;
 
 @Controller
 public class MainController {
@@ -49,51 +47,16 @@ public class MainController {
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/canmove/{cardId}", method = RequestMethod.GET)
-	public @ResponseBody CanDrop canMoveCard(
+	public @ResponseBody CanPush canMoveCard(
 			@PathVariable Integer gameId, 
 			@PathVariable Integer cardId) {
 		
 		GameBoard game = getGame(gameId);
 		Card card = game.lookupCard(cardId);
 		
-		CanDrop canDrop = new CanDrop();
-		
-		Pile[] facedown = game.getTableau().getPile();
-		Build[] tableauBuild = game.getTableau().getBuild();
-		
-		boolean isFacedown = false;
-		for (Pile pile: facedown) {
-			if (pile.contains(card)) {
-				isFacedown = true;
-			}
-		}
-		for (int i=0; i<tableauBuild.length; i++) {
-			canDrop.tableauBuild[i] = !isFacedown && tableauBuild[i].canPush(card);
-		}
-		List<Build> foundationBuld = game.getFoundation().getPile();
-		for (int i=0; i<foundationBuld.size(); i++) {
-			canDrop.foundationPile[i] = !isFacedown && foundationBuld.get(i).canPush(card);
-		}
-
-		return canDrop;
+		return game.canPush(card);
 	}
 	
-	public static class CanDrop {
-		private Boolean[] foundationPile = new Boolean[4];
-		private Boolean[] tableauBuild = new Boolean[7];
-		public Boolean[] getFoundationPile() {
-			return foundationPile;
-		}
-		public void setFoundationPile(Boolean[] foundationPile) {
-			this.foundationPile = foundationPile;
-		}
-		public Boolean[] getTableauBuild() {
-			return tableauBuild;
-		}
-		public void setTableauBuild(Boolean[] tableauBuild) {
-			this.tableauBuild = tableauBuild;
-		}
-	}
 	
 //	static class ObjectWrapper<T> {
 //		private final T value;

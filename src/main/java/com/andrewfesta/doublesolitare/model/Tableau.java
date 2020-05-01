@@ -28,11 +28,24 @@ public class Tableau {
 		}
 		//Turn over top cards for builds
 		for (int i=0; i<7; i++) {
-			build[i].push(pile[i].pop());
+			Card c = pile[i].cards.pop();
+			build[i].cards.push(c);
+			c.setCurrentLocation(build[i]);
 		}
 		
 		//return leftover cards
 		return new Pile(d);
+	}
+	
+		
+	public void flipTopPileCard(int pileId) {
+		if (build[pileId].isEmpty()) {
+			Card c = pile[pileId].cards.pop();
+			build[pileId].cards.push(c);
+			c.setCurrentLocation(build[pileId]);
+		} else {
+			throw new RuntimeException("Cannot flip card because there's a build on top of this pile");
+		}
 	}
 	
 	public Pile[] getPile() {
