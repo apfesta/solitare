@@ -20,5 +20,13 @@ public class Foundation {
 			b.push(c);
 		}
 	}
+
+	public List<Build> getPile() {
+		return pile;
+	}
+
+	public void setPile(List<Build> pile) {
+		this.pile = pile;
+	}
 	
 }

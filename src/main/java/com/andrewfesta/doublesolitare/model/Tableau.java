@@ -38,6 +38,26 @@ public class Tableau {
 		return new Pile(d);
 	}
 	
+	public Pile[] getPile() {
+		return pile;
+	}
+
+
+	public void setPile(Pile[] pile) {
+		this.pile = pile;
+	}
+
+
+	public Build[] getBuild() {
+		return build;
+	}
+
+
+	public void setBuild(Build[] build) {
+		this.build = build;
+	}
+
+
 	public void prettyPrint() {
 		StringBuffer buffer= new StringBuffer();
 		

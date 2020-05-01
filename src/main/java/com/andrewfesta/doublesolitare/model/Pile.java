@@ -2,6 +2,8 @@ package com.andrewfesta.doublesolitare.model;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class Pile {
@@ -38,4 +40,9 @@ public class Pile {
 	List<Card> asList() {
 		return new ArrayList<Card>(cards);
 	}
+	
+	public Collection<Card> getCards() {
+		return Collections.unmodifiableCollection(cards);
+	}
+
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.andrewfesta.doublesolitare.model.GameBoard;
 
@@ -31,7 +32,7 @@ public class MainController {
 	//Move card to foundation
 	
 	@RequestMapping(value="/api/game", method = RequestMethod.POST)
-	public GameBoard newGame() {
+	public @ResponseBody GameBoard newGame() {
 		GameBoard game = new GameBoard(gameIdSequence.incrementAndGet());
 		game.setup();
 		games.put(game.getGameId(), game);

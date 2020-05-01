@@ -26,10 +26,32 @@ public class Card {
 		return value;
 	}
 
-	public int getUnicode() {
-		int x = 0x1F0A1;
-		System.out.println((char)x);
-		return x;
+	public int getUnicodeInt() {
+		int code = 0;
+		switch (suit) {
+		case SPADES:
+			code = 0x1F0A0 + value;
+			break;
+		case HEARTS:
+			code = 0x1F0B0 + value;
+			break;
+		case DIAMONDS:
+			code = 0x1F0C0 + value;
+			break;
+		case CLUBS:
+			code = 0x1F0D0 + value;
+			break;
+		}
+		return code;
+	}
+	
+	public char getUnicodeChar() {
+		return (char)getUnicodeInt();
+	}
+	
+	public String getUnicodeHtmlEntity() {
+		int code=getUnicodeInt();
+		return "&#"+code+";";
 	}
 
 	public String valueName() {

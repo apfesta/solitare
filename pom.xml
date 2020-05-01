@@ -19,7 +19,8 @@
 		<java.version>1.8</java.version>
 		
 		<version.webjars-locator>0.30</version.webjars-locator>
-		<version.jquery>3.1.1</version.jquery>
+		<version.bootstrap>4.1.3</version.bootstrap>
+		<version.jquery>3.2.1</version.jquery>
 	</properties>
 
 	<dependencies>
@@ -38,6 +39,11 @@
    			<groupId>org.webjars</groupId>
     		<artifactId>webjars-locator</artifactId>
     		<version>${version.webjars-locator}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.webjars</groupId>
+		    <artifactId>bootstrap</artifactId>
+		    <version>${version.bootstrap}</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.webjars</groupId>

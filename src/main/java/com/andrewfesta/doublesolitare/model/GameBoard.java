@@ -23,5 +23,29 @@ public class GameBoard {
 	public Integer getGameId() {
 		return gameId;
 	}
+
+	public Tableau getTableau() {
+		return tableau;
+	}
+
+	public void setTableau(Tableau tableau) {
+		this.tableau = tableau;
+	}
+
+	public Pile getStockPile() {
+		return stockPile;
+	}
+
+	public void setStockPile(Pile stockPile) {
+		this.stockPile = stockPile;
+	}
+
+	public Foundation getFoundation() {
+		return foundation;
+	}
+
+	public void setFoundation(Foundation foundation) {
+		this.foundation = foundation;
+	}
 	
 }
