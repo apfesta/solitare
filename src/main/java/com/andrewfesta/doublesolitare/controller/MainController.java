@@ -57,6 +57,53 @@ public class MainController {
 		return game.canPush(card);
 	}
 	
+	@RequestMapping(value="/api/game/{gameId}/move/{cardId}/toFoundation/{toFoundationId}", method = RequestMethod.GET)
+	public @ResponseBody void moveToFoundation(@PathVariable Integer gameId, 
+			@PathVariable Integer cardId,
+			@PathVariable Integer toFoundationId) {
+		GameBoard game = getGame(gameId);
+		Card card = game.lookupCard(cardId);
+		game.getFoundation().getPile().get(toFoundationId).push(card);
+		
+		game.getFoundation().prettyPrint();
+		game.getTableau().prettyPrint();
+		game.getDiscardPile().print(3);
+	}
+	
+	/**
+	 * Move card from discard pile or another tableau build.
+	 * 
+	 * @param gameId
+	 * @param cardId
+	 * @param toBuildId
+	 */
+	@RequestMapping(value="/api/game/{gameId}/move/{cardId}/toTableau/{toBuildId}", method = RequestMethod.GET)
+	public @ResponseBody void moveToTableau(@PathVariable Integer gameId, 
+			@PathVariable Integer cardId,
+			@PathVariable Integer toBuildId) {
+		GameBoard game = getGame(gameId);
+		Card card = game.lookupCard(cardId);
+		game.getTableau().getBuild()[toBuildId].push(card);
+		
+		game.getFoundation().prettyPrint();
+		game.getTableau().prettyPrint();
+		game.getDiscardPile().print(3);
+	}
+	
+	@RequestMapping(value="/api/game/{gameId}/flip/tableau/{pileId}", method = RequestMethod.GET)
+	public @ResponseBody void flipCard(@PathVariable Integer gameId, 
+			@PathVariable Integer pileId) {
+		GameBoard game = getGame(gameId);
+		game.getTableau().flipTopPileCard(pileId);
+		
+		game.getFoundation().prettyPrint();
+		game.getTableau().prettyPrint();
+		game.getDiscardPile().print(3);
+	}
+	
+	
+	
+	
 	
 //	static class ObjectWrapper<T> {
 //		private final T value;

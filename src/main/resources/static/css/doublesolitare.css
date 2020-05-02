@@ -13,16 +13,36 @@
 	height: 100px;
 }
 
-.card {
-	font-size: 50px;
+
+.target {
+	float: left;
+	border: 1px solid black;
+	border-radius: .25rem;
+	border: 1px solid yellow;
+	min-width: 50px;
+	min-height: 50px;
 }
-.card.red {
+
+.pokercard {
+	position: relative;
+	font-size: 50px;
+	min-width: 50px;
+	background-color: white;
+	background-clip: border-box;
+	border: 1px solid black;
+	border-radius: .25rem;
+}
+.pokercard.red {
 	color: red;
 }
-.card.back {
+.pokercard.back {
 	color: blue;
 }
 
+.bottom {
+	top: 0;
+	bottom: 0;
+}
 .overlap {
 	margin-top: -40px;
 }

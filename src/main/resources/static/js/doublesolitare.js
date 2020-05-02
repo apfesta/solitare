@@ -43,24 +43,53 @@ var app = {
 			success: function(data){
 				console.log(data);
 			}});
+	};
+	
+	app.moveToFoundation = function(cardId, foundationId) {
+		console.log('moveToFoundation');
+		$.ajax({
+			type: 'GET', 
+			url: '/api/game/'+app.gameId+"/move/"+cardId+"/toFoundation/"+foundationId,
+			contentType: "application/json",
+			success: function(data){
+				$("#foundationPile"+foundationId).append($("#tableau [data-card-id='"+cardId+"']").removeClass('overlap'));
+			}});
 	}
+	
+	app.dragover = function(ev) {
+		ev.preventDefault();
+		ev.originalEvent.dataTransfer.dropEffect = "move";
+	};
 	
 	app.drag = function(ev) {
 		//what info gets dragged
-		var cardDiv = $(ev.target.getElementsByClassName('card')[0]);
+		var cardDiv = $(ev.target.getElementsByClassName('pokercard')[0]);
 		console.log(cardDiv.attr('data-card-id'));
 		
 		app.canMove(cardDiv.attr('data-card-id'));
 		
 		ev.originalEvent.dataTransfer.setData("text", cardDiv.attr('data-card-id'));
-	}
+	};
+	
+	app.drop = function(ev) {
+		ev.preventDefault();
+		var foundationId = $(ev.currentTarget).attr('data-pile-id');
+		var cardId = ev.originalEvent.dataTransfer.getData('text');
+		app.moveToFoundation(cardId, foundationId);
+	};
 	
 	app.setupFoundation = function() {
 		$('#foundation').addClass('row');
 		for (var i=0; i<4; i++) {
 			//create pileDiv
-			var pileDiv = $('<div>').attr('id','foundationPile'+i).addClass('col');
+			var pileDiv = $('<div>').attr('id','foundationPile'+i)
+				.addClass('col').addClass('pile')
+				.attr('data-pile-id',i)
+				.on('drop', app.drop).on('dragover', app.dragover);
 			$('#foundation').append(pileDiv);
+			
+			var targetDiv = $('<div>').addClass('target');
+			pileDiv.append(targetDiv);
 		}
 	};
 	
@@ -71,16 +100,17 @@ var app = {
 			var build = app.gameboard.tableau.build[i];
 			
 			//create pileDiv
-			var pileDiv = $('<div>').attr('id','pile'+i).addClass('col');
+			var pileDiv = $('<div>').attr('id','pile'+i).addClass('col').addClass('pile');
 			$('#tableau').append(pileDiv);
 			
-			
+			var targetDiv = $('<div>').addClass('target');
+			pileDiv.append(targetDiv);
 			
 			for (c in pile.cards) {
 				var card = pile.cards[c];
-				cardDiv = $('<div>').addClass('card').addClass('back').html("&#x1F0A0;");
+				cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
 				if (c>0) cardDiv.addClass('overlap');
-				pileDiv.append(cardDiv)
+				pileDiv.append(cardDiv);
 			}
 			
 			var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
@@ -89,7 +119,7 @@ var app = {
 			
 			for (c in build.cards) {
 				var card = build.cards[c];
-				cardDiv = $('<div>').addClass('card').addClass('front').attr('data-card-id',card.unicodeInt).html(card.unicodeHtmlEntity);
+				cardDiv = $('<div>').addClass('pokercard').addClass('front').attr('data-card-id',card.unicodeInt).html(card.unicodeHtmlEntity);
 				if (card.color=='RED') cardDiv.addClass('red');
 				if (c+pile.cards.length>0) cardDiv.addClass('overlap');
 				
