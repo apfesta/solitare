@@ -30,11 +30,15 @@ public class Tableau {
 		for (int i=0; i<7; i++) {
 			Card c = pile[i].cards.pop();
 			build[i].cards.push(c);
-			c.setCurrentLocation(build[i]);
+			c.setCurrentBuild(build[i]);
 		}
 		
 		//return leftover cards
-		return new Pile(d);
+		Pile p = new Pile(d);
+		for (Card c: d.cards) {
+			c.setCurrentPile(p);
+		}
+		return p;
 	}
 	
 		
@@ -42,7 +46,7 @@ public class Tableau {
 		if (build[pileId].isEmpty()) {
 			Card c = pile[pileId].cards.pop();
 			build[pileId].cards.push(c);
-			c.setCurrentLocation(build[pileId]);
+			c.setCurrentBuild(build[pileId]);
 		} else {
 			throw new RuntimeException("Cannot flip card because there's a build on top of this pile");
 		}

@@ -57,6 +57,9 @@ public class Foundation {
 					buffer.append("|");
 				}
 				buffer.append("\n");
+				if (j+1<max) {
+					buffer.append("   ");
+				}
 			}
 		}
 		

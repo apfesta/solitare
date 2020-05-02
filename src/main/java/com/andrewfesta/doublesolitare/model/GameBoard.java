@@ -10,6 +10,7 @@ public class GameBoard {
 	final Integer gameId;
 	Tableau tableau;
 	Pile stockPile;
+	Pile discardPile = new Pile();
 	Foundation foundation;
 	
 	private Map<Integer, Card> cards = new HashMap<>(); //card by ID
@@ -62,6 +63,24 @@ public class GameBoard {
 		return canPush;
 	}
 	
+	public void discard(int maxNumberOfCards) {
+		if (stockPile.isEmpty()) {
+			do {
+				Card c = discardPile.pop();
+				stockPile.push(c);
+				c.setCurrentPile(stockPile);
+			} while (!discardPile.isEmpty());
+		}
+		for (int i = 0; i<maxNumberOfCards; i++) {
+			if (stockPile.isEmpty()) {
+				break;
+			}
+			Card c = stockPile.pop();
+			discardPile.push(c);
+			c.setCurrentPile(discardPile);
+		}
+	}
+	
 	public Integer getGameId() {
 		return gameId;
 	}
@@ -80,6 +99,14 @@ public class GameBoard {
 
 	public void setStockPile(Pile stockPile) {
 		this.stockPile = stockPile;
+	}
+
+	public Pile getDiscardPile() {
+		return discardPile;
+	}
+
+	public void setDiscardPile(Pile discardPile) {
+		this.discardPile = discardPile;
 	}
 
 	public Foundation getFoundation() {

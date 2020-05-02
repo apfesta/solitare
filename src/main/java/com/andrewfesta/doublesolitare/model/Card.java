@@ -13,7 +13,8 @@ public class Card {
 	final private Suit suit;
 	final private int value;
 	
-	private Build currentLocation;
+	private Build currentBuild;
+	private Pile currentPile;
 	
 	public Card(int value, Suit suit) {
 		super();
@@ -86,15 +87,24 @@ public class Card {
 		}
 	}
 	
-	void setCurrentLocation(Build currentLocation) {
-		this.currentLocation = currentLocation;
+	void setCurrentBuild(Build currentLocation) {
+		this.currentBuild = currentLocation;
 	}
 	
 	@JsonIgnore
-	Build getCurrentLocation() {
-		return this.currentLocation;
+	Build getCurrentBuild() {
+		return this.currentBuild;
 	}
 	
+	@JsonIgnore
+	Pile getCurrentPile() {
+		return currentPile;
+	}
+
+	void setCurrentPile(Pile currentPile) {
+		this.currentPile = currentPile;
+	}
+
 	@Override
 	public String toString() {
 		return valueName()+" of "+suit.name();

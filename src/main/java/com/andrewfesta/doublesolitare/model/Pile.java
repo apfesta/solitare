@@ -54,4 +54,13 @@ public class Pile {
 		return Collections.unmodifiableCollection(cards);
 	}
 
+	public void print(int maxNumberOfCards) {
+		List<Card> readOnly = asList();
+		StringBuffer buffer = new StringBuffer("D: (").append(readOnly.size()).append(")");
+		for (int i = 0; i<maxNumberOfCards && i<readOnly.size(); i++) {
+			buffer.append(readOnly.get(i).abbrev()).append(" | ");
+		}
+		buffer.append("\n");
+		System.out.println(buffer.toString());
+	}
 }

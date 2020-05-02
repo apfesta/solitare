@@ -40,8 +40,10 @@ public class Build extends Pile {
 	}
 	
 	public boolean canMove(Card card) {
-		return card.getCurrentLocation()!=null && //Is in a build
-				card.getCurrentLocation().contains(card); 
+		return (card.getCurrentBuild()!=null && //Is in a build
+				card.getCurrentBuild().contains(card)) ||
+				(card.getCurrentPile()!=null &&
+				card.getCurrentPile().contains(card));  //Is top of the discard pile
 	}
 	
 	public boolean canPush(Build build) {
@@ -72,12 +74,20 @@ public class Build extends Pile {
 	public void push(Card c) {
 		if (canPush(c)) {
 			if (canMove(c)) {
-				if (!c.equals(c.getCurrentLocation().peek())) {
+				if (c.getCurrentBuild()!=null && !c.equals(c.getCurrentBuild().peek())) {
 					throw new RuntimeException("Card "+c+" is not on top of its build.  Use push(Build) instead.");
 				}
-				c.getCurrentLocation().pop();
+				if (c.getCurrentPile()!=null && !c.equals(c.getCurrentPile().peek())) {
+					throw new RuntimeException("Card "+c+" is not on top of its pile.");
+				}
+				
+				if (c.getCurrentBuild()!=null) c.getCurrentBuild().pop();
+				else if (c.getCurrentPile()!=null) c.getCurrentPile().pop();
+				
 				super.push(c);
-				c.setCurrentLocation(this);
+				
+				c.setCurrentBuild(this);
+				c.setCurrentPile(null);
 			} else {
 				throw new RuntimeException("Card "+c+" cannot move.");
 			}
@@ -87,9 +97,20 @@ public class Build extends Pile {
 	}
 	
 	public void push(Build b) {
-		for (Iterator<Card> it= b.cards.descendingIterator(); it.hasNext();) {
-			push(it.next());
-		}
+		do {
+			Card c = b.cards.peekLast();
+			if (canPush(c)) {
+				if (canMove(c)) {
+					b.cards.removeLast();
+					
+					super.push(c);
+					
+					c.setCurrentBuild(this);
+				} else {
+					throw new RuntimeException("Card "+c+" cannot move.");
+				}
+			}
+		} while (!b.isEmpty());
 	}
 	
 	
