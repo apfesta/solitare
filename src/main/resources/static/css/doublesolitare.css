@@ -13,6 +13,9 @@
 	height: 100px;
 }
 
+.pile.canDrop {
+	background-color: #00CC00;
+}
 
 .target {
 	float: left;

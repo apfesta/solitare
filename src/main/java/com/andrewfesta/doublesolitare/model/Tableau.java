@@ -42,11 +42,12 @@ public class Tableau {
 	}
 	
 		
-	public void flipTopPileCard(int pileId) {
+	public Card flipTopPileCard(int pileId) {
 		if (build[pileId].isEmpty()) {
 			Card c = pile[pileId].cards.pop();
 			build[pileId].cards.push(c);
 			c.setCurrentBuild(build[pileId]);
+			return c;
 		} else {
 			throw new RuntimeException("Cannot flip card because there's a build on top of this pile");
 		}

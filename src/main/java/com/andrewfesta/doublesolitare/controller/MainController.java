@@ -91,14 +91,16 @@ public class MainController {
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/flip/tableau/{pileId}", method = RequestMethod.GET)
-	public @ResponseBody void flipCard(@PathVariable Integer gameId, 
+	public @ResponseBody Card flipCard(@PathVariable Integer gameId, 
 			@PathVariable Integer pileId) {
 		GameBoard game = getGame(gameId);
-		game.getTableau().flipTopPileCard(pileId);
+		Card card = game.getTableau().flipTopPileCard(pileId);
 		
 		game.getFoundation().prettyPrint();
 		game.getTableau().prettyPrint();
 		game.getDiscardPile().print(3);
+		
+		return card;
 	}
 	
 	

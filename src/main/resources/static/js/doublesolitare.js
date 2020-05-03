@@ -2,7 +2,8 @@ console.log('hello world!');
 
 var app = {
 		gameboard: {},
-		gameId: null
+		gameId: null,
+		canMoveData: {}
 };
 
 //game class
@@ -42,6 +43,7 @@ var app = {
 			dataType: "json",
 			success: function(data){
 				console.log(data);
+				app.canMoveData = data;
 			}});
 	};
 	
@@ -54,18 +56,44 @@ var app = {
 			success: function(data){
 				$("#foundationPile"+foundationId).append($("#tableau [data-card-id='"+cardId+"']").removeClass('overlap'));
 			}});
-	}
+	};
 	
+	app.dragenter = function(ev) {
+		var curTarget = $(ev.currentTarget);
+		var dataPileId = curTarget.attr('data-pile-id')
+		if ($(ev.currentTarget).parents('#foundation').length>0) {
+			if (app.canMoveData.foundationPile[dataPileId]) {
+				ev.preventDefault();
+				ev.originalEvent.dataTransfer.dropEffect = "move";
+				curTarget.addClass('canDrop');
+			}
+		}
+		if ($(ev.currentTarget).parents('#tableau').length>0) {
+			
+		}
+	};
 	app.dragover = function(ev) {
-		ev.preventDefault();
-		ev.originalEvent.dataTransfer.dropEffect = "move";
+		var curTarget = $(ev.currentTarget);
+		var dataPileId = curTarget.attr('data-pile-id')
+		if ($(ev.currentTarget).parents('#foundation').length>0) {
+			if (app.canMoveData.foundationPile[dataPileId]) {
+				ev.preventDefault();
+				ev.originalEvent.dataTransfer.dropEffect = "move";
+			}
+		}
+		if ($(ev.currentTarget).parents('#tableau').length>0) {
+			
+		}
+	}
+	app.dragleave = function(ev) {
+		var curTarget = $(ev.currentTarget);
+		curTarget.removeClass('canDrop');
 	};
 	
 	app.drag = function(ev) {
 		//what info gets dragged
 		var cardDiv = $(ev.target.getElementsByClassName('pokercard')[0]);
-		console.log(cardDiv.attr('data-card-id'));
-		
+				
 		app.canMove(cardDiv.attr('data-card-id'));
 		
 		ev.originalEvent.dataTransfer.setData("text", cardDiv.attr('data-card-id'));
@@ -76,6 +104,9 @@ var app = {
 		var foundationId = $(ev.currentTarget).attr('data-pile-id');
 		var cardId = ev.originalEvent.dataTransfer.getData('text');
 		app.moveToFoundation(cardId, foundationId);
+		
+		var curTarget = $(ev.currentTarget);
+		curTarget.removeClass('canDrop');
 	};
 	
 	app.setupFoundation = function() {
@@ -85,7 +116,10 @@ var app = {
 			var pileDiv = $('<div>').attr('id','foundationPile'+i)
 				.addClass('col').addClass('pile')
 				.attr('data-pile-id',i)
-				.on('drop', app.drop).on('dragover', app.dragover);
+				.on('drop', app.drop)
+				.on('dragover', app.dragover)
+				.on('dragenter', app.dragenter)
+				.on('dragleave', app.dragleave);
 			$('#foundation').append(pileDiv);
 			
 			var targetDiv = $('<div>').addClass('target');
