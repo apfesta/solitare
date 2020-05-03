@@ -3,7 +3,7 @@ console.log('hello world!');
 var app = {
 		gameboard: {},
 		gameId: null,
-		canMoveData: {}
+		canMoveData: null
 };
 
 //game class
@@ -65,6 +65,26 @@ var app = {
 			}});
 	};
 	
+	app.moveToTableau = function(cardId, buildId) {
+		console.log('moveToTableau');
+		$.ajax({
+			type: 'GET', 
+			url: '/api/game/'+app.gameId+"/move/"+cardId+"/toTableau/"+buildId,
+			contentType: "application/json",
+			success: function(data){
+				var cardDiv = $("#tableau [data-card-id='"+cardId+"']");
+				var fromPileDiv = cardDiv.parents('.pile');
+				var fromPileId = fromPileDiv.attr('data-pile-id');
+				$("#pile"+buildId+" .build:last").append(cardDiv);
+				if (app.gameboard.tableau.build[buildId].numberOfCards+app.gameboard.tableau.pile[buildId].numberOfCards==0) 
+					cardDiv.removeClass('overlap');
+				app.gameboard = data;
+				if (app.gameboard.tableau.build[fromPileId].numberOfCards>0) {
+					app.flip(fromPileId);
+				}
+			}});
+	};
+	
 	app.flip = function(pileId) {
 		var cardDiv = $('#tableau #pile'+pileId+' .pokercard:last');
 		var build = app.gameboard.tableau.build[pileId];
@@ -78,30 +98,44 @@ var app = {
 	}
 	
 	app.dragenter = function(ev) {
-		var curTarget = $(ev.currentTarget);
-		var dataPileId = curTarget.attr('data-pile-id')
-		if ($(ev.currentTarget).parents('#foundation').length>0) {
-			if (app.canMoveData.foundationPile[dataPileId]) {
-				ev.preventDefault();
-				ev.originalEvent.dataTransfer.dropEffect = "move";
-				curTarget.addClass('canDrop');
+		if (app.canMoveData) {
+			var curTarget = $(ev.currentTarget);
+			var dataPileId = curTarget.attr('data-pile-id')
+			if ($(ev.currentTarget).parents('#foundation').length>0) {
+				if (app.canMoveData.foundationPile[dataPileId]) {
+					ev.preventDefault();
+					ev.originalEvent.dataTransfer.dropEffect = "move";
+					curTarget.addClass('canDrop');
+				}
+			}
+			if ($(ev.currentTarget).parents('#tableau').length>0) {
+				if (app.canMoveData.tableauBuild[dataPileId]) {
+					ev.preventDefault();
+					ev.originalEvent.dataTransfer.dropEffect = "move";
+					curTarget.addClass('canDrop');
+				}
 			}
 		}
-		if ($(ev.currentTarget).parents('#tableau').length>0) {
-			
-		}
+		
 	};
 	app.dragover = function(ev) {
-		var curTarget = $(ev.currentTarget);
-		var dataPileId = curTarget.attr('data-pile-id')
-		if ($(ev.currentTarget).parents('#foundation').length>0) {
-			if (app.canMoveData.foundationPile[dataPileId]) {
-				ev.preventDefault();
-				ev.originalEvent.dataTransfer.dropEffect = "move";
+		if (app.canMoveData) {
+			var curTarget = $(ev.currentTarget);
+			var dataPileId = curTarget.attr('data-pile-id')
+			if ($(ev.currentTarget).parents('#foundation').length>0) {
+				if (app.canMoveData.foundationPile[dataPileId]) {
+					ev.preventDefault();
+					ev.originalEvent.dataTransfer.dropEffect = "move";
+					curTarget.addClass('canDrop');
+				}
 			}
-		}
-		if ($(ev.currentTarget).parents('#tableau').length>0) {
-			
+			if ($(ev.currentTarget).parents('#tableau').length>0) {
+				if (app.canMoveData.tableauBuild[dataPileId]) {
+					ev.preventDefault();
+					ev.originalEvent.dataTransfer.dropEffect = "move";
+					curTarget.addClass('canDrop');
+				}
+			}
 		}
 	}
 	app.dragleave = function(ev) {
@@ -120,12 +154,17 @@ var app = {
 	
 	app.drop = function(ev) {
 		ev.preventDefault();
-		var foundationId = $(ev.currentTarget).attr('data-pile-id');
+		var pileId = $(ev.currentTarget).attr('data-pile-id');
 		var cardId = ev.originalEvent.dataTransfer.getData('text');
-		app.moveToFoundation(cardId, foundationId);
-		
+		if ($(ev.currentTarget).parents('#foundation').length>0) {
+			app.moveToFoundation(cardId, pileId);
+		}
+		if ($(ev.currentTarget).parents('#tableau').length>0) {
+			app.moveToTableau(cardId, pileId);
+		}
 		var curTarget = $(ev.currentTarget);
 		curTarget.removeClass('canDrop');
+		app.canMoveData = null;
 	};
 	
 	app.setupFoundation = function() {
@@ -154,7 +193,11 @@ var app = {
 			
 			//create pileDiv
 			var pileDiv = $('<div>').attr('id','pile'+i).addClass('col').addClass('pile')
-				.attr('data-pile-id',i);
+				.attr('data-pile-id',i)
+				.on('drop', app.drop)
+				.on('dragover', app.dragover)
+				.on('dragenter', app.dragenter)
+				.on('dragleave', app.dragleave);
 			$('#tableau').append(pileDiv);
 			
 			var targetDiv = $('<div>').addClass('target');
