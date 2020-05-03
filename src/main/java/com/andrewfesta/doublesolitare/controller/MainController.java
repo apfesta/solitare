@@ -57,17 +57,34 @@ public class MainController {
 		return game.canPush(card);
 	}
 	
+	protected Integer getPileIdToFlip(GameBoard game, Card card) {
+		Integer pileIdToFlip = null;
+		for (int i=0; i<game.getTableau().getPile().length; i++) {
+			if (card.getCurrentBuild()==game.getTableau().getBuild()[i]) {
+				pileIdToFlip = i;
+			}
+		}
+		return pileIdToFlip;
+	}
+	
 	@RequestMapping(value="/api/game/{gameId}/move/{cardId}/toFoundation/{toFoundationId}", method = RequestMethod.GET)
-	public @ResponseBody void moveToFoundation(@PathVariable Integer gameId, 
+	public @ResponseBody GameBoard moveToFoundation(@PathVariable Integer gameId, 
 			@PathVariable Integer cardId,
 			@PathVariable Integer toFoundationId) {
 		GameBoard game = getGame(gameId);
 		Card card = game.lookupCard(cardId);
+		Integer pileIdToFlip = getPileIdToFlip(game, card);
 		game.getFoundation().getPile().get(toFoundationId).push(card);
+		
+		if (pileIdToFlip!=null && !game.getTableau().getPile()[pileIdToFlip].isEmpty()) {
+			game.getTableau().flipTopPileCard(pileIdToFlip);
+		}
 		
 		game.getFoundation().prettyPrint();
 		game.getTableau().prettyPrint();
 		game.getDiscardPile().print(3);
+		
+		return game;
 	}
 	
 	/**
@@ -78,34 +95,25 @@ public class MainController {
 	 * @param toBuildId
 	 */
 	@RequestMapping(value="/api/game/{gameId}/move/{cardId}/toTableau/{toBuildId}", method = RequestMethod.GET)
-	public @ResponseBody void moveToTableau(@PathVariable Integer gameId, 
+	public @ResponseBody GameBoard moveToTableau(@PathVariable Integer gameId, 
 			@PathVariable Integer cardId,
 			@PathVariable Integer toBuildId) {
 		GameBoard game = getGame(gameId);
 		Card card = game.lookupCard(cardId);
+		Integer pileIdToFlip = getPileIdToFlip(game, card);
 		game.getTableau().getBuild()[toBuildId].push(card);
 		
-		game.getFoundation().prettyPrint();
-		game.getTableau().prettyPrint();
-		game.getDiscardPile().print(3);
-	}
-	
-	@RequestMapping(value="/api/game/{gameId}/flip/tableau/{pileId}", method = RequestMethod.GET)
-	public @ResponseBody Card flipCard(@PathVariable Integer gameId, 
-			@PathVariable Integer pileId) {
-		GameBoard game = getGame(gameId);
-		Card card = game.getTableau().flipTopPileCard(pileId);
-		
+		if (pileIdToFlip!=null) {
+			game.getTableau().flipTopPileCard(pileIdToFlip);
+		}
+				
 		game.getFoundation().prettyPrint();
 		game.getTableau().prettyPrint();
 		game.getDiscardPile().print(3);
 		
-		return card;
+		return game;
 	}
-	
-	
-	
-	
+		
 	
 //	static class ObjectWrapper<T> {
 //		private final T value;

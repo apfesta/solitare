@@ -54,9 +54,28 @@ var app = {
 			url: '/api/game/'+app.gameId+"/move/"+cardId+"/toFoundation/"+foundationId,
 			contentType: "application/json",
 			success: function(data){
-				$("#foundationPile"+foundationId).append($("#tableau [data-card-id='"+cardId+"']").removeClass('overlap'));
+				var cardDiv = $("#tableau [data-card-id='"+cardId+"']");
+				var pileDiv = cardDiv.parents('.pile');
+				var pileId = pileDiv.attr('data-pile-id');
+				$("#foundationPile"+foundationId).append(cardDiv.removeClass('overlap'));
+				app.gameboard = data;
+				if (app.gameboard.tableau.pile[pileId].cards.length>0) {
+					app.flip(pileId);
+				}
 			}});
 	};
+	
+	app.flip = function(pileId) {
+		var cardDiv = $('#tableau #pile'+pileId+' .pokercard:last');
+		var build = app.gameboard.tableau.build[pileId];
+		var card = build.cards[build.cards.length-1];
+		$('#tableau #pile'+pileId+' .build:first').append(cardDiv
+					.removeClass('back')
+					.addClass('front')
+					.attr('data-card-id',card.unicodeInt)
+					.html(card.unicodeHtmlEntity));
+		if (card.color=='RED') cardDiv.addClass('red');
+	}
 	
 	app.dragenter = function(ev) {
 		var curTarget = $(ev.currentTarget);
@@ -134,7 +153,8 @@ var app = {
 			var build = app.gameboard.tableau.build[i];
 			
 			//create pileDiv
-			var pileDiv = $('<div>').attr('id','pile'+i).addClass('col').addClass('pile');
+			var pileDiv = $('<div>').attr('id','pile'+i).addClass('col').addClass('pile')
+				.attr('data-pile-id',i);
 			$('#tableau').append(pileDiv);
 			
 			var targetDiv = $('<div>').addClass('target');

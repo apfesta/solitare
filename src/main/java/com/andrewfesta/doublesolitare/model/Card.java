@@ -92,12 +92,12 @@ public class Card {
 	}
 	
 	@JsonIgnore
-	Build getCurrentBuild() {
+	public Build getCurrentBuild() {
 		return this.currentBuild;
 	}
 	
 	@JsonIgnore
-	Pile getCurrentPile() {
+	public Pile getCurrentPile() {
 		return currentPile;
 	}
 
