@@ -46,6 +46,8 @@ public class Card {
 			code = 0x1F0D0 + value;
 			break;
 		}
+		//There is a 'Knight' card in Unicode between Jack and Queen.
+		if (value>JACK) code++;
 		return code;
 	}
 	
