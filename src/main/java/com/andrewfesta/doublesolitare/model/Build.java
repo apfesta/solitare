@@ -1,6 +1,8 @@
 package com.andrewfesta.doublesolitare.model;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 public class Build extends Pile {
@@ -19,6 +21,10 @@ public class Build extends Pile {
 
 	public Sequence getSequence() {
 		return sequence;
+	}
+	
+	public Collection<Card> getCards() {
+		return Collections.unmodifiableCollection(cards);
 	}
 	
 	public boolean canPush(Card card) {

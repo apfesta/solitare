@@ -2,8 +2,6 @@ package com.andrewfesta.doublesolitare.model;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class Pile {
@@ -34,6 +32,9 @@ public class Pile {
 	public int size() {
 		return cards.size();
 	}
+	public int getNumberOfCards() {
+		return cards.size();
+	}
 	public Card peekFromBottom(int index) {
 		return asList().get(cards.size()-1-index);
 	}
@@ -49,9 +50,6 @@ public class Pile {
 	
 	public boolean contains(Object o) {
 		return cards.contains(o);
-	}
-	public Collection<Card> getCards() {
-		return Collections.unmodifiableCollection(cards);
 	}
 
 	public void print(int maxNumberOfCards) {

@@ -59,7 +59,7 @@ var app = {
 				var pileId = pileDiv.attr('data-pile-id');
 				$("#foundationPile"+foundationId).append(cardDiv.removeClass('overlap'));
 				app.gameboard = data;
-				if (app.gameboard.tableau.pile[pileId].cards.length>0) {
+				if (app.gameboard.tableau.pile[pileId].numberOfCards>0) {
 					app.flip(pileId);
 				}
 			}});
@@ -160,8 +160,7 @@ var app = {
 			var targetDiv = $('<div>').addClass('target');
 			pileDiv.append(targetDiv);
 			
-			for (c in pile.cards) {
-				var card = pile.cards[c];
+			for (var c=0; c<pile.numberOfCards; c++) {
 				cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
 				if (c>0) cardDiv.addClass('overlap');
 				pileDiv.append(cardDiv);
@@ -175,7 +174,7 @@ var app = {
 				var card = build.cards[c];
 				cardDiv = $('<div>').addClass('pokercard').addClass('front').attr('data-card-id',card.unicodeInt).html(card.unicodeHtmlEntity);
 				if (card.color=='RED') cardDiv.addClass('red');
-				if (c+pile.cards.length>0) cardDiv.addClass('overlap');
+				if (c+pile.numberOfCards>0) cardDiv.addClass('overlap');
 				
 				buildDiv.append(cardDiv);
 				
