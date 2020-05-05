@@ -113,6 +113,16 @@ public class MainController {
 		
 		return game;
 	}
+	
+	@RequestMapping(value="/api/game/{gameId}/discard", method = RequestMethod.GET)
+	public @ResponseBody GameBoard discard(@PathVariable Integer gameId) {
+		GameBoard game = getGame(gameId);
+		game.discard(3);
+		
+		game.getDiscardPile().print(3);
+		
+		return game;
+	}
 		
 	
 //	static class ObjectWrapper<T> {

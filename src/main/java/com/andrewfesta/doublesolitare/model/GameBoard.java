@@ -10,7 +10,7 @@ public class GameBoard {
 	final Integer gameId;
 	Tableau tableau;
 	Pile stockPile;
-	Pile discardPile = new Pile();
+	VisiblePile discardPile = new VisiblePile();
 	Foundation foundation;
 	
 	private Map<Integer, Card> cards = new HashMap<>(); //card by ID
@@ -105,7 +105,7 @@ public class GameBoard {
 		return discardPile;
 	}
 
-	public void setDiscardPile(Pile discardPile) {
+	public void setDiscardPile(VisiblePile discardPile) {
 		this.discardPile = discardPile;
 	}
 

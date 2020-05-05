@@ -29,6 +29,7 @@ var app = {
 				console.log(data);
 				app.gameboard = data;
 				app.gameId = data.gameId;
+				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
 			}});
@@ -53,11 +54,13 @@ var app = {
 			type: 'GET', 
 			url: '/api/game/'+app.gameId+"/move/"+cardId+"/toFoundation/"+foundationId,
 			contentType: "application/json",
+			dataType: "json",
 			success: function(data){
+				console.log(data);
 				var cardDiv = $("#tableau [data-card-id='"+cardId+"']");
 				var pileDiv = cardDiv.parents('.pile');
 				var pileId = pileDiv.attr('data-pile-id');
-				$("#foundationPile"+foundationId).append(cardDiv.removeClass('overlap'));
+				$("#foundationPile"+foundationId).append(cardDiv.removeClass('overlap-down'));
 				app.gameboard = data;
 				if (app.gameboard.tableau.pile[pileId].numberOfCards>0) {
 					app.flip(pileId);
@@ -71,16 +74,54 @@ var app = {
 			type: 'GET', 
 			url: '/api/game/'+app.gameId+"/move/"+cardId+"/toTableau/"+buildId,
 			contentType: "application/json",
+			dataType: "json",
 			success: function(data){
-				var cardDiv = $("#tableau [data-card-id='"+cardId+"']");
+				console.log(data);
+				var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
 				var fromPileDiv = cardDiv.parents('.pile');
 				var fromPileId = fromPileDiv.attr('data-pile-id');
 				$("#pile"+buildId+" .build:last").append(cardDiv);
+				cardDiv.removeClass('overlap-right');
 				if (app.gameboard.tableau.build[buildId].numberOfCards+app.gameboard.tableau.pile[buildId].numberOfCards==0) 
-					cardDiv.removeClass('overlap');
+					cardDiv.removeClass('overlap-down');
+				else
+					cardDiv.addClass('overlap-down')
 				app.gameboard = data;
-				if (app.gameboard.tableau.build[fromPileId].numberOfCards>0) {
-					app.flip(fromPileId);
+				if (fromPileId!=null) {
+					if (app.gameboard.tableau.build[fromPileId].numberOfCards>0) {
+						app.flip(fromPileId);
+					}
+				}
+				
+				//TODO if came from discard pile, move next card to 'build' div.
+				
+			}});
+	};
+	
+	app.discard = function() {
+		console.log('discard');
+		$.ajax({
+			type: 'GET', 
+			url: '/api/game/'+app.gameId+"/discard",
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.log(data);
+				app.gameboard = data;
+				$('#discard-pile').empty();
+				for (var c=0; c<3; c++) {
+					var card = app.gameboard.discardPile.cards[2-c];
+					console.log(app.gameboard.discardPile);
+					cardDiv = $('<div>').addClass('pokercard').addClass('front').attr('data-card-id',card.unicodeInt).html(card.unicodeHtmlEntity);
+					if (card.color=='RED') cardDiv.addClass('red');
+					cardDiv.addClass('overlap-right');
+					if (c==2) {
+						var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+						buildDiv.append(cardDiv);
+						$('#discard-pile').append(buildDiv);
+					} else {
+						$('#discard-pile').append(cardDiv);
+					}
 				}
 			}});
 	};
@@ -166,19 +207,21 @@ var app = {
 		curTarget.removeClass('canDrop');
 		app.canMoveData = null;
 	};
-	
+		
 	app.setupFoundation = function() {
 		$('#foundation').addClass('row');
 		for (var i=0; i<4; i++) {
 			//create pileDiv
+			var colDiv = $('<div>').addClass('col');
+			$('#foundation').append(colDiv);
 			var pileDiv = $('<div>').attr('id','foundationPile'+i)
-				.addClass('col').addClass('pile')
+				.addClass('pile')
 				.attr('data-pile-id',i)
 				.on('drop', app.drop)
 				.on('dragover', app.dragover)
 				.on('dragenter', app.dragenter)
 				.on('dragleave', app.dragleave);
-			$('#foundation').append(pileDiv);
+			colDiv.append(pileDiv);
 			
 			var targetDiv = $('<div>').addClass('target');
 			pileDiv.append(targetDiv);
@@ -192,20 +235,22 @@ var app = {
 			var build = app.gameboard.tableau.build[i];
 			
 			//create pileDiv
+			var colDiv = $('<div>').addClass('col');
+			$('#tableau').append(colDiv);
 			var pileDiv = $('<div>').attr('id','pile'+i).addClass('col').addClass('pile')
 				.attr('data-pile-id',i)
 				.on('drop', app.drop)
 				.on('dragover', app.dragover)
 				.on('dragenter', app.dragenter)
 				.on('dragleave', app.dragleave);
-			$('#tableau').append(pileDiv);
+			colDiv.append(pileDiv);
 			
 			var targetDiv = $('<div>').addClass('target');
 			pileDiv.append(targetDiv);
 			
 			for (var c=0; c<pile.numberOfCards; c++) {
-				cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
-				if (c>0) cardDiv.addClass('overlap');
+				var cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
+				if (c>0) cardDiv.addClass('overlap-down');
 				pileDiv.append(cardDiv);
 			}
 			
@@ -217,7 +262,7 @@ var app = {
 				var card = build.cards[c];
 				cardDiv = $('<div>').addClass('pokercard').addClass('front').attr('data-card-id',card.unicodeInt).html(card.unicodeHtmlEntity);
 				if (card.color=='RED') cardDiv.addClass('red');
-				if (c+pile.numberOfCards>0) cardDiv.addClass('overlap');
+				if (c+pile.numberOfCards>0) cardDiv.addClass('overlap-down');
 				
 				buildDiv.append(cardDiv);
 				
@@ -225,15 +270,27 @@ var app = {
 				var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
 				buildDiv.append(subBuildDiv);
 				buildDiv = subBuildDiv;
-				
 			}
-			
-			
-		}
-		
-		
-		//$('#tableau')
+		};
 	}
+	
+	app.setupStockAndDiscardPiles = function() {
+		//create pileDiv
+		var pileDiv = $('<div>').attr('id','stock-pile').addClass('col').addClass('pile')
+			.on('click', app.discard);
+		$('#stockPile').append(pileDiv);
+		var targetDiv = $('<div>').addClass('target');
+		pileDiv.append(targetDiv);
+		var cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
+		pileDiv.append(cardDiv);
+		
+		var pileDiv = $('<div>').attr('id','discard-pile').addClass('col').addClass('pile')
+		$('#discardPile').append(pileDiv);
+//		var targetDiv = $('<div>').addClass('target');
+//		pileDiv.append(targetDiv);
+		
+		
+	};
 	
 	
 	//Service worker

@@ -9,22 +9,36 @@
     height: 100%;
 }
 
+#topSection {
+	width:100%;
+	height: 150px;
+}
+
 #foundation {
-	height: 100px;
+	/*height: 100px;*/
+}
+
+#foundation .pile {
+	border-radius: 1rem;
+	border: 2px solid #CCC;
+}
+
+.pile {
+	min-width: 50px;
+	min-height: 100px;
 }
 
 .pile.canDrop {
 	background-color: #00CC00;
 }
 
-.target {
+/*.target {
 	float: left;
-	border: 1px solid black;
 	border-radius: .25rem;
 	border: 1px solid yellow;
 	min-width: 50px;
 	min-height: 50px;
-}
+}*/
 
 .pokercard {
 	position: relative;
@@ -42,10 +56,18 @@
 	color: blue;
 }
 
+#discard-pile .pokercard {
+	width: 33%;
+	float: left;
+}
+
 .bottom {
 	top: 0;
 	bottom: 0;
 }
-.overlap {
+.overlap-down {
 	margin-top: -40px;
+}
+.overlap-right {
+	margin-right: -40px;
 }
