@@ -48,8 +48,6 @@ var app = {
 	
 	app.moveToFoundation = function(cardId, foundationId) {
 		
-		//TODO replace card with new card instead of appending.  we dont hvae room to fan.
-		
 		$.ajax({
 			type: 'GET', 
 			url: '/api/game/'+app.gameId+"/move/"+cardId+"/toFoundation/"+foundationId,
@@ -60,7 +58,13 @@ var app = {
 				var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
 				var pileDiv = cardDiv.parents('.pile');
 				var pileId = pileDiv.attr('data-pile-id');
-				$("#foundationPile"+foundationId).append(cardDiv.removeClass('fan-down'));
+				
+				if ($("#foundationPile"+foundationId+" .pokercard").length > 0) {
+					$("#foundationPile"+foundationId+" .pokercard").replaceWith(cardDiv);
+				} else {
+					$("#foundationPile"+foundationId).append(cardDiv);
+				}
+				cardDiv.removeClass('fan-down')
 				cardDiv.removeClass('fan-right');
 				app.gameboard = data;
 				if (pileId!=null) {
