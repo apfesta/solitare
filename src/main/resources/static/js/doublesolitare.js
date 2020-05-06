@@ -57,13 +57,18 @@ var app = {
 			dataType: "json",
 			success: function(data){
 				console.log(data);
-				var cardDiv = $("#tableau [data-card-id='"+cardId+"']");
+				var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
 				var pileDiv = cardDiv.parents('.pile');
 				var pileId = pileDiv.attr('data-pile-id');
 				$("#foundationPile"+foundationId).append(cardDiv.removeClass('overlap-down'));
+				cardDiv.removeClass('overlap-right');
 				app.gameboard = data;
-				if (app.gameboard.tableau.pile[pileId].numberOfCards>0) {
-					app.flip(pileId);
+				if (pileId!=null) {
+					if (app.gameboard.tableau.pile[pileId].numberOfCards>0) {
+						app.flip(pileId);
+					}
+				} else {
+					$('#discardPile .build').append($('#discardPile .pokercard:last'));
 				}
 			}});
 	};
@@ -91,10 +96,9 @@ var app = {
 					if (app.gameboard.tableau.build[fromPileId].numberOfCards>0) {
 						app.flip(fromPileId);
 					}
+				} else {
+					$('#discardPile .build').append($('#discardPile .pokercard:last'));
 				}
-				
-				//TODO if came from discard pile, move next card to 'build' div.
-				
 			}});
 	};
 	
