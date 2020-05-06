@@ -20,6 +20,7 @@ public class SamplePlayTest {
 	public void samplePlay() {
 		
 		GameBoard game = new GameBoard(1);
+		game.setShuffle(false);
 		game.setup();
 		
 		Tableau tableau = game.getTableau();

@@ -13,6 +13,8 @@ public class GameBoard {
 	VisiblePile discardPile = new VisiblePile();
 	Foundation foundation;
 	
+	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
+	
 	private Map<Integer, Card> cards = new HashMap<>(); //card by ID
 	
 	public GameBoard(Integer gameId) {
@@ -22,7 +24,9 @@ public class GameBoard {
 
 	public void setup() {
 		Deck d = Deck.getInstance();
-//		d.shuffle();
+		if (shuffle) {
+			d.shuffle();
+		}
 		for (Card c: d.cards) {
 			cards.put(c.getUnicodeInt(), c);
 		}
@@ -81,6 +85,14 @@ public class GameBoard {
 		}
 	}
 	
+	public boolean isShuffle() {
+		return shuffle;
+	}
+
+	public void setShuffle(boolean shuffle) {
+		this.shuffle = shuffle;
+	}
+
 	public Integer getGameId() {
 		return gameId;
 	}

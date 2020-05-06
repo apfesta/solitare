@@ -1,4 +1,3 @@
-console.log('hello world!');
 
 var app = {
 		gameboard: {},
@@ -6,9 +5,6 @@ var app = {
 		canMoveData: null
 };
 
-//game class
-//get intial board from API
-//print it out using unicode
 
 (function() {
 	'user strict';
@@ -18,15 +14,18 @@ var app = {
 		app.newGame();
 	};
 	
+	//---------------
+	// REST functions
+	//---------------
+	
 	app.newGame = function() {
-		console.log('new game query');
 		$.ajax({
 			type: 'POST', 
 			url: '/api/game',
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
-				console.log(data);
+				console.debug(data);
 				app.gameboard = data;
 				app.gameId = data.gameId;
 				app.setupStockAndDiscardPiles();
@@ -36,32 +35,33 @@ var app = {
 	};
 	
 	app.canMove = function(cardId) {
-		console.log('can move query');
 		$.ajax({
 			type: 'GET', 
 			url: '/api/game/'+app.gameId+"/canmove/"+cardId,
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
-				console.log(data);
+				console.debug(data);
 				app.canMoveData = data;
 			}});
 	};
 	
 	app.moveToFoundation = function(cardId, foundationId) {
-		console.log('moveToFoundation');
+		
+		//TODO replace card with new card instead of appending.  we dont hvae room to fan.
+		
 		$.ajax({
 			type: 'GET', 
 			url: '/api/game/'+app.gameId+"/move/"+cardId+"/toFoundation/"+foundationId,
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
-				console.log(data);
+				console.debug(data);
 				var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
 				var pileDiv = cardDiv.parents('.pile');
 				var pileId = pileDiv.attr('data-pile-id');
-				$("#foundationPile"+foundationId).append(cardDiv.removeClass('overlap-down'));
-				cardDiv.removeClass('overlap-right');
+				$("#foundationPile"+foundationId).append(cardDiv.removeClass('fan-down'));
+				cardDiv.removeClass('fan-right');
 				app.gameboard = data;
 				if (pileId!=null) {
 					if (app.gameboard.tableau.pile[pileId].numberOfCards>0) {
@@ -74,23 +74,22 @@ var app = {
 	};
 	
 	app.moveToTableau = function(cardId, buildId) {
-		console.log('moveToTableau');
 		$.ajax({
 			type: 'GET', 
 			url: '/api/game/'+app.gameId+"/move/"+cardId+"/toTableau/"+buildId,
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
-				console.log(data);
+				console.debug(data);
 				var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
 				var fromPileDiv = cardDiv.parents('.pile');
 				var fromPileId = fromPileDiv.attr('data-pile-id');
 				$("#pile"+buildId+" .build:last").append(cardDiv);
-				cardDiv.removeClass('overlap-right');
+				cardDiv.removeClass('fan-right');
 				if (app.gameboard.tableau.build[buildId].numberOfCards+app.gameboard.tableau.pile[buildId].numberOfCards==0) 
-					cardDiv.removeClass('overlap-down');
+					cardDiv.removeClass('fan-down');
 				else
-					cardDiv.addClass('overlap-down')
+					cardDiv.addClass('fan-down')
 				app.gameboard = data;
 				if (fromPileId!=null) {
 					if (app.gameboard.tableau.build[fromPileId].numberOfCards>0) {
@@ -103,22 +102,20 @@ var app = {
 	};
 	
 	app.discard = function() {
-		console.log('discard');
 		$.ajax({
 			type: 'GET', 
 			url: '/api/game/'+app.gameId+"/discard",
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
-				console.log(data);
+				console.debug(data);
 				app.gameboard = data;
 				$('#discard-pile').empty();
 				for (var c=0; c<3; c++) {
 					var card = app.gameboard.discardPile.cards[2-c];
-					console.log(app.gameboard.discardPile);
 					cardDiv = $('<div>').addClass('pokercard').addClass('front').attr('data-card-id',card.unicodeInt).html(card.unicodeHtmlEntity);
 					if (card.color=='RED') cardDiv.addClass('red');
-					cardDiv.addClass('overlap-right');
+					cardDiv.addClass('fan-right');
 					if (c==2) {
 						var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
 						buildDiv.append(cardDiv);
@@ -129,6 +126,10 @@ var app = {
 				}
 			}});
 	};
+	
+	//---------------
+	// Display functions
+	//---------------
 	
 	app.flip = function(pileId) {
 		var cardDiv = $('#tableau #pile'+pileId+' .pokercard:last');
@@ -141,6 +142,90 @@ var app = {
 					.html(card.unicodeHtmlEntity));
 		if (card.color=='RED') cardDiv.addClass('red');
 	}
+	
+	app.setupFoundation = function() {
+		$('#foundation').addClass('row');
+		for (var i=0; i<4; i++) {
+			//create pileDiv
+			var colDiv = $('<div>').addClass('col');
+			$('#foundation').append(colDiv);
+			var pileDiv = $('<div>').attr('id','foundationPile'+i)
+				.addClass('pile')
+				.attr('data-pile-id',i)
+				.on('drop', app.drop)
+				.on('dragover', app.dragover)
+				.on('dragenter', app.dragenter)
+				.on('dragleave', app.dragleave);
+			colDiv.append(pileDiv);
+			
+			var targetDiv = $('<div>').addClass('target');
+			pileDiv.append(targetDiv);
+		}
+	};
+	
+	app.setupTableau = function() {
+		$('#tableau').addClass('row');
+		for (var i=0; i<7; i++) {
+			var pile = app.gameboard.tableau.pile[i];
+			var build = app.gameboard.tableau.build[i];
+			
+			//create pileDiv
+			var colDiv = $('<div>').addClass('col');
+			$('#tableau').append(colDiv);
+			var pileDiv = $('<div>').attr('id','pile'+i).addClass('col').addClass('pile')
+				.attr('data-pile-id',i)
+				.on('drop', app.drop)
+				.on('dragover', app.dragover)
+				.on('dragenter', app.dragenter)
+				.on('dragleave', app.dragleave);
+			colDiv.append(pileDiv);
+			
+			var targetDiv = $('<div>').addClass('target');
+			pileDiv.append(targetDiv);
+			
+			for (var c=0; c<pile.numberOfCards; c++) {
+				var cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
+				if (c>0) cardDiv.addClass('fan-down');
+				pileDiv.append(cardDiv);
+			}
+			
+			var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+			
+			pileDiv.append(buildDiv);
+			
+			for (c in build.cards) {
+				var card = build.cards[c];
+				cardDiv = $('<div>').addClass('pokercard').addClass('front').attr('data-card-id',card.unicodeInt).html(card.unicodeHtmlEntity);
+				if (card.color=='RED') cardDiv.addClass('red');
+				if (c+pile.numberOfCards>0) cardDiv.addClass('fan-down');
+				
+				buildDiv.append(cardDiv);
+				
+				//sub-build to drag a card ontop of this, but not this card
+				var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+				buildDiv.append(subBuildDiv);
+				buildDiv = subBuildDiv;
+			}
+		};
+	}
+	
+	app.setupStockAndDiscardPiles = function() {
+		//create pileDiv
+		var pileDiv = $('<div>').attr('id','stock-pile').addClass('col').addClass('pile')
+			.on('click', app.discard);
+		$('#stockPile').append(pileDiv);
+		var targetDiv = $('<div>').addClass('target');
+		pileDiv.append(targetDiv);
+		var cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
+		pileDiv.append(cardDiv);
+		
+		var pileDiv = $('<div>').attr('id','discard-pile').addClass('col').addClass('pile')
+		$('#discardPile').append(pileDiv);
+	};
+	
+	//---------------
+	// Drag & Drop functions
+	//---------------
 	
 	app.dragenter = function(ev) {
 		if (app.canMoveData) {
@@ -212,89 +297,7 @@ var app = {
 		app.canMoveData = null;
 	};
 		
-	app.setupFoundation = function() {
-		$('#foundation').addClass('row');
-		for (var i=0; i<4; i++) {
-			//create pileDiv
-			var colDiv = $('<div>').addClass('col');
-			$('#foundation').append(colDiv);
-			var pileDiv = $('<div>').attr('id','foundationPile'+i)
-				.addClass('pile')
-				.attr('data-pile-id',i)
-				.on('drop', app.drop)
-				.on('dragover', app.dragover)
-				.on('dragenter', app.dragenter)
-				.on('dragleave', app.dragleave);
-			colDiv.append(pileDiv);
-			
-			var targetDiv = $('<div>').addClass('target');
-			pileDiv.append(targetDiv);
-		}
-	};
 	
-	app.setupTableau = function() {
-		$('#tableau').addClass('row');
-		for (var i=0; i<7; i++) {
-			var pile = app.gameboard.tableau.pile[i];
-			var build = app.gameboard.tableau.build[i];
-			
-			//create pileDiv
-			var colDiv = $('<div>').addClass('col');
-			$('#tableau').append(colDiv);
-			var pileDiv = $('<div>').attr('id','pile'+i).addClass('col').addClass('pile')
-				.attr('data-pile-id',i)
-				.on('drop', app.drop)
-				.on('dragover', app.dragover)
-				.on('dragenter', app.dragenter)
-				.on('dragleave', app.dragleave);
-			colDiv.append(pileDiv);
-			
-			var targetDiv = $('<div>').addClass('target');
-			pileDiv.append(targetDiv);
-			
-			for (var c=0; c<pile.numberOfCards; c++) {
-				var cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
-				if (c>0) cardDiv.addClass('overlap-down');
-				pileDiv.append(cardDiv);
-			}
-			
-			var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
-			
-			pileDiv.append(buildDiv);
-			
-			for (c in build.cards) {
-				var card = build.cards[c];
-				cardDiv = $('<div>').addClass('pokercard').addClass('front').attr('data-card-id',card.unicodeInt).html(card.unicodeHtmlEntity);
-				if (card.color=='RED') cardDiv.addClass('red');
-				if (c+pile.numberOfCards>0) cardDiv.addClass('overlap-down');
-				
-				buildDiv.append(cardDiv);
-				
-				//sub-build to drag a card ontop of this, but not this card
-				var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
-				buildDiv.append(subBuildDiv);
-				buildDiv = subBuildDiv;
-			}
-		};
-	}
-	
-	app.setupStockAndDiscardPiles = function() {
-		//create pileDiv
-		var pileDiv = $('<div>').attr('id','stock-pile').addClass('col').addClass('pile')
-			.on('click', app.discard);
-		$('#stockPile').append(pileDiv);
-		var targetDiv = $('<div>').addClass('target');
-		pileDiv.append(targetDiv);
-		var cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
-		pileDiv.append(cardDiv);
-		
-		var pileDiv = $('<div>').attr('id','discard-pile').addClass('col').addClass('pile')
-		$('#discardPile').append(pileDiv);
-//		var targetDiv = $('<div>').addClass('target');
-//		pileDiv.append(targetDiv);
-		
-		
-	};
 	
 	
 	//Service worker
