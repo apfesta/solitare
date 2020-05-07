@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,9 @@ import com.andrewfesta.doublesolitare.model.GameBoard.CanPush;
 
 @Controller
 public class MainController {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(MainController.class);
+	private static final Logger GAME_LOG = LoggerFactory.getLogger("GameLog");
 	
 	Map<Integer, GameBoard> games = new HashMap<>();
 	AtomicInteger gameIdSequence = new AtomicInteger(0);
@@ -35,7 +40,9 @@ public class MainController {
 	
 	@RequestMapping(value="/api/game", method = RequestMethod.POST)
 	public @ResponseBody GameBoard newGame() {
+		LOG.trace("POST /api/game");
 		GameBoard game = new GameBoard(gameIdSequence.incrementAndGet());
+		game.setShuffle(false);
 		game.setup();
 		games.put(game.getGameId(), game);
 		return game;
@@ -43,6 +50,7 @@ public class MainController {
 	
 	@RequestMapping(value="/api/game/{gameId}", method = RequestMethod.GET)
 	public @ResponseBody GameBoard getGame(@PathVariable Integer gameId) {
+		LOG.trace("GET /api/game/{}", gameId);
 		return games.get(gameId);
 	}
 	
@@ -50,6 +58,7 @@ public class MainController {
 	public @ResponseBody CanPush canMoveCard(
 			@PathVariable Integer gameId, 
 			@PathVariable Integer cardId) {
+		LOG.trace("GET /api/game/{}/canmove/{}", gameId, cardId);
 		
 		GameBoard game = getGame(gameId);
 		Card card = game.lookupCard(cardId);
@@ -67,17 +76,25 @@ public class MainController {
 		return pileIdToFlip;
 	}
 	
-	@RequestMapping(value="/api/game/{gameId}/move/{cardId}/toFoundation/{toFoundationId}", method = RequestMethod.GET)
+	@RequestMapping(value="/api/game/{gameId}/move/{cardId}/toFoundation/{toFoundationId}", 
+			method = RequestMethod.GET)
 	public @ResponseBody GameBoard moveToFoundation(@PathVariable Integer gameId, 
 			@PathVariable Integer cardId,
 			@PathVariable Integer toFoundationId) {
+		LOG.trace("GET /api/game/{}/move/{}/toFoundation/{}", gameId, cardId, toFoundationId);
+		
 		GameBoard game = getGame(gameId);
 		Card card = game.lookupCard(cardId);
 		Integer pileIdToFlip = getPileIdToFlip(game, card);
+		
+		GAME_LOG.debug("GameId:{} Move {} to foundation pile {}",
+				gameId, card.abbrev(), toFoundationId);
 		game.getFoundation().getPile().get(toFoundationId).push(card);
 		
 		if (pileIdToFlip!=null && !game.getTableau().getPile()[pileIdToFlip].isEmpty()) {
 			game.getTableau().flipTopPileCard(pileIdToFlip);
+			GAME_LOG.debug("GameId:{} Flip pile {} reveals",
+					gameId, pileIdToFlip, card.abbrev());
 		}
 		
 		game.getFoundation().prettyPrint();
@@ -94,17 +111,33 @@ public class MainController {
 	 * @param cardId
 	 * @param toBuildId
 	 */
-	@RequestMapping(value="/api/game/{gameId}/move/{cardId}/toTableau/{toBuildId}", method = RequestMethod.GET)
+	@RequestMapping(value="/api/game/{gameId}/move/{cardId}/toTableau/{toBuildId}", 
+			method = RequestMethod.GET)
 	public @ResponseBody GameBoard moveToTableau(@PathVariable Integer gameId, 
 			@PathVariable Integer cardId,
 			@PathVariable Integer toBuildId) {
+		LOG.trace("GET /api/game/{}/move/{}/toTableau/{}", gameId, cardId, toBuildId);
+		
 		GameBoard game = getGame(gameId);
 		Card card = game.lookupCard(cardId);
 		Integer pileIdToFlip = getPileIdToFlip(game, card);
-		game.getTableau().getBuild()[toBuildId].push(card);
 		
-		if (pileIdToFlip!=null) {
+		if (card.getCurrentBuild()!=null && !card.equals(card.getCurrentBuild().peek())) {
+			//Move Build of cards from pile to pile
+			GAME_LOG.debug("GameId:{} Move build ({}-{}) to tableau pile {}",
+					gameId, card.abbrev(), card.getCurrentBuild().peek().abbrev(), toBuildId);
+			game.getTableau().getBuild()[toBuildId].push(card.getCurrentBuild(), card);
+		} else {
+			//Move card from pile or discard pile to tableau pile
+			GAME_LOG.debug("GameId:{} Move {} to tableau pile {}",
+					gameId, card.abbrev(), toBuildId);
+			game.getTableau().getBuild()[toBuildId].push(card);
+		}
+		
+		if (pileIdToFlip!=null && !game.getTableau().getPile()[pileIdToFlip].isEmpty()) {
 			game.getTableau().flipTopPileCard(pileIdToFlip);
+			GAME_LOG.debug("GameId:{} Flip pile {} reveals {}",
+					gameId, pileIdToFlip, card.abbrev());
 		}
 				
 		game.getFoundation().prettyPrint();
@@ -116,32 +149,17 @@ public class MainController {
 	
 	@RequestMapping(value="/api/game/{gameId}/discard", method = RequestMethod.GET)
 	public @ResponseBody GameBoard discard(@PathVariable Integer gameId) {
+		LOG.trace("GET /api/game/{}/discard", gameId);
+		
 		GameBoard game = getGame(gameId);
+		
+		GAME_LOG.debug("GameId:{} discard",
+				gameId);
 		game.discard(3);
 		
 		game.getDiscardPile().print(3);
 		
 		return game;
 	}
-		
-	
-//	static class ObjectWrapper<T> {
-//		private final T value;
-//
-//		public ObjectWrapper(T value) {
-//			super();
-//			this.value = value;
-//		}
-//
-//		public T getValue() {
-//			return value;
-//		}
-//		
-//		static <E> ObjectWrapper<E> wrap(E value) {
-//			return new ObjectWrapper<E>(value);
-//		}
-//		
-//	}
-	
-	
+			
 }

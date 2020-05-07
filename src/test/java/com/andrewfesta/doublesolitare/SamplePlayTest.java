@@ -413,7 +413,7 @@ public class SamplePlayTest {
 		assertEquals(6, card.getValue());
 		canPush = game.canPush(card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);	
-		tableau.getBuild()[toBuildId].push(build);
+		tableau.getBuild()[toBuildId].push(build, card);
 		//MOVE #24B - Flip card
 		tableau.flipTopPileCard(fromBuildId);
 		

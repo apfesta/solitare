@@ -1,0 +1,8 @@
+logging:
+  level: 
+    root: WARN
+    org.springframework.web: INFO
+    com.andrewfesta.doublesolitare: DEBUG
+#    com.andrewfesta.doublesolitare.controller: TRACE
+    GameLog: DEBUG
+  file: logs/double-solitare.log

@@ -44,10 +44,13 @@ public class Tableau {
 		
 	public Card flipTopPileCard(int pileId) {
 		if (build[pileId].isEmpty()) {
-			Card c = pile[pileId].cards.pop();
-			build[pileId].cards.push(c);
-			c.setCurrentBuild(build[pileId]);
-			return c;
+			if (!pile[pileId].isEmpty()) {
+				Card c = pile[pileId].cards.pop();
+				build[pileId].cards.push(c);
+				c.setCurrentBuild(build[pileId]);
+				return c;
+			}
+			throw new RuntimeException("Cannot flip card because there's nothing to flip");
 		} else {
 			throw new RuntimeException("Cannot flip card because there's a build on top of this pile");
 		}

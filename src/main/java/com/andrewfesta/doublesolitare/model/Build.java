@@ -96,9 +96,17 @@ public class Build extends VisiblePile {
 		}
 	}
 	
-	public void push(Build b) {
+	public void push(Build b, Card bottomCard) {
+		boolean inBuild = false;
 		do {
+			//Find bottom card to start a sub-build
 			Card c = b.cards.peekLast();
+			if (!inBuild && !bottomCard.equals(c)) {
+				continue;
+			}
+			if (!inBuild) inBuild = true;
+			
+			//start pushing cards
 			if (canPush(c)) {
 				if (canMove(c)) {
 					b.cards.removeLast();
@@ -112,6 +120,5 @@ public class Build extends VisiblePile {
 			}
 		} while (!b.isEmpty());
 	}
-	
 	
 }
