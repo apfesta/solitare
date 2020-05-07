@@ -58,12 +58,14 @@ var app = {
 				var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
 				var pileDiv = cardDiv.parents('.pile');
 				var pileId = pileDiv.attr('data-pile-id');
+				var nextBuildDiv = cardDiv.next('.build');
 				
 				if ($("#foundationPile"+foundationId+" .pokercard").length > 0) {
 					$("#foundationPile"+foundationId+" .pokercard").replaceWith(cardDiv);
 				} else {
 					$("#foundationPile"+foundationId).append(cardDiv);
 				}
+				nextBuildDiv.remove();
 				cardDiv.removeClass('fan-down')
 				cardDiv.removeClass('fan-right');
 				app.gameboard = data;
@@ -88,7 +90,8 @@ var app = {
 				var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
 				var fromPileDiv = cardDiv.parents('.pile');
 				var fromPileId = fromPileDiv.attr('data-pile-id');
-				$("#pile"+buildId+" .build:last").append(cardDiv);
+				var nextBuildDiv = cardDiv.next('.build');
+				$("#pile"+buildId+" .build:last").append(cardDiv).append(nextBuildDiv);
 				cardDiv.removeClass('fan-right');
 				if (app.gameboard.tableau.build[buildId].numberOfCards+app.gameboard.tableau.pile[buildId].numberOfCards==0) 
 					cardDiv.removeClass('fan-down');
@@ -100,7 +103,9 @@ var app = {
 						app.flip(fromPileId);
 					}
 				} else {
-					$('#discardPile .build').append($('#discardPile .pokercard:last'));
+					//sub-build for consistency with other piles
+					var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+					$('#discardPile .build').append($('#discardPile .pokercard:last')).append(subBuildDiv);
 				}
 			}});
 	};
@@ -124,6 +129,10 @@ var app = {
 						var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
 						buildDiv.append(cardDiv);
 						$('#discard-pile').append(buildDiv);
+						
+						//sub-build for consistency with other piles
+						var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+						buildDiv.append(subBuildDiv);
 					} else {
 						$('#discard-pile').append(cardDiv);
 					}
@@ -139,11 +148,15 @@ var app = {
 		var cardDiv = $('#tableau #pile'+pileId+' .pokercard:last');
 		var build = app.gameboard.tableau.build[pileId];
 		var card = build.cards[build.cards.length-1];
-		$('#tableau #pile'+pileId+' .build:first').append(cardDiv
-					.removeClass('back')
-					.addClass('front')
-					.attr('data-card-id',card.unicodeInt)
-					.html(card.unicodeHtmlEntity));
+		var subBuildDiv = $('<div>').addClass('build').attr('draggable',true)
+			.on('dragstart', app.drag);
+		$('#tableau #pile'+pileId+' .build:first')
+					.append(cardDiv
+						.removeClass('back')
+						.addClass('front')
+						.attr('data-card-id',card.unicodeInt)
+						.html(card.unicodeHtmlEntity))
+					.append(subBuildDiv);
 		if (card.color=='RED') cardDiv.addClass('red');
 	}
 	
@@ -225,6 +238,9 @@ var app = {
 		
 		var pileDiv = $('<div>').attr('id','discard-pile').addClass('col').addClass('pile')
 		$('#discardPile').append(pileDiv);
+		
+		var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+		pileDiv.append(buildDiv);
 	};
 	
 	//---------------
