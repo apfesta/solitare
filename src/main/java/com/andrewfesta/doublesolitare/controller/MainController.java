@@ -29,15 +29,7 @@ public class MainController {
 	public String displayBoard() {
 		return "displayboard";
 	}
-	
-	//TODO - totalnonsense.com vectorized playing cards in svg
-	
-	//Move Card around tablau
-	
-	//Move card from stockpile
-	
-	//Move card to foundation
-	
+		
 	@RequestMapping(value="/api/game", method = RequestMethod.POST)
 	public @ResponseBody GameBoard newGame() {
 		LOG.trace("POST /api/game");

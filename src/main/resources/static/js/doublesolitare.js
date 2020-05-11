@@ -122,7 +122,12 @@ var app = {
 				$('#discard-pile').empty();
 				for (var c=0; c<3; c++) {
 					var card = app.gameboard.discardPile.cards[2-c];
-					cardDiv = $('<div>').addClass('pokercard').addClass('front').attr('data-card-id',card.unicodeInt).html(card.unicodeHtmlEntity);
+					var cardDiv = $('<div>')
+						.addClass('pokercard').addClass('front')
+						.attr('data-card-id',card.unicodeInt)
+						.append($('<img>')
+							.attr('src','/img/1'+card.unicodeHex+'.png')
+							.attr('title',card.unicodeHtmlEntity));
 					if (card.color=='RED') cardDiv.addClass('red');
 					cardDiv.addClass('fan-right');
 					if (c==2) {
@@ -155,7 +160,10 @@ var app = {
 						.removeClass('back')
 						.addClass('front')
 						.attr('data-card-id',card.unicodeInt)
-						.html(card.unicodeHtmlEntity))
+						.empty()
+						.append($('<img>')
+							.attr('src','/img/1'+card.unicodeHex+'.png')
+							.attr('title',card.unicodeHtmlEntity)))
 					.append(subBuildDiv);
 		if (card.color=='RED') cardDiv.addClass('red');
 	}
@@ -201,7 +209,10 @@ var app = {
 			pileDiv.append(targetDiv);
 			
 			for (var c=0; c<pile.numberOfCards; c++) {
-				var cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
+				var cardDiv = $('<div>')
+					.addClass('pokercard').addClass('back')
+					.append($('<img>')
+						.attr('src','/img/back1.png'));
 				if (c>0) cardDiv.addClass('fan-down');
 				pileDiv.append(cardDiv);
 			}
@@ -212,7 +223,12 @@ var app = {
 			
 			for (c in build.cards) {
 				var card = build.cards[c];
-				cardDiv = $('<div>').addClass('pokercard').addClass('front').attr('data-card-id',card.unicodeInt).html(card.unicodeHtmlEntity);
+				var cardDiv = $('<div>')
+					.addClass('pokercard').addClass('front')
+					.attr('data-card-id',card.unicodeInt)
+					.append($('<img>')
+						.attr('src','/img/1'+card.unicodeHex+'.png')
+						.attr('title',card.unicodeHtmlEntity));
 				if (card.color=='RED') cardDiv.addClass('red');
 				if (c+pile.numberOfCards>0) cardDiv.addClass('fan-down');
 				
@@ -228,15 +244,19 @@ var app = {
 	
 	app.setupStockAndDiscardPiles = function() {
 		//create pileDiv
-		var pileDiv = $('<div>').attr('id','stock-pile').addClass('col').addClass('pile')
+		var pileDiv = $('<div>').attr('id','stock-pile').addClass('pile')
 			.on('click', app.discard);
 		$('#stockPile').append(pileDiv);
 		var targetDiv = $('<div>').addClass('target');
 		pileDiv.append(targetDiv);
-		var cardDiv = $('<div>').addClass('pokercard').addClass('back').html("&#x1F0A0;");
+		
+		var cardDiv = $('<div>')
+			.addClass('pokercard').addClass('back')
+			.append($('<img>')
+				.attr('src','/img/back1.png'));
 		pileDiv.append(cardDiv);
 		
-		var pileDiv = $('<div>').attr('id','discard-pile').addClass('col').addClass('pile')
+		var pileDiv = $('<div>').attr('id','discard-pile').addClass('pile')
 		$('#discardPile').append(pileDiv);
 		
 		var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
@@ -295,7 +315,9 @@ var app = {
 	
 	app.drag = function(ev) {
 		//what info gets dragged
-		var cardDiv = $(ev.target.getElementsByClassName('pokercard')[0]);
+//		console.log(ev.target);
+//		console.log(ev.currentTarget);
+		var cardDiv = $(ev.currentTarget.getElementsByClassName('pokercard')[0]);
 				
 		app.canMove(cardDiv.attr('data-card-id'));
 		

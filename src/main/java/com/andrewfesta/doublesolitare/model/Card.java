@@ -13,6 +13,10 @@ public class Card {
 	final private Suit suit;
 	final private int value;
 	
+	private char unicodeChar;
+	private String unicodeHex;
+	private int unicodeInt;
+	
 	private Build currentBuild;
 	private Pile currentPile;
 	
@@ -20,17 +24,10 @@ public class Card {
 		super();
 		this.value = value;
 		this.suit = suit;
+		init();
 	}
 	
-	public Suit getSuit() {
-		return suit;
-	}
-
-	public int getValue() {
-		return value;
-	}
-
-	public int getUnicodeInt() {
+	private void init() {
 		int code = 0;
 		switch (suit) {
 		case SPADES:
@@ -48,11 +45,31 @@ public class Card {
 		}
 		//There is a 'Knight' card in Unicode between Jack and Queen.
 		if (value>JACK) code++;
-		return code;
+		this.unicodeInt = code;
+		
+		this.unicodeChar = (char)getUnicodeInt();
+		
+		this.unicodeHex = String.format("%04X", (int) getUnicodeChar());
+	}
+	
+	public Suit getSuit() {
+		return suit;
+	}
+
+	public int getValue() {
+		return value;
+	}
+
+	public int getUnicodeInt() {
+		return this.unicodeInt;
+	}
+	
+	public String getUnicodeHex() {
+		return this.unicodeHex;
 	}
 	
 	public char getUnicodeChar() {
-		return (char)getUnicodeInt();
+		return this.unicodeChar;
 	}
 	
 	public String getUnicodeHtmlEntity() {
