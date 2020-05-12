@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.andrewfesta.doublesolitare.model.Build;
 import com.andrewfesta.doublesolitare.model.Card;
 import com.andrewfesta.doublesolitare.model.GameBoard;
 import com.andrewfesta.doublesolitare.model.GameBoard.CanPush;
@@ -85,8 +86,22 @@ public class MainController {
 		
 		if (pileIdToFlip!=null && !game.getTableau().getPile()[pileIdToFlip].isEmpty()) {
 			game.getTableau().flipTopPileCard(pileIdToFlip);
-			GAME_LOG.debug("GameId:{} Flip pile {} reveals",
+			GAME_LOG.debug("GameId:{} Flip pile {} reveals {}",
 					gameId, pileIdToFlip, card.abbrev());
+		}
+		
+		boolean gameWon = true;
+		if (card.getValue() == Card.KING) {
+			//Check tableau and stock pile to see if the game has been won
+			for (Build b: game.getTableau().getBuild()) {
+				if (!b.isEmpty()) {
+					gameWon = false;
+				}
+			}
+			if (gameWon && game.getStockPile().isEmpty() && game.getDiscardPile().isEmpty()) {
+				game.setGameWon(true);
+				GAME_LOG.debug("GameId:{} has been won!", gameId);
+			}
 		}
 		
 		game.getFoundation().prettyPrint();

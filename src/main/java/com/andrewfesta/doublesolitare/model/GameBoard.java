@@ -12,6 +12,7 @@ public class GameBoard {
 	Pile stockPile;
 	VisiblePile discardPile = new VisiblePile();
 	Foundation foundation;
+	boolean gameWon = false;
 	
 	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
 	
@@ -22,6 +23,25 @@ public class GameBoard {
 		this.gameId = gameId;
 	}
 
+	/**
+	 * For testing only.  Allows us to set up a game board with a set card sequence
+	 * 
+	 * @param stackedDeck
+	 */
+	public void setup(Card[] stackedDeck) {
+		Deck d = Deck.getStackedDeck(stackedDeck);
+		for (Card c: d.cards) {
+			cards.put(c.getUnicodeInt(), c);
+		}
+		
+		tableau = new Tableau();
+		stockPile = tableau.setup(d);
+		foundation = new Foundation();
+		
+		foundation.prettyPrint();
+		tableau.prettyPrint();
+	}
+	
 	public void setup() {
 		Deck d = Deck.getInstance();
 		if (shuffle) {
@@ -129,6 +149,14 @@ public class GameBoard {
 		this.foundation = foundation;
 	}
 	
+	public boolean isGameWon() {
+		return gameWon;
+	}
+
+	public void setGameWon(boolean gameWon) {
+		this.gameWon = gameWon;
+	}
+
 	public static class CanPush {
 		private Boolean[] foundationPile = new Boolean[4];
 		private Boolean[] tableauBuild = new Boolean[7];

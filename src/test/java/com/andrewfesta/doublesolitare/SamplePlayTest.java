@@ -4,7 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.andrewfesta.doublesolitare.model.Build;
 import com.andrewfesta.doublesolitare.model.Card;
@@ -16,6 +21,156 @@ import com.andrewfesta.doublesolitare.model.Tableau;
 
 public class SamplePlayTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(SamplePlayTest.class);
+	
+	@Test
+	public void sampleWin() {
+		GameBoard game = new GameBoard(1);
+		game.setup(new Card[] {
+				//STOCK PILE (in reverse order)
+				new Card(Card.KING, Suit.HEARTS),
+				new Card(Card.KING, Suit.CLUBS),
+				new Card(Card.KING, Suit.DIAMONDS),
+				
+				new Card(Card.QUEEN, Suit.CLUBS),
+				new Card(Card.QUEEN, Suit.DIAMONDS),
+				new Card(Card.KING, Suit.SPADES),
+				
+				new Card(Card.JACK, Suit.DIAMONDS),
+				new Card(Card.QUEEN, Suit.SPADES),
+				new Card(Card.QUEEN, Suit.HEARTS),
+				
+				new Card(Card.JACK, Suit.SPADES),
+				new Card(Card.JACK, Suit.HEARTS),
+				new Card(Card.JACK, Suit.CLUBS),
+				
+				new Card(10, Suit.HEARTS),
+				new Card(10, Suit.CLUBS),
+				new Card(10, Suit.DIAMONDS),
+				
+				new Card(9, Suit.CLUBS),
+				new Card(9, Suit.DIAMONDS),
+				new Card(10, Suit.SPADES),
+				
+				new Card(8, Suit.DIAMONDS),
+				new Card(9, Suit.SPADES),
+				new Card(9, Suit.HEARTS),
+				
+				new Card(8, Suit.SPADES),
+				new Card(8, Suit.HEARTS),
+				new Card(8, Suit.CLUBS),
+				
+				//TABLEAU (in reverse order)
+				new Card(6, Suit.HEARTS),
+				
+				new Card(6, Suit.CLUBS),
+				new Card(4, Suit.DIAMONDS),
+				
+				new Card(6, Suit.DIAMONDS),
+				new Card(5, Suit.SPADES),
+				new Card(3, Suit.CLUBS),
+				
+				new Card(7, Suit.SPADES),
+				new Card(5, Suit.HEARTS),
+				new Card(3, Suit.DIAMONDS),
+				new Card(2, Suit.CLUBS),
+				
+				new Card(7, Suit.HEARTS),
+				new Card(5, Suit.CLUBS),
+				new Card(4, Suit.SPADES),
+				new Card(2, Suit.DIAMONDS),
+				new Card(Card.ACE, Suit.CLUBS),
+				
+				new Card(7, Suit.CLUBS),
+				new Card(5, Suit.DIAMONDS),
+				new Card(4, Suit.HEARTS),
+				new Card(3, Suit.SPADES),
+				new Card(2, Suit.SPADES),
+				new Card(Card.ACE, Suit.HEARTS),
+				
+				new Card(7, Suit.DIAMONDS),
+				new Card(6, Suit.SPADES),
+				new Card(4, Suit.CLUBS),
+				new Card(3, Suit.HEARTS),
+				new Card(2, Suit.HEARTS),
+				new Card(Card.ACE, Suit.DIAMONDS),
+				new Card(Card.ACE, Suit.SPADES),
+		});
+		
+		Map<Suit, Integer> foundationIds = new HashMap<>();
+		int f = 0;
+		for (int v=Card.ACE; v<=7; v++) {
+			for (Suit s: Suit.values()) {
+				if (!foundationIds.containsKey(s)) {
+					foundationIds.put(s, f++);
+				}
+				moveToFoundtion(game, v, s, foundationIds.get(s));
+			}
+		}
+		
+		int i=0;
+		for (int v=8; v<=Card.KING; v++) {
+			for (Suit s: Suit.values()) {
+				if (i==0) {
+					game.discard(3);
+					game.getDiscardPile().print(3);
+				}
+				moveToFoundtion(game, v, s, foundationIds.get(s));
+				i++;
+				if (i==3) {
+					i=0;
+				}
+			}
+		}
+				
+	}
+	
+	protected void assertCard(Card card, int value, Suit suit) {
+		assertEquals(suit,card.getSuit());
+		assertEquals(value, card.getValue());
+	}
+	
+	protected void moveToFoundtion(GameBoard game, 
+			int value, Suit suit, 
+			int toFoundationId) {
+		Card card = game.lookupCard(Card.unicodeInt(value, suit));
+		Integer pileIdToFlip = getPileIdToFlip(game, card);
+		
+		LOG.debug("Move {} to foundation pile {}",
+				card.abbrev(), toFoundationId);
+		game.getFoundation().getPile().get(toFoundationId).push(card);
+		
+		if (pileIdToFlip!=null && !game.getTableau().getPile()[pileIdToFlip].isEmpty()) {
+			game.getTableau().flipTopPileCard(pileIdToFlip);
+			LOG.debug("Flip pile {} reveals {}",
+					pileIdToFlip, card.abbrev());
+		}
+		
+		boolean gameWon = true;
+		if (card.getValue() == Card.KING) {
+			//Check tableau and stock pile to see if the game has been won
+			for (Build b: game.getTableau().getBuild()) {
+				if (!b.isEmpty()) {
+					gameWon = false;
+				}
+			}
+			if (gameWon && game.getStockPile().isEmpty() && game.getDiscardPile().isEmpty()) {
+				game.setGameWon(true);
+				LOG.debug("Game has been won!");
+			}
+		}
+	}
+	
+	protected Integer getPileIdToFlip(GameBoard game, Card card) {
+		Integer pileIdToFlip = null;
+		for (int i=0; i<game.getTableau().getPile().length; i++) {
+			if (card.getCurrentBuild()==game.getTableau().getBuild()[i]) {
+				pileIdToFlip = i;
+			}
+		}
+		return pileIdToFlip;
+	}
+	
 	@Test
 	public void samplePlay() {
 		

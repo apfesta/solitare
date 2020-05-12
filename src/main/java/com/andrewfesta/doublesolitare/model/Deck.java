@@ -22,6 +22,18 @@ public class Deck extends Pile {
 		return deck;
 	}
 	
+	public static Deck getStackedDeck(Card[] cards) {
+		if (cards.length!=52) {
+			throw new IllegalArgumentException("Not enough cards.  Expected 52.  Got "+cards.length);
+		}
+		Deck deck = new Deck();
+		for (Card card: cards) {
+			deck.cards.push(card);
+		
+		}
+		return deck;
+	}
+	
 	public void shuffle() {
 		ArrayList<Card> oldOrder = new ArrayList<>(cards);
 		ArrayDeque<Card> newOrder = new ArrayDeque<>();

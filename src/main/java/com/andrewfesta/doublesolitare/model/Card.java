@@ -27,7 +27,7 @@ public class Card {
 		init();
 	}
 	
-	private void init() {
+	public static int unicodeInt(int value, Suit suit) {
 		int code = 0;
 		switch (suit) {
 		case SPADES:
@@ -45,7 +45,11 @@ public class Card {
 		}
 		//There is a 'Knight' card in Unicode between Jack and Queen.
 		if (value>JACK) code++;
-		this.unicodeInt = code;
+		return code;
+	}
+	
+	private void init() {
+		this.unicodeInt = unicodeInt(value, suit);
 		
 		this.unicodeChar = (char)getUnicodeInt();
 		
