@@ -4,8 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class GameBoard {
+	
+	private static final Logger GAME_LOG = LoggerFactory.getLogger("GameLog");
 
 	final Integer gameId;
 	Tableau tableau;
@@ -88,6 +93,9 @@ public class GameBoard {
 	}
 	
 	public void discard(int maxNumberOfCards) {
+		GAME_LOG.debug("GameId:{} discard",
+				gameId);
+		
 		if (stockPile.isEmpty()) {
 			do {
 				Card c = discardPile.pop();
@@ -102,6 +110,76 @@ public class GameBoard {
 			Card c = stockPile.pop();
 			discardPile.push(c);
 			c.setCurrentPile(discardPile);
+		}
+	}
+	
+	protected Integer getPileIdToFlip(Card card) {
+		Integer pileIdToFlip = null;
+		for (int i=0; i<getTableau().getPile().length; i++) {
+			if (card.getCurrentBuild()==getTableau().getBuild()[i]) {
+				pileIdToFlip = i;
+			}
+		}
+		return pileIdToFlip;
+	}
+	
+	public void moveToFoundation(Integer cardId, Integer toFoundationId) {
+		
+		Card card = lookupCard(cardId);
+		Integer pileIdToFlip = getPileIdToFlip(card);
+		
+		GAME_LOG.debug("GameId:{} Move {} to foundation pile {}",
+				gameId, card.abbrev(), toFoundationId);
+		getFoundation().getPile().get(toFoundationId).push(card);
+		
+		if (pileIdToFlip!=null && !getTableau().getPile()[pileIdToFlip].isEmpty()) {
+			getTableau().flipTopPileCard(pileIdToFlip);
+			GAME_LOG.debug("GameId:{} Flip pile {} reveals {}",
+					gameId, pileIdToFlip, card.abbrev());
+		}
+		
+		boolean gameWon = true;
+		if (card.getValue() == Card.KING) {
+			//Check tableau and stock pile to see if the game has been won
+			for (Build b: getTableau().getBuild()) {
+				if (!b.isEmpty()) {
+					gameWon = false;
+				}
+			}
+			if (gameWon && getStockPile().isEmpty() && getDiscardPile().isEmpty()) {
+				setGameWon(true);
+				GAME_LOG.debug("GameId:{} has been won!", gameId);
+			}
+		}
+	}
+	
+	/**
+	 * Move card from discard pile or another tableau build.
+	 * 
+	 * @param cardId
+	 * @param toBuildId
+	 */
+	public void moveToTableau(Integer cardId, Integer toBuildId) {
+		
+		Card card = lookupCard(cardId);
+		Integer pileIdToFlip = getPileIdToFlip(card);
+		
+		if (card.getCurrentBuild()!=null && !card.equals(card.getCurrentBuild().peek())) {
+			//Move Build of cards from pile to pile
+			GAME_LOG.debug("GameId:{} Move build ({}-{}) to tableau pile {}",
+					gameId, card.abbrev(), card.getCurrentBuild().peek().abbrev(), toBuildId);
+			getTableau().getBuild()[toBuildId].push(card.getCurrentBuild(), card);
+		} else {
+			//Move card from pile or discard pile to tableau pile
+			GAME_LOG.debug("GameId:{} Move {} to tableau pile {}",
+					gameId, card.abbrev(), toBuildId);
+			getTableau().getBuild()[toBuildId].push(card);
+		}
+		
+		if (pileIdToFlip!=null && !getTableau().getPile()[pileIdToFlip].isEmpty()) {
+			getTableau().flipTopPileCard(pileIdToFlip);
+			GAME_LOG.debug("GameId:{} Flip pile {} reveals {}",
+					gameId, pileIdToFlip, card.abbrev());
 		}
 	}
 	

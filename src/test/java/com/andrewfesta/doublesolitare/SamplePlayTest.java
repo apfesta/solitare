@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.andrewfesta.doublesolitare.model.Build;
 import com.andrewfesta.doublesolitare.model.Card;
@@ -21,8 +19,6 @@ import com.andrewfesta.doublesolitare.model.Tableau;
 
 public class SamplePlayTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SamplePlayTest.class);
-	
 	@Test
 	public void sampleWin() {
 		GameBoard game = new GameBoard(1);
@@ -104,7 +100,7 @@ public class SamplePlayTest {
 				if (!foundationIds.containsKey(s)) {
 					foundationIds.put(s, f++);
 				}
-				moveToFoundtion(game, v, s, foundationIds.get(s));
+				game.moveToFoundation(cardId(v,s), foundationIds.get(s));
 			}
 		}
 		
@@ -115,7 +111,7 @@ public class SamplePlayTest {
 					game.discard(3);
 					game.getDiscardPile().print(3);
 				}
-				moveToFoundtion(game, v, s, foundationIds.get(s));
+				game.moveToFoundation(cardId(v,s), foundationIds.get(s));
 				i++;
 				if (i==3) {
 					i=0;
@@ -125,52 +121,10 @@ public class SamplePlayTest {
 				
 	}
 	
-	protected void assertCard(Card card, int value, Suit suit) {
-		assertEquals(suit,card.getSuit());
-		assertEquals(value, card.getValue());
+	private int cardId(int value, Suit suit) {
+		return Card.unicodeInt(value, suit);
 	}
-	
-	protected void moveToFoundtion(GameBoard game, 
-			int value, Suit suit, 
-			int toFoundationId) {
-		Card card = game.lookupCard(Card.unicodeInt(value, suit));
-		Integer pileIdToFlip = getPileIdToFlip(game, card);
 		
-		LOG.debug("Move {} to foundation pile {}",
-				card.abbrev(), toFoundationId);
-		game.getFoundation().getPile().get(toFoundationId).push(card);
-		
-		if (pileIdToFlip!=null && !game.getTableau().getPile()[pileIdToFlip].isEmpty()) {
-			game.getTableau().flipTopPileCard(pileIdToFlip);
-			LOG.debug("Flip pile {} reveals {}",
-					pileIdToFlip, card.abbrev());
-		}
-		
-		boolean gameWon = true;
-		if (card.getValue() == Card.KING) {
-			//Check tableau and stock pile to see if the game has been won
-			for (Build b: game.getTableau().getBuild()) {
-				if (!b.isEmpty()) {
-					gameWon = false;
-				}
-			}
-			if (gameWon && game.getStockPile().isEmpty() && game.getDiscardPile().isEmpty()) {
-				game.setGameWon(true);
-				LOG.debug("Game has been won!");
-			}
-		}
-	}
-	
-	protected Integer getPileIdToFlip(GameBoard game, Card card) {
-		Integer pileIdToFlip = null;
-		for (int i=0; i<game.getTableau().getPile().length; i++) {
-			if (card.getCurrentBuild()==game.getTableau().getBuild()[i]) {
-				pileIdToFlip = i;
-			}
-		}
-		return pileIdToFlip;
-	}
-	
 	@Test
 	public void samplePlay() {
 		
