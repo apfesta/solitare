@@ -1,3 +1,7 @@
+spring: 
+  
+  profiles.active: ssl
+
 logging:
   level: 
     root: WARN
@@ -6,3 +10,16 @@ logging:
 #    com.andrewfesta.doublesolitare.controller: TRACE
     GameLog: DEBUG
   file: logs/double-solitare.log
+  
+---
+spring:
+  profiles: ssl
+  
+server:
+  tomcat:
+    remote_ip_header: x-forwarded-for
+    protocol_header: x-forwarded-proto
+  ssl:
+    key-store: ${KEYSTORE_FILE}
+    key-store-type: ${KEYSTORE_TYPE}
+    key-password: ${KEYSTORE_PASS} 

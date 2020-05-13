@@ -1,0 +1,9 @@
+{
+	"name": "Double Solitare",
+	"short_name": "DoubleSolitare",
+	"icons" : [],
+    "start_url": "/",
+	"display": "standalone",
+	"theme_color": "#222222",
+	"background_color": "#FFFFFF"
+}
