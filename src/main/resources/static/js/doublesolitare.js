@@ -15,7 +15,7 @@ var app = {
 	};
 	
 	//---------------
-	// REST functions
+	// AJAX functions
 	//---------------
 	
 	app.newGame = function() {
@@ -314,9 +314,6 @@ var app = {
 	};
 	
 	app.drag = function(ev) {
-		//what info gets dragged
-//		console.log(ev.target);
-//		console.log(ev.currentTarget);
 		var cardDiv = $(ev.currentTarget.getElementsByClassName('pokercard')[0]);
 				
 		app.canMove(cardDiv.attr('data-card-id'));

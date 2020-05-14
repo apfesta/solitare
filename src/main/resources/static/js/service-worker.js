@@ -11,6 +11,7 @@ var filesToCache = [
 	'/webjars/jquery/3.2.1/jquery.min.js',
 	'/webjars/bootstrap/4.1.3/js/bootstrap.min.js',
 	'/js/doublesolitare.js',
+	'/js/DragDropTouch.js',
 	//IMAGES
 	'/img/1F0A1.png',
 	'/img/1F0A2.png',
