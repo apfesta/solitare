@@ -24,59 +24,31 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+      
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-    - name: Upload jar
-      uses: actions/upload-artifact@v2
-      with:
-        name: target
-        path: target/*.jar
-    - name: Upload Dockerfile
-      uses: actions/upload-artifact@v2
-      with:
-        name: Dockerfile
-        path: Dockerfile
-    - name: Build image
+      
+    - name: Build docker image
       run: |
         docker build . --file Dockerfile --tag $IMAGE_NAME
         docker tag $IMAGE_NAME $IMAGE_NAME:$(date +%s)
       
-  push:
-    # Ensure build job passes before pushing image.
-    needs: build
-    
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    
-    steps:
-      - name: Download jar
-        uses: actions/download-artifact@v1
-        with:
-          name: target
-      - name: Download Dockerfile
-        uses: actions/download-artifact@v1
-        with:
-          name: Dockerfile
+    - name: Log into registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
-      - name: Build docker image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+    - name: Push image
+      run: |
+        IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
 
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-    
-      - name: Push image
-        run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-          
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+        # Change all uppercase to lowercase
+        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+        # Strip git ref prefix from version
+        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        # Strip "v" prefix from tag name
+        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+        # Use Docker `latest` tag convention
+        [ "$VERSION" == "master" ] && VERSION=latest
+        echo IMAGE_ID=$IMAGE_ID
+        echo VERSION=$VERSION
+        docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+        docker push $IMAGE_ID:$VERSION
