@@ -37,7 +37,9 @@ jobs:
 #         name: Dockerfile
 #         path: Dockerfile
     - name: Build image
-      run: docker build . --file Dockerfile --tag $IMAGE_NAME:$(date +%s)
+      run: |
+        docker build . --file Dockerfile --tag $IMAGE_NAME
+        docker tag $IMAGE_NAME $IMAGE_NAME:$(date +%s)
       
   push:
     # Ensure build job passes before pushing image.
