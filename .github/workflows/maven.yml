@@ -29,8 +29,15 @@ jobs:
     - name: Upload jar
       uses: actions/upload-artifact@v2
       with:
-        name: jar
+        name: target
         path: target/*.jar
+#     - name: Upload Dockerfile
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: Dockerfile
+#         path: Dockerfile
+    - name: Build image
+      run: docker build . --file Dockerfile --tag $IMAGE_NAME:$(date +%s)
       
   push:
     # Ensure build job passes before pushing image.
@@ -43,10 +50,14 @@ jobs:
       - name: Download jar
         uses: actions/download-artifact@v1
         with:
-          name: jar
+          name: target
+#       - name: Download Dockerfile
+#         uses: actions/download-artifact@v1
+#         with:
+#           name: Dockerfile
 
-      - name: Build docker image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+#       - name: Build docker image
+#         run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
