@@ -1,9 +1,21 @@
 
 console.log('service worker hello world');
 
+function fixContextPath(ctxPath, uriArray) {
+	if (ctxPath=='/') {
+		/*relative urls cant start with a double slash*/
+		return uriArray;
+	} 
+	for (uriIdx in uriArray) {
+		uriArray[uriIdx] = ctxPath+uriArray[uriIdx];
+	}
+	return uriArray;
+}
+
 var cacheName = 'double-solitare-v1';
 var filesToCache = [
 	//HTML
+	'/',
 	//CSS
 	'/webjars/bootstrap/4.1.3/css/bootstrap.min.css',
 	'/css/doublesolitare.css',
@@ -70,16 +82,18 @@ var filesToCache = [
 
 self.addEventListener('install', function(e) {
 	console.log('[ServiceWorker] Install');
-	e.waitUntil(precache());
+	const ctxPath = new URL(location).searchParams.get('ctxPath');
+	e.waitUntil(precache(ctxPath));
 });
 
 
-function precache() {
+function precache(ctxPath) {
 	// Open the cache
 	caches.open(cacheName).then(function(cache){
 		
 		// Add all the default files to the cache
 		console.log('[ServiceWorker] Caching app shell');
+		fixContextPath(ctxPath, filesToCache);
 		return cache.addAll(filesToCache);
 	}).catch(function(error){console.log('[ServiceWorker] Error trying to pre-fetch files: ', error)})
 }
