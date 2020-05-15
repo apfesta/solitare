@@ -31,11 +31,11 @@ jobs:
       with:
         name: target
         path: target/*.jar
-#     - name: Upload Dockerfile
-#       uses: actions/upload-artifact@v2
-#       with:
-#         name: Dockerfile
-#         path: Dockerfile
+    - name: Upload Dockerfile
+      uses: actions/upload-artifact@v2
+      with:
+        name: Dockerfile
+        path: Dockerfile
     - name: Build image
       run: |
         docker build . --file Dockerfile --tag $IMAGE_NAME
@@ -53,13 +53,13 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: target
-#       - name: Download Dockerfile
-#         uses: actions/download-artifact@v1
-#         with:
-#           name: Dockerfile
+      - name: Download Dockerfile
+        uses: actions/download-artifact@v1
+        with:
+          name: Dockerfile
 
-#       - name: Build docker image
-#         run: docker build . --file Dockerfile --tag $IMAGE_NAME
+      - name: Build docker image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
