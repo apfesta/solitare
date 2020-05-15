@@ -31,6 +31,7 @@
 	</div>
 	
 	
+	
 	<!-- JQuery 
 	================================================== -->
 	<script th:src="@{|/webjars/jquery/jquery.min.js|}"></script>
@@ -41,6 +42,24 @@
 	
 	<!-- My JavaScript 
  	================================================== -->
+ 	<script th:fragment="common" th:inline="javascript">
+  	/*<![CDATA[*/
+  		/*
+  		 * This allows us to dynmically set the servlet context path
+  		 */
+  		var ctx = /*[[@{|/|}]]*/ "/";
+  		console.log('Context path: '+ctx);
+  		
+  		function getRelativePath(uri) {
+	  		if (ctx=='/') {
+	  			/*relative urls cant start with a double slash*/
+	  			return uri;
+	  		} 
+	  		return ctx+uri;
+  		}
+  		
+  	/*]]>*/
+  	</script>
 	<script type="text/javascript" th:src="@{|/js/doublesolitare.js|}" src="../js/doublesolitare.js"></script>
 	<script type="text/javascript" th:src="@{|/js/DragDropTouch.js|}" src="../js/DragDropTouch.js"></script>
 </body>

@@ -21,7 +21,7 @@ var app = {
 	app.newGame = function() {
 		$.ajax({
 			type: 'POST', 
-			url: '/api/game',
+			url: getRelativePath('/api/game'),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
@@ -37,7 +37,7 @@ var app = {
 	app.canMove = function(cardId) {
 		$.ajax({
 			type: 'GET', 
-			url: '/api/game/'+app.gameId+"/canmove/"+cardId,
+			url: getRelativePath('/api/game/'+app.gameId+"/canmove/"+cardId),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
@@ -50,7 +50,7 @@ var app = {
 		
 		$.ajax({
 			type: 'GET', 
-			url: '/api/game/'+app.gameId+"/move/"+cardId+"/toFoundation/"+foundationId,
+			url: getRelativePath('/api/game/'+app.gameId+"/move/"+cardId+"/toFoundation/"+foundationId),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
@@ -82,7 +82,7 @@ var app = {
 	app.moveToTableau = function(cardId, buildId) {
 		$.ajax({
 			type: 'GET', 
-			url: '/api/game/'+app.gameId+"/move/"+cardId+"/toTableau/"+buildId,
+			url: getRelativePath('/api/game/'+app.gameId+"/move/"+cardId+"/toTableau/"+buildId),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
@@ -113,7 +113,7 @@ var app = {
 	app.discard = function() {
 		$.ajax({
 			type: 'GET', 
-			url: '/api/game/'+app.gameId+"/discard",
+			url: getRelativePath('/api/game/'+app.gameId+"/discard"),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
@@ -126,7 +126,7 @@ var app = {
 						.addClass('pokercard').addClass('front')
 						.attr('data-card-id',card.unicodeInt)
 						.append($('<img>')
-							.attr('src','/img/1'+card.unicodeHex+'.png')
+							.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
 							.attr('title',card.unicodeHtmlEntity));
 					if (card.color=='RED') cardDiv.addClass('red');
 					cardDiv.addClass('fan-right');
@@ -162,7 +162,7 @@ var app = {
 						.attr('data-card-id',card.unicodeInt)
 						.empty()
 						.append($('<img>')
-							.attr('src','/img/1'+card.unicodeHex+'.png')
+							.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
 							.attr('title',card.unicodeHtmlEntity)))
 					.append(subBuildDiv);
 		if (card.color=='RED') cardDiv.addClass('red');
@@ -212,7 +212,7 @@ var app = {
 				var cardDiv = $('<div>')
 					.addClass('pokercard').addClass('back')
 					.append($('<img>')
-						.attr('src','/img/back1.png'));
+						.attr('src',getRelativePath('/img/back1.png')));
 				if (c>0) cardDiv.addClass('fan-down');
 				pileDiv.append(cardDiv);
 			}
@@ -227,7 +227,7 @@ var app = {
 					.addClass('pokercard').addClass('front')
 					.attr('data-card-id',card.unicodeInt)
 					.append($('<img>')
-						.attr('src','/img/1'+card.unicodeHex+'.png')
+						.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
 						.attr('title',card.unicodeHtmlEntity));
 				if (card.color=='RED') cardDiv.addClass('red');
 				if (c+pile.numberOfCards>0) cardDiv.addClass('fan-down');
@@ -253,7 +253,7 @@ var app = {
 		var cardDiv = $('<div>')
 			.addClass('pokercard').addClass('back')
 			.append($('<img>')
-				.attr('src','/img/back1.png'));
+				.attr('src',getRelativePath('/img/back1.png')));
 		pileDiv.append(cardDiv);
 		
 		var pileDiv = $('<div>').attr('id','discard-pile').addClass('pile')
