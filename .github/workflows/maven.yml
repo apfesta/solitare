@@ -52,3 +52,11 @@ jobs:
         echo VERSION=$VERSION
         docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
         docker push $IMAGE_ID:$VERSION
+        
+    - name: Publish Image
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: $IMAGE_ID
+        tag: $VERSION
+        username: ${{ secrets.DOCKER_USER_NAME }}
+        password: ${{ secrets.DOCKER_HUB_TOKEN }}
