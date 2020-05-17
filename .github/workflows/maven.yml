@@ -56,6 +56,6 @@ jobs:
     - name: Publish Image
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
-        name: $IMAGE_ID
+        name: "$IMAGE_ID"
         username: ${{ secrets.DOCKER_USER_NAME }}
         password: ${{ secrets.DOCKER_HUB_TOKEN }}
