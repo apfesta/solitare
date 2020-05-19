@@ -14,7 +14,7 @@ LABEL org.label-schema.version="@project.version@"
 
 # Copy the script and Spring Boot "uberjar" that is built by Maven into the Docker image
 ADD start.sh .
-ADD @project.build.finalName@.jar app.jar
+ADD @project.build.finalName@.jar .
 
 # Install prereq's
 RUN chmod +x start.sh
