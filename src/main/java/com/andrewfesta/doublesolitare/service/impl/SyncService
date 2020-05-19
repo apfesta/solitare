@@ -1,0 +1,16 @@
+package com.andrewfesta.doublesolitare.service.impl
+
+public class SyncService {
+  //private SimpMessageSendingOperations simpMessageSending;
+  
+  //@Autowired
+  //public void setSimpMessageSending(SimpMessageSendingOperations simpMessageSending) {
+  //  this.simpMessageSending = simpMessageSending;
+  //}
+  
+  //public void renameMe() {
+  //  //Pay load is bean (static inner class) containing any info you want
+  //  simpMessageSending.convertAndSend("/topic/game/"+gameId+"/activity", payload);
+  //}
+  
+}
