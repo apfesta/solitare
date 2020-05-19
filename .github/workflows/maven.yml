@@ -30,8 +30,9 @@ jobs:
       
     - name: Build docker image
       run: |
-        docker build . --file Dockerfile --tag $IMAGE_NAME
-        docker tag $IMAGE_NAME $IMAGE_NAME:$(date +%s)
+        mvn docker:build
+        #docker build . --file Dockerfile --tag $IMAGE_NAME
+        #docker tag $IMAGE_NAME $IMAGE_NAME:$(date +%s)
       
     - name: Log into registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
