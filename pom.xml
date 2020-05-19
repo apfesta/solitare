@@ -117,7 +117,7 @@
 							<resources>
 								<directory>${docker.src}</directory>
 								<filtering>true</filtering>
-							<resources>
+							</resources>
 						</configuration>
 					</execution>
 				</executions>
