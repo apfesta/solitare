@@ -117,8 +117,10 @@
 							<outputDirectory>${project.build.directory}/docker-ready</outputDirectory>
 							<escapeString>\</escapeString>
 							<resources>
-								<directory>${docker.src}</directory>
-								<filtering>true</filtering>
+								<resource>
+									<directory>${docker.src}</directory>
+									<filtering>true</filtering>
+								</resource>
 							</resources>
 						</configuration>
 					</execution>
