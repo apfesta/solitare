@@ -91,7 +91,10 @@
 					<useConfigFile>true</useConfigFile>
 					<imageName>${docker.repository.name}/${docker.image.name}</imageName>
 					<forceTags>true</forceTags>
-					<imageTags><imageTag>${project.version}</imageTag></imageTags>
+					<imageTags>
+						<imageTag>${project.version}</imageTag>
+						<imageTag>latest</imageTag>
+					</imageTags>
 					<dockerDirectory>${project.build.directory}/docker-ready</dockerDirectory>
 					<resources>
 						<resource>
