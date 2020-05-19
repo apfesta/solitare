@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.6.RELEASE</version>
+		<version>2.1.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.andrewfesta</groupId>
@@ -16,11 +16,15 @@
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		
 		<version.webjars-locator>0.30</version.webjars-locator>
 		<version.bootstrap>4.1.3</version.bootstrap>
 		<version.jquery>3.2.1</version.jquery>
+		
+		<docker.repository.name>apfesta</docker.repository.name>
+		<docker.image.name>${project.artifactId}</docker.image.name>
+		<docker.src>src/main/docker</docker.src>
 	</properties>
 
 	<dependencies>
@@ -69,10 +73,52 @@
 
 	<build>
 		<plugins>
+			<!-- Spring Boot Plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			
+			<!-- Docker Plugin -->
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<configuration>
+					<useConfigFile>true</useConfigFile>
+					<imageName>${docker.repository.name}/${docker.image.name}</imageName>
+					<forceTags>true</forceTags>
+					<imageTags><imageTag>${project.version}</imageTag></imageTags>
+					<dockerDirectory>${project.build.directory}/docker-ready</dockerDirectory>
+					<resources>
+						<resource>
+							<targetPath>/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+					</resources>
+				</configuration>
+			</plugin>
+			
+			<!-- Resource filtering for docker directory -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>prepare-dockerfile</id>
+						<phase>validate</phase>
+						<goals><goal>copy-resources</goal></goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/docker-ready</outputDirectory>
+							<escapeString>\</escapeString>
+							<resources>
+								<directory>${docker.src}</directory>
+								<filtering>true</filtering>
+							<resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin?
 		</plugins>
 	</build>
 
