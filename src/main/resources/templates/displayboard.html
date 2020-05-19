@@ -37,8 +37,13 @@
 	<script th:src="@{|/webjars/jquery/jquery.min.js|}"></script>
 	
 	<!-- Bootstrap core JavaScript
-    ================================================== -->
-    <script th:src="@{|/webjars/bootstrap/js/bootstrap.min.js|}"></script>
+    	================================================== -->
+   	<script th:src="@{|/webjars/bootstrap/js/bootstrap.min.js|}"></script>
+	
+	<!-- Websocket JavaScript
+    	================================================== -->
+   	<script th:src="@{|/webjars/sockjs-client/sockjs.min.js|}"></script>
+	<script th:src="@{|/webjars/stomp-websocket/stomp.min.js|}"></script>
 	
 	<!-- My JavaScript 
  	================================================== -->
@@ -48,6 +53,7 @@
   		 * This allows us to dynmically set the servlet context path
   		 */
   		var ctx = /*[[@{|/|}]]*/ "/";
+		var stompUrl = /*[[@{|/stomp|}]]*/ '/stomp';
   		console.log('Context path: '+ctx);
   		
   		function getRelativePath(uri) {
