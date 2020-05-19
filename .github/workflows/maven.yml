@@ -36,7 +36,7 @@ jobs:
           
     - name: Build Docker image with Maven
       run: |
-        mvn docker:build
+        mvn docker:build -DpushImageTag
         #docker build . --file Dockerfile --tag $IMAGE_NAME
         #docker tag $IMAGE_NAME $IMAGE_NAME:$(date +%s)
     
@@ -57,9 +57,9 @@ jobs:
 #         docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
 #         docker push $IMAGE_ID:$VERSION
         
-    - name: Publish Image
-      uses: elgohr/Publish-Docker-Github-Action@master
-      with:
-        name: apfesta/double-solitare
-        username: ${{ secrets.DOCKER_USER_NAME }}
-        password: ${{ secrets.DOCKER_HUB_TOKEN }}
+#     - name: Publish Image
+#       uses: elgohr/Publish-Docker-Github-Action@master
+#       with:
+#         name: apfesta/double-solitare
+#         username: ${{ secrets.DOCKER_USER_NAME }}
+#         password: ${{ secrets.DOCKER_HUB_TOKEN }}
