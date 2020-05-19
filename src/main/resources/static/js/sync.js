@@ -1,3 +1,4 @@
+//Call connect() when you've got a game Id and are ready to listen
 function connect() {
   if (!connectStarted) {
     connectStarted = true;
@@ -15,4 +16,10 @@ function disconnect() {
     stompClient.disconnect();
   }
   console.log('Disconnected');
+}
+
+function setConnected(connected) {
+  if (connected) {
+    //stomp.subscribe('/topic/..', function(result){ // on payload });
+  }
 }
