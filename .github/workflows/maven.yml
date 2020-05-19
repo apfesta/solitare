@@ -33,7 +33,7 @@ jobs:
 
     - name: Build docker image
       run: |
-        mvn docker:build -DpushImageTag
+        mvn docker:build
         #docker build . --file Dockerfile --tag $IMAGE_NAME
         #docker tag $IMAGE_NAME $IMAGE_NAME:$(date +%s)
     
