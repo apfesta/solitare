@@ -21,6 +21,8 @@
 		<version.webjars-locator>0.30</version.webjars-locator>
 		<version.bootstrap>4.1.3</version.bootstrap>
 		<version.jquery>3.2.1</version.jquery>
+		<version.sockjs-client>1.1.2</version.sockjs-client>
+		<version.stomp-websocket>2.3.3-1</version.stomp-websocket>
 		
 		<docker.repository.name>apfesta</docker.repository.name>
 		<docker.image.name>${project.artifactId}</docker.image.name>
@@ -40,6 +42,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
 		
 		<!-- WebJars -->
 		<dependency>
@@ -56,6 +62,16 @@
 		    <groupId>org.webjars</groupId>
 		    <artifactId>jquery</artifactId>
 		    <version>${version.jquery}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.webjars</groupId>
+		    <artifactId>sockjs-client</artifactId>
+		    <version>${version.sockjs-client}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.webjars</groupId>
+		    <artifactId>stomp-websocket</artifactId>
+		    <version>${version.stomp-websocket}</version>
 		</dependency>
 
 		<!-- Dev tools -->
