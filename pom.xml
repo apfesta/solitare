@@ -25,6 +25,9 @@
 		<docker.repository.name>apfesta</docker.repository.name>
 		<docker.image.name>${project.artifactId}</docker.image.name>
 		<docker.src>src/main/docker</docker.src>
+		
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 	</properties>
 
 	<dependencies>
