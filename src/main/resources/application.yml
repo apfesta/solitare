@@ -22,5 +22,5 @@ server:
   ssl:
     key-store: ${KEYSTORE_FILE}
     key-store-type: ${KEYSTORE_TYPE}
-    key-password: ${KEYSTORE_PASS} 
-    key-alias: ${KEYSTORE_ALIAS}
+    key-store-password: ${KEYSTORE_PASS} 
+#    key-alias: ${KEYSTORE_ALIAS}
