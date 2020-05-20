@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Set Default Active Profiles
-if [[ -z "$SPRING_OPTS" ]]; then
+if [ -z "$SPRING_OPTS" ]; then
 	export SPRING_OPTS='--spring.profiles.active=ssl'
 fi
 
