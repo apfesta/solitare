@@ -42,3 +42,18 @@ spec:
     targetPort: 8080
   selector:
     app: solitare
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: solitare-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: solitare.andrewfesta.com
+    http:
+      paths:
+      - backend:
+          serviceName: solitare-svc
+          servicePort: 80
