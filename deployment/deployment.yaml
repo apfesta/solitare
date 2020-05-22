@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: solitare
+  name: solitare-deploy
+  namespace: andrewfesta
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: solitare
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: solitare
+    spec:
+      containers:
+      - image: apfesta/double-solitare:latest
+        name: solitare
+        resources: {}
+        env:
+        - name: SPRING_OPTS
+          value: "--spring.profiles.active=ssl --server.port=8443"
+        - name: KEYSTORE_FILE
+          value: "/etc/cert/keystore.p12"
+        - name: KEYSTORE_TYPE
+          value: "PKCS12"
+        - name: KEYSTORE_PASS
+          valueFrom:
+            secretKeyRef:
+              name: ssl-keystore-p12
+              key: keystore.p12.pass
+        volumeMounts:
+        - name: keystore
+          mountPath: "/etc/cert"
+          readOnly: true
+      volumes:
+      - name: keystore
+        secret:
+          secretName: ssl-keystore-p12
+      imagePullSecrets:
+      - name: dockerhub
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: solitare-svc
+  namespace: andrewfesta
+  labels:
+    app: solitare
+  annotations:
+	service.beta.kubernetes.io/do-loadbalancer-protocol: "https"
+    service.beta.kubernetes.io/do-loadbalancer-hostname: "solitare.andrewfesta.com"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 443
+    targetPort: 8443
+    protocol: TCP
+  selector:
+    app: solitare
