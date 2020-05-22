@@ -55,6 +55,7 @@ metadata:
   annotations:
     service.beta.kubernetes.io/do-loadbalancer-protocol: "https"
     service.beta.kubernetes.io/do-loadbalancer-hostname: "solitare.andrewfesta.com"
+    service.beta.kubernetes.io/do-loadbalancer-tls-passthrough: "true"
 spec:
   type: LoadBalancer
   ports:
