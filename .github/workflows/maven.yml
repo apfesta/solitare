@@ -47,3 +47,9 @@ jobs:
     
     - name: Save DigitalOcean kubeconfig
       run: doctl kubernetes cluster kubeconfig save k8s-1-17-5-do-0-nyc1-1590032691719
+    
+    - name: Deploy to DigitalOcean Kubernetes
+      run: kubectl apply -f $GITHUB_WORKSPACE/deployment/deployment.yaml
+
+    - name: Verify deployment
+      run: kubectl rollout status deployment/solitare-deploy
