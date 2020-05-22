@@ -1,11 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
-  labels:
-    app: solitare
   name: solitare-deploy
   namespace: andrewfesta
+  labels:
+    app: solitare
 spec:
   replicas: 1
   selector:
@@ -14,13 +13,14 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: solitare
     spec:
       containers:
       - image: apfesta/double-solitare:latest
         name: solitare
+        ports:
+        - containerPort: 8443
         resources: {}
         env:
         - name: SPRING_OPTS
