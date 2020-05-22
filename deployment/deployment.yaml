@@ -20,28 +20,11 @@ spec:
       - image: apfesta/double-solitare:latest
         name: solitare
         ports:
-        - containerPort: 8443
+        - containerPort: 8080
         resources: {}
         env:
         - name: SPRING_OPTS
-          value: "--spring.profiles.active=ssl --server.port=8443"
-        - name: KEYSTORE_FILE
-          value: "/etc/cert/keystore.p12"
-        - name: KEYSTORE_TYPE
-          value: "PKCS12"
-        - name: KEYSTORE_PASS
-          valueFrom:
-            secretKeyRef:
-              name: ssl-keystore-p12
-              key: keystore.p12.pass
-        volumeMounts:
-        - name: keystore
-          mountPath: "/etc/cert"
-          readOnly: true
-      volumes:
-      - name: keystore
-        secret:
-          secretName: ssl-keystore-p12
+          value: "--spring.profiles.active=none --server.port=8080"
       imagePullSecrets:
       - name: dockerhub
 ---
@@ -52,15 +35,10 @@ metadata:
   namespace: andrewfesta
   labels:
     app: solitare
-  annotations:
-    service.beta.kubernetes.io/do-loadbalancer-protocol: "https"
-    service.beta.kubernetes.io/do-loadbalancer-hostname: "solitare.andrewfesta.com"
-    service.beta.kubernetes.io/do-loadbalancer-tls-passthrough: "true"
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
-  - port: 443
-    targetPort: 8443
-    protocol: TCP
+  - port: 80
+    targetPort: 8080
   selector:
     app: solitare
