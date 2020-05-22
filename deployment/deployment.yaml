@@ -53,7 +53,7 @@ metadata:
   labels:
     app: solitare
   annotations:
-	service.beta.kubernetes.io/do-loadbalancer-protocol: "https"
+    service.beta.kubernetes.io/do-loadbalancer-protocol: "https"
     service.beta.kubernetes.io/do-loadbalancer-hostname: "solitare.andrewfesta.com"
 spec:
   type: LoadBalancer
