@@ -47,6 +47,7 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: solitare-ingress
+  namespace: andrewfesta
   annotations:
     kubernetes.io/ingress.class: nginx
 spec:
