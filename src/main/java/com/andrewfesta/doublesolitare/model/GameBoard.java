@@ -1,10 +1,13 @@
 package com.andrewfesta.doublesolitare.model;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 public class GameBoard {
@@ -121,6 +124,11 @@ public class GameBoard {
 		return gameId;
 	}
 
+	@JsonIgnore
+	public Collection<User> getUsers() {
+		return userBoards.keySet();
+	}
+	
 	public Tableau getTableau(User user) {
 		return userBoards.get(user).tableau;
 	}

@@ -1,4 +1,38 @@
 
+var menu = {
+		games: []
+};
+
+
+(function() {
+	'user strict';
+	
+	menu.setup = function() {
+		menu.getGames();
+	}
+	
+	//---------------
+	// AJAX functions
+	//---------------
+	
+	menu.getGames = function() {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game'),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.debug(data);
+				menu.games = data;
+				//TODO display game selection
+			}});
+	};
+
+})();
+
+
+
+
 var app = {
 		gameboard: {},
 		gameId: null,
@@ -352,4 +386,4 @@ var app = {
 	
 })();
 
-app.setup();
+menu.setup();

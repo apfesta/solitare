@@ -1,7 +1,11 @@
 package com.andrewfesta.doublesolitare.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -44,6 +48,15 @@ public class MainController {
 		game.setup(user);
 		games.put(game.getGameId(), game);
 		return game;
+	}
+	
+	@RequestMapping(value="/api/game", method = RequestMethod.GET)
+	public @ResponseBody List<Game> getGames() {
+		List<Game> ret = new ArrayList<>();
+		for (Entry<Integer, GameBoard> entry: games.entrySet()) {
+			ret.add(new Game(entry.getKey(), entry.getValue().getUsers()));
+		}
+		return ret;
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}", method = RequestMethod.GET)
@@ -123,6 +136,33 @@ public class MainController {
 		game.getDiscardPile(user).print(3);
 		
 		return game;
+	}
+	
+	public static class Game {
+		Integer gameId;
+		Collection<User> users;
+
+		public Game(Integer gameId, Collection<User> users) {
+			super();
+			this.gameId = gameId;
+			this.users = users;
+		}
+
+		public Integer getGameId() {
+			return gameId;
+		}
+
+		public void setGameId(Integer gameId) {
+			this.gameId = gameId;
+		}
+
+		public Collection<User> getUsers() {
+			return users;
+		}
+
+		public void setUsers(List<User> users) {
+			this.users = users;
+		}
 	}
 			
 }
