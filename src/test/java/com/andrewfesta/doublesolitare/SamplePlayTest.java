@@ -126,6 +126,58 @@ public class SamplePlayTest {
 	private int cardId(int value, Suit suit) {
 		return Card.unicodeInt(value, suit);
 	}
+	
+	@Test
+	public void sampleMultiplayer() {
+		GameBoard game = new GameBoard(1);
+		game.setShuffle(false);
+		
+		User user1 = new User();
+		game.setup(user1);
+		
+		User user2 = new User();
+		game.join(user2);
+				
+		Foundation foundation = game.getFoundation();
+		
+		int fromBuildId;
+		int toFoundationId;
+		
+				
+		//MOVE #1 - Move ACE of SPADES
+		fromBuildId = 0;
+		toFoundationId = 0;
+		Build build = game.getTableau(user1).getBuild()[fromBuildId];
+		Card card = build.peek();
+		assertEquals(Suit.SPADES,card.getSuit());
+		assertEquals(Card.ACE, card.getValue());
+		CanPush canPush = game.canPush(user1, card);
+		assertTrue(canPush.getFoundationPile()[toFoundationId]);
+		assertFalse(canPush.getTableauBuild()[1]);
+		foundation.getPile().get(toFoundationId).push(card);
+		System.out.println("User1:");
+		foundation.prettyPrint();
+		game.getTableau(user1).prettyPrint();
+		
+		//MOVE #2 - Move ACE of HEARTS
+		fromBuildId = 2;
+		toFoundationId = 1;
+		build = game.getTableau(user2).getBuild()[fromBuildId];
+		card = build.peek();
+		assertEquals(Suit.HEARTS,card.getSuit());
+		assertEquals(Card.ACE, card.getValue());
+		canPush = game.canPush(user2, card);
+		assertTrue(canPush.getFoundationPile()[toFoundationId]);
+		assertFalse(canPush.getTableauBuild()[1]);
+		assertFalse(canPush.getTableauBuild()[0]);
+		foundation.getPile().get(toFoundationId).push(card);
+		//MOVE #2B - Flip card
+		game.getTableau(user2).flipTopPileCard(fromBuildId);
+		
+		System.out.println("User2:");
+		foundation.prettyPrint();
+		game.getTableau(user2).prettyPrint();
+	}
 		
 	@Test
 	public void samplePlay() {
