@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.andrewfesta.doublesolitare.model.Card;
 import com.andrewfesta.doublesolitare.model.GameBoard;
-import com.andrewfesta.doublesolitare.model.GameBoard.CanPush;
+import com.andrewfesta.doublesolitare.model.User;
+import com.andrewfesta.doublesolitare.model.UserBoard.CanPush;
 import com.andrewfesta.doublesolitare.service.impl.SyncService;
 
 @Controller
@@ -35,11 +37,11 @@ public class MainController {
 	}
 		
 	@RequestMapping(value="/api/game", method = RequestMethod.POST)
-	public @ResponseBody GameBoard newGame() {
+	public @ResponseBody GameBoard newGame(@AuthenticationPrincipal User user) {
 		LOG.trace("POST /api/game");
 		GameBoard game = new GameBoard(gameIdSequence.incrementAndGet());
 		game.setShuffle(false);
-		game.setup();
+		game.setup(user);
 		games.put(game.getGameId(), game);
 		return game;
 	}
@@ -53,29 +55,31 @@ public class MainController {
 	@RequestMapping(value="/api/game/{gameId}/canmove/{cardId}", method = RequestMethod.GET)
 	public @ResponseBody CanPush canMoveCard(
 			@PathVariable Integer gameId, 
-			@PathVariable Integer cardId) {
+			@PathVariable Integer cardId,
+			@AuthenticationPrincipal User user) {
 		LOG.trace("GET /api/game/{}/canmove/{}", gameId, cardId);
 		
 		GameBoard game = getGame(gameId);
-		Card card = game.lookupCard(cardId);
+		Card card = game.lookupCard(user, cardId);
 		
-		return game.canPush(card);
+		return game.canPush(user, card);
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/move/{cardId}/toFoundation/{toFoundationId}", 
 			method = RequestMethod.GET)
 	public @ResponseBody GameBoard moveToFoundation(@PathVariable Integer gameId, 
 			@PathVariable Integer cardId,
-			@PathVariable Integer toFoundationId) {
+			@PathVariable Integer toFoundationId, 
+			@AuthenticationPrincipal User user) {
 		LOG.trace("GET /api/game/{}/move/{}/toFoundation/{}", gameId, cardId, toFoundationId);
 		
 		GameBoard game = getGame(gameId);
 		
-		game.moveToFoundation(cardId, toFoundationId);
+		game.moveToFoundation(user, cardId, toFoundationId);
 		
 		game.getFoundation().prettyPrint();
-		game.getTableau().prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getTableau(user).prettyPrint();
+		game.getDiscardPile(user).print(3);
 		
 		return game;
 	}
@@ -91,29 +95,32 @@ public class MainController {
 			method = RequestMethod.GET)
 	public @ResponseBody GameBoard moveToTableau(@PathVariable Integer gameId, 
 			@PathVariable Integer cardId,
-			@PathVariable Integer toBuildId) {
+			@PathVariable Integer toBuildId, 
+			@AuthenticationPrincipal User user) {
 		LOG.trace("GET /api/game/{}/move/{}/toTableau/{}", gameId, cardId, toBuildId);
 		
 		GameBoard game = getGame(gameId);
 		
-		game.moveToTableau(cardId, toBuildId);
+		game.moveToTableau(user, cardId, toBuildId);
 						
 		game.getFoundation().prettyPrint();
-		game.getTableau().prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getTableau(user).prettyPrint();
+		game.getDiscardPile(user).print(3);
 		
 		return game;
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/discard", method = RequestMethod.GET)
-	public @ResponseBody GameBoard discard(@PathVariable Integer gameId) {
+	public @ResponseBody GameBoard discard(
+			@PathVariable Integer gameId, 
+			@AuthenticationPrincipal User user) {
 		LOG.trace("GET /api/game/{}/discard", gameId);
 		
 		GameBoard game = getGame(gameId);
 		
-		game.discard(3);
+		game.discard(user);
 		
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 		
 		return game;
 	}

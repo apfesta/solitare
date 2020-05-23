@@ -13,6 +13,9 @@ public class Foundation {
 	public Foundation() {
 		super();
 		pile = new ArrayList<>(4);
+	}
+	
+	public void addPlayer() {
 		for (int i=0; i<4; i++) {
 			pile.add(new Build(Sequence.RANK));
 		}

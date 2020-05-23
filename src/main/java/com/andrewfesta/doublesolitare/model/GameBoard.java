@@ -1,7 +1,6 @@
 package com.andrewfesta.doublesolitare.model;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -13,15 +12,13 @@ public class GameBoard {
 	private static final Logger GAME_LOG = LoggerFactory.getLogger("GameLog");
 
 	final Integer gameId;
-	Tableau tableau;
-	Pile stockPile;
-	VisiblePile discardPile = new VisiblePile();
 	Foundation foundation;
-	boolean gameWon = false;
+	boolean gameOver = false;
 	
 	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
+	int maxNumberOfCards = 3; //cards to discard
 	
-	private Map<Integer, Card> cards = new HashMap<>(); //card by ID
+	Map<User, UserBoard> userBoards = new HashMap<>();
 	
 	public GameBoard(Integer gameId) {
 		super();
@@ -33,124 +30,73 @@ public class GameBoard {
 	 * 
 	 * @param stackedDeck
 	 */
-	public void setup(Card[] stackedDeck) {
-		Deck d = Deck.getStackedDeck(stackedDeck);
-		for (Card c: d.cards) {
-			cards.put(c.getUnicodeInt(), c);
-		}
-		
-		tableau = new Tableau();
-		stockPile = tableau.setup(d);
+	public void setup(User user, Card[] stackedDeck) {
 		foundation = new Foundation();
 		
+		join(user, stackedDeck);
+			
 		foundation.prettyPrint();
-		tableau.prettyPrint();
+		userBoards.get(user).getTableau().prettyPrint();
 	}
 	
-	public void setup() {
-		Deck d = Deck.getInstance();
-		if (shuffle) {
-			d.shuffle();
-		}
-		for (Card c: d.cards) {
-			cards.put(c.getUnicodeInt(), c);
-		}
-		
-		tableau = new Tableau();
-		stockPile = tableau.setup(d);
+	public void setup(User user) {
 		foundation = new Foundation();
 		
+		join(user);
+		
 		foundation.prettyPrint();
-		tableau.prettyPrint();
+		userBoards.get(user).getTableau().prettyPrint();
 	}
 	
-	public Card lookupCard(Integer cardId) {
-		return cards.get(cardId);
-	}
-	
-	public CanPush canPush(Card card) {
+	public void join(User user, Card[] stackedDeck) {
+		UserBoard userBoard = new UserBoard(this, user);
+		userBoard.setup(stackedDeck);
+		userBoards.put(user, userBoard);
 				
-		CanPush canPush = new CanPush();
+		foundation.addPlayer();
 		
-		Pile[] facedown = getTableau().getPile();
-		Build[] tableauBuild = getTableau().getBuild();
-		
-		boolean isFacedown = false;
-		for (Pile pile: facedown) {
-			if (pile.contains(card)) {
-				isFacedown = true;
-			}
-		}
-		for (int i=0; i<tableauBuild.length; i++) {
-			canPush.tableauBuild[i] = !isFacedown && tableauBuild[i].canPush(card);
-		}
-		List<Build> foundationBuld = getFoundation().getPile();
-		for (int i=0; i<foundationBuld.size(); i++) {
-			canPush.foundationPile[i] = !isFacedown && foundationBuld.get(i).canPush(card);
-		}
-
-		return canPush;
+		foundation.prettyPrint();
+		userBoard.getTableau().prettyPrint();
 	}
 	
-	public void discard(int maxNumberOfCards) {
-		GAME_LOG.debug("GameId:{} discard",
-				gameId);
+	public void join(User user) {
+		UserBoard userBoard = new UserBoard(this, user);
+		userBoard.setShuffle(shuffle);
+		userBoard.setup();
+		userBoards.put(user, userBoard);
+				
+		foundation.addPlayer();
 		
-		if (stockPile.isEmpty()) {
-			do {
-				Card c = discardPile.pop();
-				stockPile.push(c);
-				c.setCurrentPile(stockPile);
-			} while (!discardPile.isEmpty());
-		}
-		for (int i = 0; i<maxNumberOfCards; i++) {
-			if (stockPile.isEmpty()) {
-				break;
-			}
-			Card c = stockPile.pop();
-			discardPile.push(c);
-			c.setCurrentPile(discardPile);
-		}
+		foundation.prettyPrint();
+		userBoard.getTableau().prettyPrint();
+		
+		GAME_LOG.info("GameId:{} User:{} joined game", gameId, user);
 	}
 	
-	protected Integer getPileIdToFlip(Card card) {
-		Integer pileIdToFlip = null;
-		for (int i=0; i<getTableau().getPile().length; i++) {
-			if (card.getCurrentBuild()==getTableau().getBuild()[i]) {
-				pileIdToFlip = i;
-			}
-		}
-		return pileIdToFlip;
+	public Card lookupCard(User user, Integer cardId) {
+		return userBoards.get(user).lookupCard(cardId);
 	}
 	
-	public void moveToFoundation(Integer cardId, Integer toFoundationId) {
-		
-		Card card = lookupCard(cardId);
-		Integer pileIdToFlip = getPileIdToFlip(card);
-		
-		GAME_LOG.debug("GameId:{} Move {} to foundation pile {}",
-				gameId, card.abbrev(), toFoundationId);
-		getFoundation().getPile().get(toFoundationId).push(card);
-		
-		if (pileIdToFlip!=null && !getTableau().getPile()[pileIdToFlip].isEmpty()) {
-			getTableau().flipTopPileCard(pileIdToFlip);
-			GAME_LOG.debug("GameId:{} Flip pile {} reveals {}",
-					gameId, pileIdToFlip, card.abbrev());
-		}
-		
-		boolean gameWon = true;
-		if (card.getValue() == Card.KING) {
-			//Check tableau and stock pile to see if the game has been won
-			for (Build b: getTableau().getBuild()) {
-				if (!b.isEmpty()) {
-					gameWon = false;
-				}
-			}
-			if (gameWon && getStockPile().isEmpty() && getDiscardPile().isEmpty()) {
-				setGameWon(true);
-				GAME_LOG.debug("GameId:{} has been won!", gameId);
-			}
-		}
+	public UserBoard.CanPush canPush(User user, Card card) {
+		return userBoards.get(user).canPush(card);
+	}
+	
+	public void discard(User user) {
+		userBoards.get(user).discard(maxNumberOfCards);
+	}
+	
+//	protected Integer getPileIdToFlip(Card card) {
+//		Integer pileIdToFlip = null;
+//		for (int i=0; i<getTableau().getPile().length; i++) {
+//			if (card.getCurrentBuild()==getTableau().getBuild()[i]) {
+//				pileIdToFlip = i;
+//			}
+//		}
+//		return pileIdToFlip;
+//	}
+	
+	public void moveToFoundation(User user, Integer cardId, Integer toFoundationId) {
+		userBoards.get(user).moveToFoundation(cardId, toFoundationId);
 	}
 	
 	/**
@@ -159,28 +105,8 @@ public class GameBoard {
 	 * @param cardId
 	 * @param toBuildId
 	 */
-	public void moveToTableau(Integer cardId, Integer toBuildId) {
-		
-		Card card = lookupCard(cardId);
-		Integer pileIdToFlip = getPileIdToFlip(card);
-		
-		if (card.getCurrentBuild()!=null && !card.equals(card.getCurrentBuild().peek())) {
-			//Move Build of cards from pile to pile
-			GAME_LOG.debug("GameId:{} Move build ({}-{}) to tableau pile {}",
-					gameId, card.abbrev(), card.getCurrentBuild().peek().abbrev(), toBuildId);
-			getTableau().getBuild()[toBuildId].push(card.getCurrentBuild(), card);
-		} else {
-			//Move card from pile or discard pile to tableau pile
-			GAME_LOG.debug("GameId:{} Move {} to tableau pile {}",
-					gameId, card.abbrev(), toBuildId);
-			getTableau().getBuild()[toBuildId].push(card);
-		}
-		
-		if (pileIdToFlip!=null && !getTableau().getPile()[pileIdToFlip].isEmpty()) {
-			getTableau().flipTopPileCard(pileIdToFlip);
-			GAME_LOG.debug("GameId:{} Flip pile {} reveals {}",
-					gameId, pileIdToFlip, card.abbrev());
-		}
+	public void moveToTableau(User user, Integer cardId, Integer toBuildId) {
+		userBoards.get(user).moveToTableau(cardId, toBuildId);
 	}
 	
 	public boolean isShuffle() {
@@ -195,28 +121,16 @@ public class GameBoard {
 		return gameId;
 	}
 
-	public Tableau getTableau() {
-		return tableau;
+	public Tableau getTableau(User user) {
+		return userBoards.get(user).tableau;
 	}
 
-	public void setTableau(Tableau tableau) {
-		this.tableau = tableau;
+	public Pile getStockPile(User user) {
+		return userBoards.get(user).stockPile;
 	}
 
-	public Pile getStockPile() {
-		return stockPile;
-	}
-
-	public void setStockPile(Pile stockPile) {
-		this.stockPile = stockPile;
-	}
-
-	public Pile getDiscardPile() {
-		return discardPile;
-	}
-
-	public void setDiscardPile(VisiblePile discardPile) {
-		this.discardPile = discardPile;
+	public Pile getDiscardPile(User user) {
+		return userBoards.get(user).discardPile;
 	}
 
 	public Foundation getFoundation() {
@@ -227,29 +141,12 @@ public class GameBoard {
 		this.foundation = foundation;
 	}
 	
-	public boolean isGameWon() {
-		return gameWon;
+	public boolean isGameOver() {
+		return gameOver;
 	}
 
-	public void setGameWon(boolean gameWon) {
-		this.gameWon = gameWon;
-	}
-
-	public static class CanPush {
-		private Boolean[] foundationPile = new Boolean[4];
-		private Boolean[] tableauBuild = new Boolean[7];
-		public Boolean[] getFoundationPile() {
-			return foundationPile;
-		}
-		public void setFoundationPile(Boolean[] foundationPile) {
-			this.foundationPile = foundationPile;
-		}
-		public Boolean[] getTableauBuild() {
-			return tableauBuild;
-		}
-		public void setTableauBuild(Boolean[] tableauBuild) {
-			this.tableauBuild = tableauBuild;
-		}
+	public void setGameOver(boolean gameWon) {
+		this.gameOver = gameWon;
 	}
 	
 }
