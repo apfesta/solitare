@@ -181,6 +181,10 @@ public class UserBoard {
 		}
 	}
 	
+	public GameBoard getGame() {
+		return game;
+	}
+
 	public boolean isShuffle() {
 		return shuffle;
 	}

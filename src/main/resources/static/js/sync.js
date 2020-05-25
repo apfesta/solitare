@@ -1,13 +1,14 @@
 //Call connect() when you've got a game Id and are ready to listen
 var stompClient = null;
+var connectStarted = false;
 
-function connect() {
+function connect(gameId) {
   if (!connectStarted) {
     connectStarted = true;
     var socket = new SockJS(stompUrl);
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function(frame){
-      setConnected(true);
+      setConnected(true, gameId);
       console.log('Connected: '+frame);
     });
   }
@@ -20,8 +21,11 @@ function disconnect() {
   console.log('Disconnected');
 }
 
-function setConnected(connected) {
+function setConnected(connected, gameId) {
   if (connected) {
-    //stomp.subscribe('/topic/..', function(result){ // on payload });
+    stompClient.subscribe('/topic/game/'+gameId+'/activity', function(result){ 
+    	console.log(result);
+    });
   }
 }
+

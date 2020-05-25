@@ -129,6 +129,10 @@ public class GameBoard {
 		return userBoards.keySet();
 	}
 	
+	public UserBoard getUserBoard(User user) {
+		return userBoards.get(user);
+	}
+	
 	public Tableau getTableau(User user) {
 		return userBoards.get(user).tableau;
 	}
