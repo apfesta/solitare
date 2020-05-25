@@ -160,6 +160,26 @@ var app = {
 			}});
 	};
 	
+	app.syncFoundation = function(cardId, card, foundationId) {
+		console.log('syncFoundation('+cardId+","+foundationId+")");
+		var cardDiv = $("#foundationPile"+foundationId+" .pokercard");
+		var newCardDiv = $('<div>')
+			.addClass('pokercard').addClass('front')
+			.attr('data-card-id',card.unicodeInt)
+			.append($('<img>')
+				.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
+				.attr('title',card.unicodeHtmlEntity));
+		if (card.color=='RED') newCardDiv.addClass('red');
+		
+		if (cardDiv.length==0) {
+			if (cardDiv.attr('data-card-id')!=cardId) {
+				$("#foundationPile"+foundationId).append(newCardDiv);
+			}
+		} else {
+			cardDiv.replaceWith(newCardDiv);
+		}
+	}
+	
 	app.moveToFoundation = function(cardId, foundationId) {
 		
 		$.ajax({

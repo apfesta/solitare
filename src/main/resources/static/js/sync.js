@@ -25,6 +25,13 @@ function setConnected(connected, gameId) {
   if (connected) {
     stompClient.subscribe('/topic/game/'+gameId+'/activity', function(result){ 
     	console.log(result);
+    	var data = JSON.parse(result.body);
+    	console.log(data);
+    	if (data.action=='MOVE_TO_FOUNDATION') {
+    		console.log(data.foundation.pile[data.toFoundationId]);
+    		app.syncFoundation(data.cardId, data.foundation.pile[data.toFoundationId].cards[0], data.toFoundationId);
+    	}
+    	
     });
   }
 }

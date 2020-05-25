@@ -117,7 +117,7 @@ public class MainController {
 		User user = users.get(userId);
 		
 		game.moveToFoundation(user, cardId, toFoundationId);
-		syncService.notifyMoveToFoundation(game, user);
+		syncService.notifyMoveToFoundation(game, user, cardId, toFoundationId);
 		
 		game.getFoundation().prettyPrint();
 		game.getTableau(user).prettyPrint();

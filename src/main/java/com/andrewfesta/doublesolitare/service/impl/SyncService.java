@@ -23,9 +23,11 @@ public class SyncService {
 				new GameUpdate(GameUpdateAction.PLAYER_JOIN, user, game));
 	}
 	
-	public void notifyMoveToFoundation(GameBoard game, User user) {
+	public void notifyMoveToFoundation(GameBoard game, User user,
+			Integer cardId,
+			Integer toFoundationId) {
 		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
-				new GameUpdate(GameUpdateAction.MOVE_TO_FOUNDATION, user, game));
+				new GameUpdate(GameUpdateAction.MOVE_TO_FOUNDATION, user, game, cardId, toFoundationId));
 	}
 	
 	enum GameUpdateAction {
@@ -34,9 +36,11 @@ public class SyncService {
 	}
 
 	static class GameUpdate {
-		GameUpdateAction action;
-		User user;
-		Foundation foundation;
+		final GameUpdateAction action;
+		final User user;
+		final Foundation foundation;
+		Integer cardId;
+		Integer toFoundationId;
 		
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game) {
 			super();
@@ -44,24 +48,34 @@ public class SyncService {
 			this.user = user;
 			this.foundation = game.getFoundation();
 		}
+		public GameUpdate(GameUpdateAction action, User user, GameBoard game, 
+				Integer cardId, Integer toFoundationId) {
+			this(action, user, game);
+			this.cardId = cardId;
+			this.toFoundationId = toFoundationId;
+		}
 		public GameUpdateAction getAction() {
 			return action;
-		}
-		public void setAction(GameUpdateAction action) {
-			this.action = action;
 		}
 		public User getUser() {
 			return user;
 		}
-		public void setUser(User user) {
-			this.user = user;
-		}
 		public Foundation getFoundation() {
 			return foundation;
 		}
-		public void setFoundation(Foundation foundation) {
-			this.foundation = foundation;
+		public Integer getCardId() {
+			return cardId;
 		}
+		public void setCardId(Integer cardId) {
+			this.cardId = cardId;
+		}
+		public Integer getToFoundationId() {
+			return toFoundationId;
+		}
+		public void setToFoundationId(Integer toFoundationId) {
+			this.toFoundationId = toFoundationId;
+		}
+		
 		
 	}
 
