@@ -23,7 +23,7 @@ public class SamplePlayTest {
 	@Test
 	public void sampleWin() {
 		GameBoard game = new GameBoard(1);
-		User user = new User();
+		User user = new User(1);
 		game.setup(user, new Card[] {
 				//STOCK PILE (in reverse order)
 				new Card(Card.KING, Suit.HEARTS),
@@ -132,10 +132,10 @@ public class SamplePlayTest {
 		GameBoard game = new GameBoard(1);
 		game.setShuffle(false);
 		
-		User user1 = new User();
+		User user1 = new User(1);
 		game.setup(user1);
 		
-		User user2 = new User();
+		User user2 = new User(2);
 		game.join(user2);
 				
 		Foundation foundation = game.getFoundation();
@@ -183,7 +183,7 @@ public class SamplePlayTest {
 	public void samplePlay() {
 		
 		GameBoard game = new GameBoard(1);
-		User user = new User();
+		User user = new User(1);
 		game.setShuffle(false);
 		game.setup(user);
 		

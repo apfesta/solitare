@@ -58,8 +58,7 @@ public class MainController {
 	@RequestMapping(value="/api/user", method = RequestMethod.POST)
 	public @ResponseBody User newTestUser() {
 		LOG.trace("POST /api/user");
-		User user = new User();
-		user.setId(userIdSequence.incrementAndGet());
+		User user = new User(userIdSequence.incrementAndGet());
 		users.put(user.getId(), user);
 		return user;
 	}

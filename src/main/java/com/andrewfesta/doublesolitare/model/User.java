@@ -4,6 +4,15 @@ public class User {
 	
 	Integer id;
 
+	public User() {
+		super();
+	}
+
+	public User(Integer id) {
+		super();
+		this.id = id;
+	}
+
 	public Integer getId() {
 		return id;
 	}
