@@ -1,7 +1,18 @@
+@media (orientation: landscape) {
+	#board {
+		padding-left: 3vw;
+		padding-right: 3vw;
+	}
+}
+@media (orientation: portrait) {
+	#board {
+    	padding: 0;
+	}
+}
+
 #board {
 	background-color: #008800;
 	position:fixed;
-    padding:0;
     margin:0;
     top:0;
     left:0;
@@ -15,12 +26,17 @@
 }
 
 #foundationPiles {
-	background-color: #44AA44;
+	/*background-color: #44AA44;*/
 }
+
 
 
 #foundation .row {
 	min-height: 10vw;
+}
+
+#tableau {
+	margin-top: 2vw;
 }
 
 #tableau.row, #topSection.row {
@@ -33,8 +49,16 @@
 }
 
 .pile {
-	/*width: 100%;*/
 	min-height: 17vw;
+}
+
+#foundation .pile, #tableau .pile {
+	background-color: #44AA44;
+	width: 12vw;
+	border-radius: .5rem;
+}
+#foundation .row {
+	padding: 1vw;
 }
 
 .pile.canDrop {
