@@ -133,6 +133,10 @@ public class GameBoard {
 		return gameId;
 	}
 
+	public int getNumOfUsers() {
+		return userBoards.size();
+	}
+	
 	@JsonIgnore
 	public Collection<User> getUsers() {
 		return userBoards.keySet();

@@ -73,9 +73,12 @@ public class MainController {
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}", method = RequestMethod.GET)
-	public @ResponseBody GameBoard getGame(@PathVariable Integer gameId) {
+	public @ResponseBody UserBoard getGame(@PathVariable Integer gameId,
+			@RequestParam("userId") Integer userId) {
 		LOG.trace("GET /api/game/{}", gameId);
-		return games.get(gameId);
+		GameBoard game = games.get(gameId);
+		User user = users.get(userId);
+		return game.getUserBoard(user);
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/join", method = RequestMethod.POST)
@@ -110,7 +113,7 @@ public class MainController {
 			@RequestParam("userId") Integer userId) {
 		LOG.trace("GET /api/game/{}/canmove/{}", gameId, cardId);
 		
-		GameBoard game = getGame(gameId);
+		GameBoard game = games.get(gameId);
 		User user = users.get(userId);
 		Card card = game.lookupCard(user, cardId);
 		
@@ -125,7 +128,7 @@ public class MainController {
 			@RequestParam("userId") Integer userId) {
 		LOG.trace("GET /api/game/{}/move/{}/toFoundation/{}", gameId, cardId, toFoundationId);
 		
-		GameBoard game = getGame(gameId);
+		GameBoard game = games.get(gameId);
 		User user = users.get(userId);
 		
 		game.moveToFoundation(user, cardId, toFoundationId);
@@ -153,7 +156,7 @@ public class MainController {
 			@RequestParam("userId") Integer userId) {
 		LOG.trace("GET /api/game/{}/move/{}/toTableau/{}", gameId, cardId, toBuildId);
 		
-		GameBoard game = getGame(gameId);
+		GameBoard game = games.get(gameId);
 		User user = users.get(userId);
 		
 		game.moveToTableau(user, cardId, toBuildId);
@@ -171,7 +174,7 @@ public class MainController {
 			@RequestParam("userId") Integer userId) {
 		LOG.trace("GET /api/game/{}/discard", gameId);
 		
-		GameBoard game = getGame(gameId);
+		GameBoard game = games.get(gameId);
 		User user = users.get(userId);
 		
 		game.discard(user);

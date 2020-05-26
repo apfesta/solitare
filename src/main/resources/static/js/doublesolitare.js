@@ -122,8 +122,6 @@ var app = {
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				connect(app.gameId);
-				app.handleBeforeUnload
-				app.handleUnload();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -140,14 +138,27 @@ var app = {
 			success: function(data){
 				console.debug(data);
 				connect(gameId);
-				app.handleBeforeUnload
-				app.handleUnload();
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
+			}});		
+	};
+	
+	app.syncGame = function(gameId) {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+gameId
+					+'?userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.debug(data);
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
+				app.gameId = app.gameboard.gameId;
 			}});		
 	};
 	
@@ -172,13 +183,6 @@ var app = {
 	    	app.leaveGame();
 	    });
 	}
-	
-	/*
-	 *     //Unsubscribe event:
-    $(window).on('unload', function(){
-    	
-    });
-	 */
 	
 	app.canMove = function(cardId) {
 		$.ajax({
@@ -341,15 +345,16 @@ var app = {
 		if (card.color=='RED') cardDiv.addClass('red');
 	}
 	
-	app.setupFoundation = function() {
-		$('#foundation').addClass('row');
+	app.addPlayer = function(rowNum) {
+		var rowDiv = $('<div>').addClass('row')
+		$('#foundation').append(rowDiv);
 		for (var i=0; i<4; i++) {
 			//create pileDiv
 			var colDiv = $('<div>').addClass('col');
-			$('#foundation').append(colDiv);
-			var pileDiv = $('<div>').attr('id','foundationPile'+i)
+			rowDiv.append(colDiv);
+			var pileDiv = $('<div>').attr('id','foundationPile'+((rowNum*4)+i))
 				.addClass('pile')
-				.attr('data-pile-id',i)
+				.attr('data-pile-id',((rowNum*4)+i))
 				.on('drop', app.drop)
 				.on('dragover', app.dragover)
 				.on('dragenter', app.dragenter)
@@ -358,6 +363,12 @@ var app = {
 			
 			var targetDiv = $('<div>').addClass('target');
 			pileDiv.append(targetDiv);
+		}
+	}
+	
+	app.setupFoundation = function() {
+		for (var i=0; i<app.gameboard.numOfUsers; i++) {
+			app.addPlayer(i);
 		}
 	};
 	

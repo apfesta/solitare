@@ -47,12 +47,14 @@ public class SyncService {
 		final Foundation foundation;
 		Integer cardId;
 		Integer toFoundationId;
+		Integer numOfUsers;
 		
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game) {
 			super();
 			this.action = action;
 			this.user = user;
 			this.foundation = game.getFoundation();
+			this.numOfUsers = game.getUsers().size();
 		}
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game, 
 				Integer cardId, Integer toFoundationId) {
@@ -80,6 +82,12 @@ public class SyncService {
 		}
 		public void setToFoundationId(Integer toFoundationId) {
 			this.toFoundationId = toFoundationId;
+		}
+		public Integer getNumOfUsers() {
+			return numOfUsers;
+		}
+		public void setNumOfUsers(Integer numOfUsers) {
+			this.numOfUsers = numOfUsers;
 		}
 		
 		
