@@ -24,6 +24,7 @@ public class UserBoard {
 	Pile stockPile;
 	VisiblePile discardPile = new VisiblePile();
 	boolean gameWon = false;
+	Score score = new Score();
 	
 	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
 	
@@ -95,6 +96,7 @@ public class UserBoard {
 		GAME_LOG.debug("GameId:{} User:{} discard",
 				game.gameId, user);
 		if (stockPile.isEmpty()) {
+			score.deckPassthrough++;
 			do {
 				Card c = discardPile.pop();
 				stockPile.push(c);
@@ -129,9 +131,11 @@ public class UserBoard {
 		GAME_LOG.debug("GameId:{} User:{} Move {} to foundation pile {}",
 				game.gameId, user, card.abbrev(), toFoundationId);
 		game.getFoundation().getPile().get(toFoundationId).push(card);
+		score.toFoundation++;
 		
 		if (pileIdToFlip!=null && !getTableau().getPile()[pileIdToFlip].isEmpty()) {
 			getTableau().flipTopPileCard(pileIdToFlip);
+			score.tableauFlip++;
 			GAME_LOG.debug("GameId:{} User:{} Flip pile {} reveals {}",
 					game.gameId, user, pileIdToFlip, card.abbrev());
 		}
@@ -172,10 +176,12 @@ public class UserBoard {
 			GAME_LOG.debug("GameId:{} User:{} Move {} to tableau pile {}",
 					game.gameId, user, card.abbrev(), toBuildId);
 			getTableau().getBuild()[toBuildId].push(card);
+			score.discardToTableau++;
 		}
 		
 		if (pileIdToFlip!=null && !getTableau().getPile()[pileIdToFlip].isEmpty()) {
 			getTableau().flipTopPileCard(pileIdToFlip);
+			score.tableauFlip++;
 			GAME_LOG.debug("GameId:{} User:{} Flip pile {} reveals {}",
 					game.gameId, user, pileIdToFlip, card.abbrev());
 		}
@@ -225,6 +231,14 @@ public class UserBoard {
 		this.gameWon = gameWon;
 	}
 	
+	public Score getScore() {
+		return score;
+	}
+
+	public void setScore(Score score) {
+		this.score = score;
+	}
+
 	public static class CanPush {
 		private Boolean[] foundationPile = new Boolean[4];
 		private Boolean[] tableauBuild = new Boolean[7];
@@ -242,6 +256,46 @@ public class UserBoard {
 		}
 		public void setTableauBuild(Boolean[] tableauBuild) {
 			this.tableauBuild = tableauBuild;
+		}
+	}
+	
+	public class Score {
+		int toFoundation = 0;
+		int discardToTableau = 0;
+		int tableauFlip = 0;
+		int discard = 0;
+		int deckPassthrough = 0;
+		
+		public int getToFoundation() {
+			return toFoundation;
+		}
+		public int getDiscardToTableau() {
+			return discardToTableau;
+		}
+		public int getTableauFlip() {
+			return tableauFlip;
+		}
+		public int getDiscard() {
+			return discard;
+		}
+		public int getDeckPassthrough() {
+			return deckPassthrough;
+		}
+		public int getTotalScore() {
+			return (toFoundation*10)+
+					(discardToTableau*5)+
+					(tableauFlip*5)+
+					(deckPassthrough*-20);
+		}
+		public int getTotalMoves() {
+			return toFoundation+discardToTableau+discard;
+		}
+		
+		public void prettyPrint() {
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("Moves: "+getTotalMoves())
+				.append(" Score: "+getTotalScore());
+			System.out.println(buffer.toString());
 		}
 	}
 

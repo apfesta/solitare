@@ -32,13 +32,23 @@ public class SyncService {
 			Integer cardId,
 			Integer toFoundationId) {
 		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
-				new GameUpdate(GameUpdateAction.MOVE_TO_FOUNDATION, user, game, cardId, toFoundationId));
+				new GameUpdate(GameUpdateAction.MOVE_TO_FOUNDATION, user, game, 
+						cardId, toFoundationId, null));
+	}
+	
+	public void notifyMoveToTableau(GameBoard game, User user,
+			Integer cardId,
+			Integer toBuildId) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new GameUpdate(GameUpdateAction.MOVE_TO_TABLEAU, user, game, 
+						cardId, null, toBuildId));
 	}
 	
 	enum GameUpdateAction {
 		PLAYER_JOIN,
 		PLAYER_DROP,
-		MOVE_TO_FOUNDATION
+		MOVE_TO_FOUNDATION,
+		MOVE_TO_TABLEAU
 	}
 
 	static class GameUpdate {
@@ -47,6 +57,7 @@ public class SyncService {
 		final Foundation foundation;
 		Integer cardId;
 		Integer toFoundationId;
+		Integer toBuildId;
 		Integer numOfUsers;
 		
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game) {
@@ -57,10 +68,11 @@ public class SyncService {
 			this.numOfUsers = game.getUsers().size();
 		}
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game, 
-				Integer cardId, Integer toFoundationId) {
+				Integer cardId, Integer toFoundationId, Integer toBuildId) {
 			this(action, user, game);
 			this.cardId = cardId;
 			this.toFoundationId = toFoundationId;
+			this.toBuildId = toBuildId;
 		}
 		public GameUpdateAction getAction() {
 			return action;

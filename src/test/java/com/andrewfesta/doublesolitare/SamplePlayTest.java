@@ -103,6 +103,7 @@ public class SamplePlayTest {
 					foundationIds.put(s, f++);
 				}
 				game.moveToFoundation(user, cardId(v,s), foundationIds.get(s));
+				game.getUserBoard(user).getScore().prettyPrint();
 			}
 		}
 		
@@ -114,6 +115,7 @@ public class SamplePlayTest {
 					game.getDiscardPile(user).print(3);
 				}
 				game.moveToFoundation(user, cardId(v,s), foundationIds.get(s));
+				game.getUserBoard(user).getScore().prettyPrint();
 				i++;
 				if (i==3) {
 					i=0;
