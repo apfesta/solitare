@@ -16,6 +16,7 @@ public class GameBoard {
 
 	final Integer gameId;
 	Foundation foundation;
+	boolean inProgress = false;
 	boolean gameOver = false;
 	
 	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
@@ -74,6 +75,14 @@ public class GameBoard {
 		userBoard.getTableau().prettyPrint();
 		
 		GAME_LOG.info("GameId:{} User:{} joined game", gameId, user);
+	}
+	
+	public void leave(User user) {
+		userBoards.remove(user);
+		if (inProgress) {
+			inProgress = false;
+			gameOver = true;
+		}
 	}
 	
 	public Card lookupCard(User user, Integer cardId) {

@@ -122,6 +122,8 @@ var app = {
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				connect(app.gameId);
+				app.handleBeforeUnload
+				app.handleUnload();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -138,6 +140,8 @@ var app = {
 			success: function(data){
 				console.debug(data);
 				connect(gameId);
+				app.handleBeforeUnload
+				app.handleUnload();
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
@@ -146,6 +150,35 @@ var app = {
 				app.setupTableau();
 			}});		
 	};
+	
+	app.leaveGame = function() {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+app.gameId+'/leave'
+					+'?userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json"});	
+	};
+	
+	app.handleBeforeUnload = function(){
+		$(window).on("beforeunload", function(e) {
+			app.leaveGame();
+		    return e.originalEvent.returnValue = "Are you sure you want to leave the game?";
+		});
+	};
+	
+	app.handleUnload = function() {
+		$(window).on('unload', function(){
+	    	app.leaveGame();
+	    });
+	}
+	
+	/*
+	 *     //Unsubscribe event:
+    $(window).on('unload', function(){
+    	
+    });
+	 */
 	
 	app.canMove = function(cardId) {
 		$.ajax({

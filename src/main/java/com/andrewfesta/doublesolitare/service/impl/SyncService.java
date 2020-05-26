@@ -23,6 +23,11 @@ public class SyncService {
 				new GameUpdate(GameUpdateAction.PLAYER_JOIN, user, game));
 	}
 	
+	public void notifyPlayerDrop(GameBoard game, User user) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new GameUpdate(GameUpdateAction.PLAYER_DROP, user, game));
+	}
+	
 	public void notifyMoveToFoundation(GameBoard game, User user,
 			Integer cardId,
 			Integer toFoundationId) {
@@ -32,6 +37,7 @@ public class SyncService {
 	
 	enum GameUpdateAction {
 		PLAYER_JOIN,
+		PLAYER_DROP,
 		MOVE_TO_FOUNDATION
 	}
 

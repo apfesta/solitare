@@ -90,6 +90,19 @@ public class MainController {
 		return game.getUserBoard(user);
 	}
 	
+	@RequestMapping(value="/api/game/{gameId}/leave", method = RequestMethod.GET)
+	public @ResponseBody void leaveGame(@PathVariable Integer gameId,
+			@RequestParam("userId") Integer userId) {
+		LOG.trace("POST /api/game/{}/leave", gameId);
+		GameBoard game = games.get(gameId);
+		User user = users.get(userId);
+		game.leave(user);
+		syncService.notifyPlayerDrop(game, user);
+		if (game.getUsers().isEmpty()) {
+			games.remove(game.getGameId());
+		}
+	}
+	
 	@RequestMapping(value="/api/game/{gameId}/canmove/{cardId}", method = RequestMethod.GET)
 	public @ResponseBody CanPush canMoveCard(
 			@PathVariable Integer gameId, 
