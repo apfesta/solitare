@@ -319,6 +319,11 @@ var app = {
 						$('#discard-pile').append(cardDiv);
 					}
 				}
+				if (app.userboard.stockPile.empty) {
+					$('#stock-pile .pokercard').hide();
+				} else {
+					$('#stock-pile .pokercard').show();
+				}
 			}});
 	};
 	

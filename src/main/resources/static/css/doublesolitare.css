@@ -57,7 +57,7 @@
 	min-height: 17vw;
 }
 
-#foundation .pile, #tableau .pile {
+#foundation .pile, #tableau .pile, #stockPile .pile {
 	background-color: #44AA44;
 	width: 12vw;
 	border-radius: .5rem;
