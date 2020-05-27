@@ -25,10 +25,15 @@
 	width:100%;
 }
 
-#foundationPiles {
-	/*background-color: #44AA44;*/
+
+#stockPile, #discardPile {
+	position: relative;
 }
 
+#stock-pile, #discard-pile {
+	position: absolute;
+	bottom: 0;
+}
 
 
 #foundation .row {
@@ -94,6 +99,9 @@
 	color: blue;
 }
 
+#discard-pile {
+	min-width: 12vw;
+}
 #discard-pile .pokercard {
 	width: 12vw;
 	float: left;
