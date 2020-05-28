@@ -49,6 +49,7 @@ var menu = {
 	menu.showGames = function() {
 		$('#board').hide();
 		$('#menu').addClass("container").append(
+				$("<h1>").text("Double Solitare")).append(
 				$("<div>")
 					.addClass("list-group"));
 		
@@ -59,12 +60,19 @@ var menu = {
 			app.setup(game.gameId);
 		};
 		
-		$("#menu .list-group").append(
+		$("#menu .list-group")
+			.append(
 				$("<a href='#'>")
 					.addClass("list-group-item")
 					.addClass("list-group-item-action")
-					.text("New Game")
+					.text("New Single Player Game")
 					.on('click', newGameAction));
+//			.append(
+//				$("<a href='#'>")
+//					.addClass("list-group-item")
+//					.addClass("list-group-item-action")
+//					.text("New Multi-Player Game")
+//					.on('click', newMultiplayerGameAction));
 		for (gameIdx in menu.games) {
 			var game = menu.games[gameIdx];
 			$("#menu .list-group").append(
@@ -112,8 +120,8 @@ var app = {
 	app.newGame = function() {
 		$.ajax({
 			type: 'POST', 
-			url: getRelativePath('/api/game'
-					+'?userId='+app.user.id),
+			url: getRelativePath('/api/game?multiplayer=false'
+					+'&userId='+app.user.id),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){

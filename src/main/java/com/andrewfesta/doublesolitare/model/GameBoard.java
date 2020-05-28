@@ -16,6 +16,7 @@ public class GameBoard {
 
 	final Integer gameId;
 	Foundation foundation;
+	final boolean multiPlayer;
 	boolean inProgress = false;
 	boolean gameOver = false;
 	
@@ -24,9 +25,10 @@ public class GameBoard {
 	
 	Map<User, UserBoard> userBoards = new HashMap<>();
 	
-	public GameBoard(Integer gameId) {
+	public GameBoard(Integer gameId, boolean multiPlayer) {
 		super();
 		this.gameId = gameId;
+		this.multiPlayer = multiPlayer;
 	}
 
 	/**
@@ -53,6 +55,9 @@ public class GameBoard {
 	}
 	
 	public void join(User user, Card[] stackedDeck) {
+		if (userBoards.size() >= 1 && !this.multiPlayer) {
+			throw new RuntimeException("Cannot join single player game.");
+		}
 		UserBoard userBoard = new UserBoard(this, user);
 		userBoard.setup(stackedDeck);
 		userBoards.put(user, userBoard);
@@ -64,6 +69,9 @@ public class GameBoard {
 	}
 	
 	public void join(User user) {
+		if (userBoards.size() >= 1 && !this.multiPlayer) {
+			throw new RuntimeException("Cannot join single player game.");
+		}
 		UserBoard userBoard = new UserBoard(this, user);
 		userBoard.setShuffle(shuffle);
 		userBoard.setup();
@@ -121,6 +129,14 @@ public class GameBoard {
 		userBoards.get(user).moveToTableau(cardId, toBuildId);
 	}
 	
+	public boolean isMultiPlayer() {
+		return multiPlayer;
+	}
+
+	public boolean isInProgress() {
+		return inProgress;
+	}
+
 	public boolean isShuffle() {
 		return shuffle;
 	}

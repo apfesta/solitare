@@ -1,12 +1,11 @@
 package com.andrewfesta.doublesolitare.controller;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +43,10 @@ public class MainController {
 	}
 		
 	@RequestMapping(value="/api/game", method = RequestMethod.POST)
-	public @ResponseBody UserBoard newGame(@RequestParam Integer userId) {
+	public @ResponseBody UserBoard newGame(@RequestParam("multiplayer") boolean multiplayer,
+			@RequestParam Integer userId) {
 		LOG.trace("POST /api/game");
-		GameBoard game = new GameBoard(gameIdSequence.incrementAndGet());
+		GameBoard game = new GameBoard(gameIdSequence.incrementAndGet(), multiplayer);
 		User user = users.get(userId);
 		game.setShuffle(false);
 		game.setup(user);
@@ -64,12 +64,12 @@ public class MainController {
 	}
 	
 	@RequestMapping(value="/api/game", method = RequestMethod.GET)
-	public @ResponseBody List<Game> getGames() {
-		List<Game> ret = new ArrayList<>();
-		for (Entry<Integer, GameBoard> entry: games.entrySet()) {
-			ret.add(new Game(entry.getKey(), entry.getValue().getUsers()));
-		}
-		return ret;
+	public @ResponseBody List<Game> getGamesToJoin() {
+		return games.entrySet().stream()
+			.filter((e)->e.getValue().isMultiPlayer())
+			.filter((e)->!e.getValue().isInProgress())
+			.map((entry)->new Game(entry.getKey(), entry.getValue().getUsers()))
+			.collect(Collectors.toList());
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}", method = RequestMethod.GET)
