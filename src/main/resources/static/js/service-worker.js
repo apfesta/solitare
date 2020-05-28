@@ -15,14 +15,15 @@ function fixContextPath(ctxPath, uriArray) {
 var cacheName = 'double-solitare-v1';
 var filesToCache = [
 	//HTML
-	'/',
+	//'/',
 	//CSS
 	'/webjars/bootstrap/4.1.3/css/bootstrap.min.css',
-	'/css/doublesolitare.css',
+	//'/css/doublesolitare.css',
 	//JAVASCRIPT
 	'/webjars/jquery/3.2.1/jquery.min.js',
 	'/webjars/bootstrap/4.1.3/js/bootstrap.min.js',
-	'/js/doublesolitare.js',
+	//'/js/doublesolitare.js',
+	//'/js/sync.js',
 	'/js/DragDropTouch.js',
 	//IMAGES
 	'/img/1F0A1.png',

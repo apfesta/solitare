@@ -13,16 +13,18 @@ import com.andrewfesta.doublesolitare.model.Build;
 import com.andrewfesta.doublesolitare.model.Card;
 import com.andrewfesta.doublesolitare.model.Foundation;
 import com.andrewfesta.doublesolitare.model.GameBoard;
-import com.andrewfesta.doublesolitare.model.GameBoard.CanPush;
 import com.andrewfesta.doublesolitare.model.Suit;
 import com.andrewfesta.doublesolitare.model.Tableau;
+import com.andrewfesta.doublesolitare.model.User;
+import com.andrewfesta.doublesolitare.model.UserBoard.CanPush;
 
 public class SamplePlayTest {
 
 	@Test
 	public void sampleWin() {
-		GameBoard game = new GameBoard(1);
-		game.setup(new Card[] {
+		GameBoard game = new GameBoard(1, false);
+		User user = new User(1);
+		game.setup(user, new Card[] {
 				//STOCK PILE (in reverse order)
 				new Card(Card.KING, Suit.HEARTS),
 				new Card(Card.KING, Suit.CLUBS),
@@ -100,7 +102,8 @@ public class SamplePlayTest {
 				if (!foundationIds.containsKey(s)) {
 					foundationIds.put(s, f++);
 				}
-				game.moveToFoundation(cardId(v,s), foundationIds.get(s));
+				game.moveToFoundation(user, cardId(v,s), foundationIds.get(s));
+				game.getUserBoard(user).getScore().prettyPrint();
 			}
 		}
 		
@@ -108,10 +111,11 @@ public class SamplePlayTest {
 		for (int v=8; v<=Card.KING; v++) {
 			for (Suit s: Suit.values()) {
 				if (i==0) {
-					game.discard(3);
-					game.getDiscardPile().print(3);
+					game.discard(user);
+					game.getDiscardPile(user).print(3);
 				}
-				game.moveToFoundation(cardId(v,s), foundationIds.get(s));
+				game.moveToFoundation(user, cardId(v,s), foundationIds.get(s));
+				game.getUserBoard(user).getScore().prettyPrint();
 				i++;
 				if (i==3) {
 					i=0;
@@ -124,15 +128,68 @@ public class SamplePlayTest {
 	private int cardId(int value, Suit suit) {
 		return Card.unicodeInt(value, suit);
 	}
+	
+	@Test
+	public void sampleMultiplayer() {
+		GameBoard game = new GameBoard(1, true);
+		game.setShuffle(false);
+		
+		User user1 = new User(1);
+		game.setup(user1);
+		
+		User user2 = new User(2);
+		game.join(user2);
+				
+		Foundation foundation = game.getFoundation();
+		
+		int fromBuildId;
+		int toFoundationId;
+		
+				
+		//MOVE #1 - Move ACE of SPADES
+		fromBuildId = 0;
+		toFoundationId = 0;
+		Build build = game.getTableau(user1).getBuild()[fromBuildId];
+		Card card = build.peek();
+		assertEquals(Suit.SPADES,card.getSuit());
+		assertEquals(Card.ACE, card.getValue());
+		CanPush canPush = game.canPush(user1, card);
+		assertTrue(canPush.getFoundationPile()[toFoundationId]);
+		assertFalse(canPush.getTableauBuild()[1]);
+		foundation.getPile().get(toFoundationId).push(card);
+		System.out.println("User1:");
+		foundation.prettyPrint();
+		game.getTableau(user1).prettyPrint();
+		
+		//MOVE #2 - Move ACE of HEARTS
+		fromBuildId = 2;
+		toFoundationId = 1;
+		build = game.getTableau(user2).getBuild()[fromBuildId];
+		card = build.peek();
+		assertEquals(Suit.HEARTS,card.getSuit());
+		assertEquals(Card.ACE, card.getValue());
+		canPush = game.canPush(user2, card);
+		assertTrue(canPush.getFoundationPile()[toFoundationId]);
+		assertFalse(canPush.getTableauBuild()[1]);
+		assertFalse(canPush.getTableauBuild()[0]);
+		foundation.getPile().get(toFoundationId).push(card);
+		//MOVE #2B - Flip card
+		game.getTableau(user2).flipTopPileCard(fromBuildId);
+		
+		System.out.println("User2:");
+		foundation.prettyPrint();
+		game.getTableau(user2).prettyPrint();
+	}
 		
 	@Test
 	public void samplePlay() {
 		
-		GameBoard game = new GameBoard(1);
+		GameBoard game = new GameBoard(1, false);
+		User user = new User(1);
 		game.setShuffle(false);
-		game.setup();
+		game.setup(user);
 		
-		Tableau tableau = game.getTableau();
+		Tableau tableau = game.getTableau(user);
 		Foundation foundation = game.getFoundation();
 		
 		int fromBuildId;
@@ -147,7 +204,7 @@ public class SamplePlayTest {
 		Card card = build.peek();
 		assertEquals(Suit.SPADES,card.getSuit());
 		assertEquals(Card.ACE, card.getValue());
-		CanPush canPush = game.canPush(card);
+		CanPush canPush = game.canPush(user, card);
 		assertTrue(canPush.getFoundationPile()[toFoundationId]);
 		assertFalse(canPush.getTableauBuild()[1]);
 		foundation.getPile().get(toFoundationId).push(card);
@@ -161,7 +218,7 @@ public class SamplePlayTest {
 		card = build.peek();
 		assertEquals(Suit.HEARTS,card.getSuit());
 		assertEquals(Card.ACE, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getFoundationPile()[toFoundationId]);
 		assertFalse(canPush.getTableauBuild()[1]);
 		assertFalse(canPush.getTableauBuild()[0]);
@@ -179,7 +236,7 @@ public class SamplePlayTest {
 		card = build.peek();
 		assertEquals(Suit.HEARTS,card.getSuit());
 		assertEquals(Card.KING, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		assertFalse(canPush.getTableauBuild()[1]);
 		assertFalse(canPush.getFoundationPile()[0]);
@@ -198,7 +255,7 @@ public class SamplePlayTest {
 		card = build.peek();
 		assertEquals(Suit.SPADES,card.getSuit());
 		assertEquals(9, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		assertFalse(canPush.getTableauBuild()[1]);
 		assertFalse(canPush.getFoundationPile()[0]);
@@ -211,117 +268,117 @@ public class SamplePlayTest {
 		tableau.prettyPrint();
 				
 		//MOVE #5 - Discard
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #6 - Move FIVE of CLUBS to 6 of HEARTS
 		toBuildId = 3;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.CLUBS,card.getSuit());
 		assertEquals(5, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		assertFalse(canPush.getTableauBuild()[1]);
 		tableau.getBuild()[toBuildId].push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #7 - Discard 3 times til we get to the ACE
-		game.discard(3);
-		game.getDiscardPile().print(3);
-		game.discard(3);
-		game.getDiscardPile().print(3);
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #8 - Move ACE of DIAMONDS
 		toFoundationId = 2;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.DIAMONDS,card.getSuit());
 		assertEquals(Card.ACE, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getFoundationPile()[toFoundationId]);
 		foundation.getPile().get(toFoundationId).push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #9 - Discard
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #10 - Move FOUR DIAMONDS
 		toBuildId = 3;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.DIAMONDS,card.getSuit());
 		assertEquals(4, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		tableau.getBuild()[toBuildId].push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #11 - Discard
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #12 - Move SEVEN DIAMONDS
 		toBuildId = 1;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.DIAMONDS,card.getSuit());
 		assertEquals(7, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		tableau.getBuild()[toBuildId].push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #13 - Discard
-		game.discard(3);
-		game.getDiscardPile().print(3);
-		game.discard(3);
-		game.getDiscardPile().print(3);
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #14 - Move SIX CLUBS
 		toBuildId = 1;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.CLUBS,card.getSuit());
 		assertEquals(6, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		tableau.getBuild()[toBuildId].push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 		
 		//DIscard
-		game.discard(3);
-		game.getDiscardPile().print(3);
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #14 - Move QUEEN CLUBS
 		toBuildId = 0;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.CLUBS,card.getSuit());
 		assertEquals(Card.QUEEN, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		tableau.getBuild()[toBuildId].push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE 15 - Move JACK of HEARTS
 		fromBuildId = 5;
@@ -330,7 +387,7 @@ public class SamplePlayTest {
 		card = build.peek();
 		assertEquals(Suit.HEARTS,card.getSuit());
 		assertEquals(Card.JACK, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);		
 		tableau.getBuild()[toBuildId].push(card);
 		//MOVE #15B - Flip card
@@ -346,7 +403,7 @@ public class SamplePlayTest {
 		card = build.peek();
 		assertEquals(Suit.HEARTS,card.getSuit());
 		assertEquals(8, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);		
 		tableau.getBuild()[toBuildId].push(card);
 		//MOVE #16B - Flip card
@@ -356,104 +413,104 @@ public class SamplePlayTest {
 		tableau.prettyPrint();
 		
 		//DIscard
-		game.discard(3);
-		game.getDiscardPile().print(3);
-		game.discard(3);
-		game.getDiscardPile().print(3);
-		game.discard(3);
-		game.getDiscardPile().print(3);
-		game.discard(3);
-		game.getDiscardPile().print(3);
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #17 - Move SEVEN CLUBS
 		toBuildId = 4;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.CLUBS,card.getSuit());
 		assertEquals(7, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		tableau.getBuild()[toBuildId].push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 		
 		//DIscard
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #18 - Move TEN CLUBS
 		toBuildId = 0;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.CLUBS,card.getSuit());
 		assertEquals(10, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		tableau.getBuild()[toBuildId].push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 				
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #8 - Move TWO of DIAMONDS
 		toFoundationId = 2;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.DIAMONDS,card.getSuit());
 		assertEquals(2, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getFoundationPile()[toFoundationId]);
 		foundation.getPile().get(toFoundationId).push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
 		
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #19 - Move SIX of DIAMONDS
 		toBuildId = 4;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.DIAMONDS,card.getSuit());
 		assertEquals(6, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		tableau.getBuild()[toBuildId].push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #20 - Move FIVE of DIAMONDS
 		toBuildId = 1;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.DIAMONDS,card.getSuit());
 		assertEquals(5, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);
 		tableau.getBuild()[toBuildId].push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 			
 		
 		//MOVE #21 - Move THREE of DIAMONDS
 		toFoundationId = 2;
-		card = game.getDiscardPile().peek();
+		card = game.getDiscardPile(user).peek();
 		assertEquals(Suit.DIAMONDS,card.getSuit());
 		assertEquals(3, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getFoundationPile()[toFoundationId]);
 		foundation.getPile().get(toFoundationId).push(card);
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile().print(3);
+		game.getDiscardPile(user).print(3);
 		
 		//MOVE #22 - Move FOUR of DIAMONDS
 		fromBuildId = 3;
@@ -462,7 +519,7 @@ public class SamplePlayTest {
 		card = build.peek();
 		assertEquals(Suit.DIAMONDS,card.getSuit());
 		assertEquals(4, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getFoundationPile()[toFoundationId]);
 		foundation.getPile().get(toFoundationId).push(card);
 				
@@ -476,7 +533,7 @@ public class SamplePlayTest {
 		card = build.peek();
 		assertEquals(Suit.DIAMONDS,card.getSuit());
 		assertEquals(5, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getFoundationPile()[toFoundationId]);
 		foundation.getPile().get(toFoundationId).push(card);
 				
@@ -490,7 +547,7 @@ public class SamplePlayTest {
 		card = build.peek();
 		assertEquals(Suit.DIAMONDS,card.getSuit());
 		assertEquals(6, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getFoundationPile()[toFoundationId]);
 		foundation.getPile().get(toFoundationId).push(card);
 				
@@ -504,7 +561,7 @@ public class SamplePlayTest {
 		card = build.peek();
 		assertEquals(Suit.HEARTS,card.getSuit());
 		assertEquals(4, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);		
 		tableau.getBuild()[toBuildId].push(card);
 		//MOVE #23B - Flip card
@@ -520,7 +577,7 @@ public class SamplePlayTest {
 		card = build.peekFromBottom(0);
 		assertEquals(Suit.HEARTS,card.getSuit());
 		assertEquals(6, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getTableauBuild()[toBuildId]);	
 		tableau.getBuild()[toBuildId].push(build, card);
 		//MOVE #24B - Flip card
@@ -536,7 +593,7 @@ public class SamplePlayTest {
 		card = build.peek();
 		assertEquals(Suit.HEARTS,card.getSuit());
 		assertEquals(2, card.getValue());
-		canPush = game.canPush(card);
+		canPush = game.canPush(user, card);
 		assertTrue(canPush.getFoundationPile()[toFoundationId]);
 		foundation.getPile().get(toFoundationId).push(card);
 		//MOVE #25B - Flip card
@@ -547,10 +604,10 @@ public class SamplePlayTest {
 
 		
 				
-		game.discard(3);
-		game.getDiscardPile().print(3);
-		game.discard(3);
-		game.getDiscardPile().print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
+		game.discard(user);
+		game.getDiscardPile(user).print(3);
 		
 		//Game over because we've run out of moves
 	}

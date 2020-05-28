@@ -1,5 +1,98 @@
 
+var menu = {
+		games: []
+};
+
+
+(function() {
+	'user strict';
+	
+	menu.setup = function() {
+		menu.getUser();
+	}
+	
+	//---------------
+	// AJAX functions
+	//---------------
+	
+	menu.getUser = function() {
+		$.ajax({
+			type: 'POST', 
+			url: getRelativePath('/api/user'),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.debug(data);
+				app.user = data;
+				menu.getGames();
+			}});
+		
+	};
+	
+	menu.getGames = function() {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game'),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.debug(data);
+				menu.games = data;
+				menu.showGames();
+			}});
+	};
+	
+	//---------------
+	// Display functions
+	//---------------
+	
+	menu.showGames = function() {
+		$('#board').hide();
+		$('#menu').addClass("container").append(
+				$("<h1>").text("Double Solitare")).append(
+				$("<div>")
+					.addClass("list-group"));
+		
+		var newGameAction = function() {
+			app.setup(null);
+		};
+		var joinGameAction = function() {
+			app.setup(game.gameId);
+		};
+		
+		$("#menu .list-group")
+			.append(
+				$("<a href='#'>")
+					.addClass("list-group-item")
+					.addClass("list-group-item-action")
+					.text("New Single Player Game")
+					.on('click', newGameAction));
+//			.append(
+//				$("<a href='#'>")
+//					.addClass("list-group-item")
+//					.addClass("list-group-item-action")
+//					.text("New Multi-Player Game")
+//					.on('click', newMultiplayerGameAction));
+		for (gameIdx in menu.games) {
+			var game = menu.games[gameIdx];
+			$("#menu .list-group").append(
+					$("<a href='#'>")
+						.addClass("list-group-item")
+						.addClass("list-group-item-action")
+						.text("Game "+game.gameId)
+						.on('click', joinGameAction));
+		}
+		
+	}
+
+})();
+
+
+
+
 var app = {
+		user: {},
+		userboard: {},
 		gameboard: {},
 		gameId: null,
 		canMoveData: null
@@ -10,8 +103,14 @@ var app = {
 	'user strict';
 	
 	
-	app.setup = function() {
-		app.newGame();
+	app.setup = function(gameId) {
+		$('#board').show();
+		$('#menu').hide();
+		if (gameId!=null) {
+			app.joinGame(gameId);
+		} else {
+			app.newGame();
+		}
 	};
 	
 	//---------------
@@ -21,23 +120,84 @@ var app = {
 	app.newGame = function() {
 		$.ajax({
 			type: 'POST', 
-			url: getRelativePath('/api/game'),
+			url: getRelativePath('/api/game?multiplayer=false'
+					+'&userId='+app.user.id),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
 				console.debug(data);
-				app.gameboard = data;
-				app.gameId = data.gameId;
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
+				app.gameId = app.gameboard.gameId;
+				connect(app.gameId);
+				$('scoreBoard').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
-			}});
+			}});		
 	};
+	
+	app.joinGame = function(gameId) {
+		$.ajax({
+			type: 'POST', 
+			url: getRelativePath('/api/game/'+gameId+'/join'
+					+'?userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.debug(data);
+				connect(gameId);
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
+				app.gameId = app.gameboard.gameId;
+				app.setupStockAndDiscardPiles();
+				app.setupFoundation();
+				app.setupTableau();
+			}});		
+	};
+	
+	app.syncGame = function(gameId) {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+gameId
+					+'?userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.debug(data);
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
+				app.gameId = app.gameboard.gameId;
+			}});		
+	};
+	
+	app.leaveGame = function() {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+app.gameId+'/leave'
+					+'?userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json"});	
+	};
+	
+	app.handleBeforeUnload = function(){
+		$(window).on("beforeunload", function(e) {
+			app.leaveGame();
+		    return e.originalEvent.returnValue = "Are you sure you want to leave the game?";
+		});
+	};
+	
+	app.handleUnload = function() {
+		$(window).on('unload', function(){
+	    	app.leaveGame();
+	    });
+	}
 	
 	app.canMove = function(cardId) {
 		$.ajax({
 			type: 'GET', 
-			url: getRelativePath('/api/game/'+app.gameId+"/canmove/"+cardId),
+			url: getRelativePath('/api/game/'+app.gameId+"/canmove/"+cardId
+					+'?userId='+app.user.id),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
@@ -46,11 +206,32 @@ var app = {
 			}});
 	};
 	
+	app.syncFoundation = function(cardId, card, foundationId) {
+		console.log('syncFoundation('+cardId+","+foundationId+")");
+		var cardDiv = $("#foundationPile"+foundationId+" .pokercard");
+		var newCardDiv = $('<div>')
+			.addClass('pokercard').addClass('front')
+			.attr('data-card-id',card.unicodeInt)
+			.append($('<img>')
+				.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
+				.attr('title',card.unicodeHtmlEntity));
+		if (card.color=='RED') newCardDiv.addClass('red');
+		
+		if (cardDiv.length==0) {
+			if (cardDiv.attr('data-card-id')!=cardId) {
+				$("#foundationPile"+foundationId).append(newCardDiv);
+			}
+		} else {
+			cardDiv.replaceWith(newCardDiv);
+		}
+	}
+	
 	app.moveToFoundation = function(cardId, foundationId) {
 		
 		$.ajax({
 			type: 'GET', 
-			url: getRelativePath('/api/game/'+app.gameId+"/move/"+cardId+"/toFoundation/"+foundationId),
+			url: getRelativePath('/api/game/'+app.gameId+"/move/"+cardId+"/toFoundation/"+foundationId
+					+'?userId='+app.user.id),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
@@ -68,21 +249,25 @@ var app = {
 				nextBuildDiv.remove();
 				cardDiv.removeClass('fan-down')
 				cardDiv.removeClass('fan-right');
-				app.gameboard = data;
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
 				if (pileId!=null) {
-					if (app.gameboard.tableau.pile[pileId].numberOfCards>0) {
+					if (app.userboard.tableau.pile[pileId].numberOfCards>0) {
 						app.flip(pileId);
 					}
 				} else {
 					$('#discardPile .build').append($('#discardPile .pokercard:last'));
 				}
+				$('#score').html('Score: '+app.userboard.score.totalScore);
+				$('#moves').html('Moves: '+app.userboard.score.totalMoves);
 			}});
 	};
 	
 	app.moveToTableau = function(cardId, buildId) {
 		$.ajax({
 			type: 'GET', 
-			url: getRelativePath('/api/game/'+app.gameId+"/move/"+cardId+"/toTableau/"+buildId),
+			url: getRelativePath('/api/game/'+app.gameId+"/move/"+cardId+"/toTableau/"+buildId
+					+'?userId='+app.user.id),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
@@ -93,13 +278,14 @@ var app = {
 				var nextBuildDiv = cardDiv.next('.build');
 				$("#pile"+buildId+" .build:last").append(cardDiv).append(nextBuildDiv);
 				cardDiv.removeClass('fan-right');
-				if (app.gameboard.tableau.build[buildId].numberOfCards+app.gameboard.tableau.pile[buildId].numberOfCards==0) 
+				if (app.userboard.tableau.build[buildId].numberOfCards+app.userboard.tableau.pile[buildId].numberOfCards==0) 
 					cardDiv.removeClass('fan-down');
 				else
 					cardDiv.addClass('fan-down')
-				app.gameboard = data;
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
 				if (fromPileId!=null) {
-					if (app.gameboard.tableau.build[fromPileId].numberOfCards>0) {
+					if (app.userboard.tableau.build[fromPileId].numberOfCards>0) {
 						app.flip(fromPileId);
 					}
 				} else {
@@ -107,21 +293,25 @@ var app = {
 					var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
 					$('#discardPile .build').append($('#discardPile .pokercard:last')).append(subBuildDiv);
 				}
+				$('#score').html('Score: '+app.userboard.score.totalScore);
+				$('#moves').html('Moves: '+app.userboard.score.totalMoves);
 			}});
 	};
 	
 	app.discard = function() {
 		$.ajax({
 			type: 'GET', 
-			url: getRelativePath('/api/game/'+app.gameId+"/discard"),
+			url: getRelativePath('/api/game/'+app.gameId+"/discard"
+					+'?userId='+app.user.id),
 			contentType: "application/json",
 			dataType: "json",
 			success: function(data){
 				console.debug(data);
-				app.gameboard = data;
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
 				$('#discard-pile').empty();
 				for (var c=0; c<3; c++) {
-					var card = app.gameboard.discardPile.cards[2-c];
+					var card = app.userboard.discardPile.cards[2-c];
 					var cardDiv = $('<div>')
 						.addClass('pokercard').addClass('front')
 						.attr('data-card-id',card.unicodeInt)
@@ -142,6 +332,13 @@ var app = {
 						$('#discard-pile').append(cardDiv);
 					}
 				}
+				if (app.userboard.stockPile.empty) {
+					$('#stock-pile .pokercard').hide();
+				} else {
+					$('#stock-pile .pokercard').show();
+				}
+				$('#score').html('Score: '+app.userboard.score.totalScore);
+				$('#moves').html('Moves: '+app.userboard.score.totalMoves);
 			}});
 	};
 	
@@ -151,7 +348,7 @@ var app = {
 	
 	app.flip = function(pileId) {
 		var cardDiv = $('#tableau #pile'+pileId+' .pokercard:last');
-		var build = app.gameboard.tableau.build[pileId];
+		var build = app.userboard.tableau.build[pileId];
 		var card = build.cards[build.cards.length-1];
 		var subBuildDiv = $('<div>').addClass('build').attr('draggable',true)
 			.on('dragstart', app.drag);
@@ -168,15 +365,16 @@ var app = {
 		if (card.color=='RED') cardDiv.addClass('red');
 	}
 	
-	app.setupFoundation = function() {
-		$('#foundation').addClass('row');
+	app.addPlayer = function(rowNum) {
+		var rowDiv = $('<div>').addClass('row')
+		$('#foundation').append(rowDiv);
 		for (var i=0; i<4; i++) {
 			//create pileDiv
 			var colDiv = $('<div>').addClass('col');
-			$('#foundation').append(colDiv);
-			var pileDiv = $('<div>').attr('id','foundationPile'+i)
+			rowDiv.append(colDiv);
+			var pileDiv = $('<div>').attr('id','foundationPile'+((rowNum*4)+i))
 				.addClass('pile')
-				.attr('data-pile-id',i)
+				.attr('data-pile-id',((rowNum*4)+i))
 				.on('drop', app.drop)
 				.on('dragover', app.dragover)
 				.on('dragenter', app.dragenter)
@@ -186,13 +384,19 @@ var app = {
 			var targetDiv = $('<div>').addClass('target');
 			pileDiv.append(targetDiv);
 		}
+	}
+	
+	app.setupFoundation = function() {
+		for (var i=0; i<app.gameboard.numOfUsers; i++) {
+			app.addPlayer(i);
+		}
 	};
 	
 	app.setupTableau = function() {
 		$('#tableau').addClass('row');
 		for (var i=0; i<7; i++) {
-			var pile = app.gameboard.tableau.pile[i];
-			var build = app.gameboard.tableau.build[i];
+			var pile = app.userboard.tableau.pile[i];
+			var build = app.userboard.tableau.build[i];
 			
 			//create pileDiv
 			var colDiv = $('<div>').addClass('col');
@@ -352,4 +556,4 @@ var app = {
 	
 })();
 
-app.setup();
+menu.setup();

@@ -1,7 +1,18 @@
+@media (orientation: landscape) {
+	#board {
+		padding-left: 3vw;
+		padding-right: 3vw;
+	}
+}
+@media (orientation: portrait) {
+	#board {
+    	padding: 0;
+	}
+}
+
 #board {
 	background-color: #008800;
 	position:fixed;
-    padding:0;
     margin:0;
     top:0;
     left:0;
@@ -9,15 +20,34 @@
     height: 100%;
 }
 
+#scoreBar {
+	padding: 0.5vw;
+	color: #FFF;
+	background-color: rgba(0,0,0,0.4); 
+}
+
 #topSection {
 	margin-top: 1vw;
 	width:100%;
-	height: 20vw;
 }
 
-#foundation .pile {
-	/*border-radius: 1rem;
-	border: 2px solid #CCC;*/
+
+#stockPile, #discardPile {
+	position: relative;
+}
+
+#stock-pile, #discard-pile {
+	position: absolute;
+	bottom: 0;
+}
+
+
+#foundation .row {
+	min-height: 10vw;
+}
+
+#tableau {
+	margin-top: 2vw;
 }
 
 #tableau.row, #topSection.row {
@@ -30,8 +60,16 @@
 }
 
 .pile {
-	/*width: 100%;*/
 	min-height: 17vw;
+}
+
+#foundation .pile, #tableau .pile, #stockPile .pile {
+	background-color: #44AA44;
+	width: 12vw;
+	border-radius: .5rem;
+}
+#foundation .row {
+	padding: 1vw;
 }
 
 .pile.canDrop {
@@ -67,6 +105,9 @@
 	color: blue;
 }
 
+#discard-pile {
+	min-width: 12vw;
+}
 #discard-pile .pokercard {
 	width: 12vw;
 	float: left;
