@@ -72,7 +72,7 @@
 	padding: 1vw;
 }
 
-.pile.canDrop {
+#foundation .pile.canDrop, #tableau .pile.canDrop {
 	background-color: #00CC00;
 }
 
