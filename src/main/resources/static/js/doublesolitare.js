@@ -129,8 +129,27 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				$('scoreBar').show();
+				app.setupStockAndDiscardPiles();
+				app.setupFoundation();
+				app.setupTableau();
+			}});		
+	};
+	
+	app.newMultiplayerGame = function() {
+		$.ajax({
+			type: 'POST', 
+			url: getRelativePath('/api/game?multiplayer=true'
+					+'&userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.debug(data);
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
+				app.gameId = app.gameboard.gameId;
 				connect(app.gameId);
-				$('scoreBoard').show();
+				//$('scoreBoard').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
