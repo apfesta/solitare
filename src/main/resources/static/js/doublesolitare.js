@@ -130,6 +130,7 @@ var app = {
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				connect(app.gameId);
+				$('scoreBoard').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -257,6 +258,8 @@ var app = {
 				} else {
 					$('#discardPile .build').append($('#discardPile .pokercard:last'));
 				}
+				$('#score').html('Score: '+app.userboard.score.totalScore);
+				$('#moves').html('Moves: '+app.userboard.score.totalMoves);
 			}});
 	};
 	
@@ -290,6 +293,8 @@ var app = {
 					var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
 					$('#discardPile .build').append($('#discardPile .pokercard:last')).append(subBuildDiv);
 				}
+				$('#score').html('Score: '+app.userboard.score.totalScore);
+				$('#moves').html('Moves: '+app.userboard.score.totalMoves);
 			}});
 	};
 	
@@ -332,6 +337,8 @@ var app = {
 				} else {
 					$('#stock-pile .pokercard').show();
 				}
+				$('#score').html('Score: '+app.userboard.score.totalScore);
+				$('#moves').html('Moves: '+app.userboard.score.totalMoves);
 			}});
 	};
 	

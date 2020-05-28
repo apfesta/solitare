@@ -20,6 +20,12 @@
     height: 100%;
 }
 
+#scoreBar {
+	padding: 0.5vw;
+	color: #FFF;
+	background-color: rgba(0,0,0,0.4); 
+}
+
 #topSection {
 	margin-top: 1vw;
 	width:100%;
