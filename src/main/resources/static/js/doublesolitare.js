@@ -24,6 +24,7 @@ var menu = {
 			success: function(data){
 				console.debug(data);
 				app.user = data;
+				$('.users .me').text(app.user.username);
 				menu.getGames();
 			}});
 		
@@ -54,10 +55,13 @@ var menu = {
 					.addClass("list-group"));
 		
 		var newGameAction = function() {
-			app.setup(null);
+			app.setup(null, false);
+		};
+		var newMultiplayerGameAction = function() {
+			app.setup(null, true);
 		};
 		var joinGameAction = function() {
-			app.setup(game.gameId);
+			app.setup(game.gameId, true);
 		};
 		
 		$("#menu .list-group")
@@ -72,13 +76,20 @@ var menu = {
 //					.addClass("list-group-item")
 //					.addClass("list-group-item-action")
 //					.text("New Multi-Player Game")
+//					.attr('data-toggle','modal')
+//					.attr('data-target','#waitForPlayers')
+//					.attr('data-backdrop',"static")
 //					.on('click', newMultiplayerGameAction));
+			
 		for (gameIdx in menu.games) {
 			var game = menu.games[gameIdx];
 			$("#menu .list-group").append(
 					$("<a href='#'>")
 						.addClass("list-group-item")
 						.addClass("list-group-item-action")
+						 .attr('data-toggle','modal')
+						 .attr('data-target','#waitForPlayers')
+						 .attr('data-backdrop',"static")
 						.text("Game "+game.gameId)
 						.on('click', joinGameAction));
 		}
@@ -103,11 +114,13 @@ var app = {
 	'user strict';
 	
 	
-	app.setup = function(gameId) {
+	app.setup = function(gameId, multiplayer) {
 		$('#board').show();
 		$('#menu').hide();
-		if (gameId!=null) {
+		if (multiplayer && gameId!=null) {
 			app.joinGame(gameId);
+		} else if (multiplayer){
+			app.newMultiplayerGame();
 		} else {
 			app.newGame();
 		}
@@ -129,8 +142,27 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				$('#scoreBar').show();
+				app.setupStockAndDiscardPiles();
+				app.setupFoundation();
+				app.setupTableau();
+			}});		
+	};
+	
+	app.newMultiplayerGame = function() {
+		$.ajax({
+			type: 'POST', 
+			url: getRelativePath('/api/game?multiplayer=true'
+					+'&userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.debug(data);
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
+				app.gameId = app.gameboard.gameId;
 				connect(app.gameId);
-				$('scoreBoard').show();
+				$('#scoreBar').hide();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -147,6 +179,7 @@ var app = {
 			success: function(data){
 				console.debug(data);
 				connect(gameId);
+				$('#scoreBar').hide();
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
@@ -386,9 +419,22 @@ var app = {
 		}
 	}
 	
+	app.removePlayer = function() {
+		$('#foundation .row').get(0).remove();
+	}
+	
 	app.setupFoundation = function() {
-		for (var i=0; i<app.gameboard.numOfUsers; i++) {
+		for (i in app.gameboard.users) {
 			app.addPlayer(i);
+			if (app.gameboard.users[i].id!=app.user.id) {
+				$('.users').append(
+	    				$('<div>')
+	    					.addClass('list-group-item')
+	    					.addClass('user')
+	    					.attr('data-user-id',app.gameboard.users[i].id)
+	    					.text(app.gameboard.users[i].username));
+			}
+			
 		}
 	};
 	

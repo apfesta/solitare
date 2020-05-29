@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugProperties;
 import com.andrewfesta.doublesolitare.model.Card;
 import com.andrewfesta.doublesolitare.model.GameBoard;
 import com.andrewfesta.doublesolitare.model.User;
@@ -36,6 +37,9 @@ public class MainController {
 	
 	@Autowired
 	SyncService syncService;
+	
+	@Autowired
+	DoubleSolitareDebugProperties debugProperties;
 
 	@RequestMapping(value="/", method = RequestMethod.GET)
 	public String displayBoard() {
@@ -48,7 +52,7 @@ public class MainController {
 		LOG.trace("POST /api/game");
 		GameBoard game = new GameBoard(gameIdSequence.incrementAndGet(), multiplayer);
 		User user = users.get(userId);
-		game.setShuffle(false);
+		game.setShuffle(debugProperties.isShuffle());
 		game.setup(user);
 		games.put(game.getGameId(), game);
 		

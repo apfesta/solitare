@@ -7,8 +7,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 public class GameBoard {
 	
@@ -24,6 +22,7 @@ public class GameBoard {
 	int maxNumberOfCards = 3; //cards to discard
 	
 	Map<User, UserBoard> userBoards = new HashMap<>();
+	Map<Integer, Score> userScores = new HashMap<>();
 	
 	public GameBoard(Integer gameId, boolean multiPlayer) {
 		super();
@@ -149,11 +148,6 @@ public class GameBoard {
 		return gameId;
 	}
 
-	public int getNumOfUsers() {
-		return userBoards.size();
-	}
-	
-	@JsonIgnore
 	public Collection<User> getUsers() {
 		return userBoards.keySet();
 	}
@@ -162,6 +156,14 @@ public class GameBoard {
 		return userBoards.get(user);
 	}
 	
+	public Map<Integer, Score> getUserScores() {
+		return userScores;
+	}
+
+	public void setUserScores(Map<Integer, Score> userScores) {
+		this.userScores = userScores;
+	}
+
 	public Tableau getTableau(User user) {
 		return userBoards.get(user).tableau;
 	}
@@ -188,6 +190,24 @@ public class GameBoard {
 
 	public void setGameOver(boolean gameWon) {
 		this.gameOver = gameWon;
+	}
+	
+	public static class Score {
+		int toFoundation = 0;
+		int discardToTableau = 0;
+		int discard = 0;
+		
+		public int getToFoundation() {
+			return toFoundation;
+		}
+
+		public void setToFoundation(int toFoundation) {
+			this.toFoundation = toFoundation;
+		}
+		public int getTotalMoves() {
+			return toFoundation+discardToTableau+discard;
+		}
+		
 	}
 	
 }

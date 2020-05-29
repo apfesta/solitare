@@ -24,3 +24,11 @@ server:
     key-store-type: ${KEYSTORE_TYPE}
     key-store-password: ${KEYSTORE_PASS} 
 #    key-alias: ${KEYSTORE_ALIAS}
+
+---
+spring:
+  profiles: test
+
+doublesolitare:
+  debug:
+    shuffle: false

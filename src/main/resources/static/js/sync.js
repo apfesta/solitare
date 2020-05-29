@@ -28,14 +28,22 @@ function setConnected(connected, gameId) {
     stompClient.subscribe('/topic/game/'+gameId+'/activity', function(result){ 
     	console.log(result);
     	var data = JSON.parse(result.body);
-    	console.log(data);
     	if (data.action=='MOVE_TO_FOUNDATION') {
     		console.log(data.foundation.pile[data.toFoundationId]);
     		app.syncFoundation(data.cardId, data.foundation.pile[data.toFoundationId].cards[0], data.toFoundationId);
     	}
     	if (data.action=='PLAYER_JOIN') {
-    		console.log(data.foundation);
     		app.addPlayer(data.numOfUsers-1);
+    		$('.users').append(
+    				$('<div>')
+    					.addClass('list-group-item')
+    					.addClass('user')
+    					.attr('data-user-id',data.user.id)
+    					.text(data.user.username));
+    	}
+    	if (data.action=='PLAYER_DROP') {
+    		app.removePlayer();
+    		$('.users .user[data-user-id='+data.user.id+']').remove();
     	}
     	
     });
