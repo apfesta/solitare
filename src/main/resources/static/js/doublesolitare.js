@@ -70,16 +70,16 @@ var menu = {
 					.addClass("list-group-item")
 					.addClass("list-group-item-action")
 					.text("New Single Player Game")
-					.on('click', newGameAction))
-			.append(
-				$("<a href='#'>")
-					.addClass("list-group-item")
-					.addClass("list-group-item-action")
-					.text("New Multi-Player Game")
-					.attr('data-toggle','modal')
-					.attr('data-target','#waitForPlayers')
-					.attr('data-backdrop',"static")
-					.on('click', newMultiplayerGameAction));
+					.on('click', newGameAction));
+//			.append(
+//				$("<a href='#'>")
+//					.addClass("list-group-item")
+//					.addClass("list-group-item-action")
+//					.text("New Multi-Player Game")
+//					.attr('data-toggle','modal')
+//					.attr('data-target','#waitForPlayers')
+//					.attr('data-backdrop',"static")
+//					.on('click', newMultiplayerGameAction));
 			
 		for (gameIdx in menu.games) {
 			var game = menu.games[gameIdx];
