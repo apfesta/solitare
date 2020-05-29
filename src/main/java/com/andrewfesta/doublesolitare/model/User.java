@@ -12,6 +12,7 @@ public class User {
 	public User(Integer id) {
 		super();
 		this.id = id;
+		this.username = "User "+id;
 	}
 
 	public Integer getId() {
