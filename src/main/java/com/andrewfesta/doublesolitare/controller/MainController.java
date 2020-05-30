@@ -97,6 +97,16 @@ public class MainController {
 		return game.getUserBoard(user);
 	}
 	
+	@RequestMapping(value="/api/game/{gameId}/ready", method = RequestMethod.GET)
+	public @ResponseBody void readyStatus(@PathVariable Integer gameId,
+			@RequestParam("userId") Integer userId,
+			@RequestParam("ready") boolean ready) {
+		LOG.trace("GET /api/game/{}/ready", gameId);
+		GameBoard game = games.get(gameId);
+		User user = users.get(userId);
+		syncService.notifyPlayerStatus(game, user, ready);
+	}
+	
 	@RequestMapping(value="/api/game/{gameId}/leave", method = RequestMethod.GET)
 	public @ResponseBody void leaveGame(@PathVariable Integer gameId,
 			@RequestParam("userId") Integer userId) {

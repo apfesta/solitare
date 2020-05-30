@@ -23,9 +23,14 @@ public class SyncService {
 				new GameUpdate(GameUpdateAction.PLAYER_JOIN, user, game));
 	}
 	
+	public void notifyPlayerStatus(GameBoard game, User user, boolean isReady) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new BasePayload(isReady?GameUpdateAction.PLAYER_READY:GameUpdateAction.PLAYER_NOT_READY, user));
+	}
+	
 	public void notifyPlayerDrop(GameBoard game, User user) {
 		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
-				new GameUpdate(GameUpdateAction.PLAYER_DROP, user, game));
+				new BasePayload(GameUpdateAction.PLAYER_DROP, user));
 	}
 	
 	public void notifyMoveToFoundation(GameBoard game, User user,
@@ -47,13 +52,30 @@ public class SyncService {
 	enum GameUpdateAction {
 		PLAYER_JOIN,
 		PLAYER_DROP,
+		PLAYER_READY,
+		PLAYER_NOT_READY,
 		MOVE_TO_FOUNDATION,
 		MOVE_TO_TABLEAU
 	}
 
-	static class GameUpdate {
+	static class BasePayload {
 		final GameUpdateAction action;
 		final User user;
+		
+		public BasePayload(GameUpdateAction action, User user) {
+			super();
+			this.action = action;
+			this.user = user;
+		}
+		public GameUpdateAction getAction() {
+			return action;
+		}
+		public User getUser() {
+			return user;
+		}
+	}
+		
+	static class GameUpdate extends BasePayload {
 		final Foundation foundation;
 		Integer cardId;
 		Integer toFoundationId;
@@ -61,9 +83,7 @@ public class SyncService {
 		Integer numOfUsers;
 		
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game) {
-			super();
-			this.action = action;
-			this.user = user;
+			super(action, user);
 			this.foundation = game.getFoundation();
 			this.numOfUsers = game.getUsers().size();
 		}
@@ -73,12 +93,6 @@ public class SyncService {
 			this.cardId = cardId;
 			this.toFoundationId = toFoundationId;
 			this.toBuildId = toBuildId;
-		}
-		public GameUpdateAction getAction() {
-			return action;
-		}
-		public User getUser() {
-			return user;
 		}
 		public Foundation getFoundation() {
 			return foundation;

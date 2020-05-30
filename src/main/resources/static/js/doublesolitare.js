@@ -24,7 +24,9 @@ var menu = {
 			success: function(data){
 				console.debug(data);
 				app.user = data;
-				$('.users .me').text(app.user.username);
+				$('.users .me')
+					.html(app.user.username+ " <label>I'm Ready: <input class='ready' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
+				$('.ready').on('change',app.readyStatusOnChange);
 				menu.getGames();
 			}});
 		
@@ -70,16 +72,16 @@ var menu = {
 					.addClass("list-group-item")
 					.addClass("list-group-item-action")
 					.text("New Single Player Game")
-					.on('click', newGameAction));
-//			.append(
-//				$("<a href='#'>")
-//					.addClass("list-group-item")
-//					.addClass("list-group-item-action")
-//					.text("New Multi-Player Game")
-//					.attr('data-toggle','modal')
-//					.attr('data-target','#waitForPlayers')
-//					.attr('data-backdrop',"static")
-//					.on('click', newMultiplayerGameAction));
+					.on('click', newGameAction))
+			.append(
+				$("<a href='#'>")
+					.addClass("list-group-item")
+					.addClass("list-group-item-action")
+					.text("New Multi-Player Game")
+					.attr('data-toggle','modal')
+					.attr('data-target','#waitForPlayers')
+					.attr('data-backdrop',"static")
+					.on('click', newMultiplayerGameAction));
 			
 		for (gameIdx in menu.games) {
 			var game = menu.games[gameIdx];
@@ -187,6 +189,16 @@ var app = {
 				app.setupFoundation();
 				app.setupTableau();
 			}});		
+	};
+	
+	app.readyStatus = function(gameId, ready) {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+gameId+'/ready'
+					+'?ready='+ready
+					+'&userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json"});		
 	};
 	
 	app.syncGame = function(gameId) {
@@ -427,16 +439,26 @@ var app = {
 		for (i in app.gameboard.users) {
 			app.addPlayer(i);
 			if (app.gameboard.users[i].id!=app.user.id) {
-				$('.users').append(
-	    				$('<div>')
-	    					.addClass('list-group-item')
-	    					.addClass('user')
-	    					.attr('data-user-id',app.gameboard.users[i].id)
-	    					.text(app.gameboard.users[i].username));
+				app.addPlayerStatus(app.gameboard.users[i]);
 			}
 			
 		}
 	};
+	
+	app.readyStatusOnChange = function() {
+		console.log($(this).is(':checked'));
+		app.readyStatus(app.gameId, $(this).is(':checked'));
+	}
+	
+	app.addPlayerStatus = function(user) {
+		var userDiv = $('<div>')
+			.addClass('list-group-item')
+			.addClass('user')
+			.attr('data-user-id',user.id)
+			.html(user.username+ " <label>I'm Ready: <input class='ready' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
+		userDiv.find('.ready').on('change',app.readyStatusOnChange);
+		$('.users').append(userDiv);
+	}
 	
 	app.setupTableau = function() {
 		$('#tableau').addClass('row');

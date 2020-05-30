@@ -126,3 +126,6 @@
 .fan-right {
 	margin-right: -10vw;
 }
+.users .user label {
+	float:right;
+}

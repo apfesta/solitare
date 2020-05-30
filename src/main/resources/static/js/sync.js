@@ -34,18 +34,17 @@ function setConnected(connected, gameId) {
     	}
     	if (data.action=='PLAYER_JOIN') {
     		app.addPlayer(data.numOfUsers-1);
-    		$('.users').append(
-    				$('<div>')
-    					.addClass('list-group-item')
-    					.addClass('user')
-    					.attr('data-user-id',data.user.id)
-    					.text(data.user.username));
+    		app.addPlayerStatus(data.user);
     	}
     	if (data.action=='PLAYER_DROP') {
     		app.removePlayer();
     		$('.users .user[data-user-id='+data.user.id+']').remove();
     	}
-    	
+    	if (data.action=='PLAYER_READY') {
+    		$('.ready[data-user-id='+data.user.id+']').prop('checked', true);
+    	} else if (data.action=='PLAYER_NOT_READY') {
+    		$('.ready[data-user-id='+data.user.id+']').prop('checked', false);
+    	}
     });
   }
 }
