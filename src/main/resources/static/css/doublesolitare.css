@@ -133,3 +133,6 @@
     transform: scale(2);
     -webkit-transform: scale(2);
 }
+progress#startgame_countdown {
+	width:100%;
+}

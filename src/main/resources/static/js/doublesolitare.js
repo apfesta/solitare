@@ -108,7 +108,8 @@ var app = {
 		userboard: {},
 		gameboard: {},
 		gameId: null,
-		canMoveData: null
+		canMoveData: null,
+		countdownTimer: null
 };
 
 
@@ -451,9 +452,10 @@ var app = {
 		if ($('.user .ready').length < 2) {
 			isready = false;
 			console.log('Not enough players');
-			$('#startgame')
-				.prop('disabled',true)
+			$('#startgame_countdown_text')
 				.text('Waiting...');
+			if (app.coundownTimer!=null) clearInterval(app.countdownTimer);
+			$("#startgame_countdown").val(0);
 			return;
 		}
 		$('.user .ready').each(function(i){
@@ -461,14 +463,27 @@ var app = {
 			if (!$(this).is(':checked')) {
 				isready = false;
 				console.log('user '+$(this).attr('data-user-id')+' is not ready');
-				$('#startgame')
-					.prop('disabled',true)
+				$('#startgame_countdown_text')
 					.text('Waiting...');
+				if (app.coundownTimer!=null) clearInterval(app.countdownTimer);
+				$("#startgame_countdown").val(0);
 			}
 		});
 		if (isready) {
-			$('#startgame')
-				.prop('disabled',false).text('Starting game in 5...');
+			$('#startgame_countdown_text')
+				.text('Starting game in 5...');
+			
+			var timeleft = 5;
+			app.countdownTimer = setInterval(function(){
+			  if(timeleft <= 0){
+			    clearInterval(app.countdownTimer);
+			    $('#waitForPlayers').modal('hide');
+			  }
+			  $("#startgame_countdown").val(5 - timeleft);
+			  $('#startgame_countdown_text')
+				.text('Starting game in '+timeleft+'...');
+			  timeleft -= 1;
+			}, 1000);
 		}
 	}
 	
