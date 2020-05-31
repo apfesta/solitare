@@ -25,7 +25,7 @@ var menu = {
 				console.debug(data);
 				app.user = data;
 				$('.users .me')
-					.html(app.user.username+ " <label>I'm Ready: <input class='ready' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
+					.html(app.user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
 				$('.ready').on('change',app.readyStatusOnChange);
 				menu.getGames();
 			}});
@@ -391,6 +391,7 @@ var app = {
 	// Display functions
 	//---------------
 	
+	
 	app.flip = function(pileId) {
 		var cardDiv = $('#tableau #pile'+pileId+' .pokercard:last');
 		var build = app.userboard.tableau.build[pileId];
@@ -445,8 +446,35 @@ var app = {
 		}
 	};
 	
+	app.checkReadyStatus = function() {
+		var isready = true;
+		if ($('.user .ready').length < 2) {
+			isready = false;
+			console.log('Not enough players');
+			$('#startgame')
+				.prop('disabled',true)
+				.text('Waiting...');
+			return;
+		}
+		$('.user .ready').each(function(i){
+			console.log($(this))
+			if (!$(this).is(':checked')) {
+				isready = false;
+				console.log('user '+$(this).attr('data-user-id')+' is not ready');
+				$('#startgame')
+					.prop('disabled',true)
+					.text('Waiting...');
+			}
+		});
+		if (isready) {
+			$('#startgame')
+				.prop('disabled',false).text('Starting game in 5...');
+		}
+	}
+	
+	
 	app.readyStatusOnChange = function() {
-		console.log($(this).is(':checked'));
+//		console.log($(this).is(':checked'));
 		app.readyStatus(app.gameId, $(this).is(':checked'));
 	}
 	
@@ -455,7 +483,7 @@ var app = {
 			.addClass('list-group-item')
 			.addClass('user')
 			.attr('data-user-id',user.id)
-			.html(user.username+ " <label>I'm Ready: <input class='ready' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
+			.html(user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
 		userDiv.find('.ready').on('change',app.readyStatusOnChange);
 		$('.users').append(userDiv);
 	}

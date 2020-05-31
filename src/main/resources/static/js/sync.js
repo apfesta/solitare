@@ -42,8 +42,10 @@ function setConnected(connected, gameId) {
     	}
     	if (data.action=='PLAYER_READY') {
     		$('.ready[data-user-id='+data.user.id+']').prop('checked', true);
+    		app.checkReadyStatus();
     	} else if (data.action=='PLAYER_NOT_READY') {
     		$('.ready[data-user-id='+data.user.id+']').prop('checked', false);
+    		app.checkReadyStatus();
     	}
     });
   }
