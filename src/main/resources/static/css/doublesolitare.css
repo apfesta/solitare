@@ -20,8 +20,22 @@
     height: 100%;
 }
 
+
 #scoreBar {
 	padding: 0.5vw;
+	color: #FFF;
+	background-color: rgba(0,0,0,0.4); 
+}
+
+
+#topLeftSection #scoreBoard {
+	padding-right: 1vw;
+	padding-top: 0.5vw;
+}
+
+#scoreBoard .user {
+	padding: 0.5vw;
+	margin: 0.5vw;
 	color: #FFF;
 	background-color: rgba(0,0,0,0.4); 
 }
@@ -31,6 +45,11 @@
 	width:100%;
 }
 
+#stockAndDiscardPiles {
+	min-height: 17vw;
+	width: 100%;
+	margin: 0;
+}
 
 #stockPile, #discardPile {
 	position: relative;
@@ -57,6 +76,10 @@
 #tableau .col, #topSection .col, #foundation .col {
 	padding-left:0.25vh;
 	padding-right:0.25vh;
+}
+#topLeftSection .col {
+	padding-left:0;
+	padding-right:0;
 }
 
 .pile {

@@ -28,6 +28,11 @@ public class SyncService {
 				new BasePayload(isReady?GameUpdateAction.PLAYER_READY:GameUpdateAction.PLAYER_NOT_READY, user));
 	}
 	
+	public void notifyCountdown(GameBoard game, User user, boolean isCountdown) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new BasePayload(isCountdown?GameUpdateAction.COUNTDOWN_STARTED:GameUpdateAction.COUNTDOWN_CANCELLED, user));
+	}
+	
 	public void notifyPlayerDrop(GameBoard game, User user) {
 		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new BasePayload(GameUpdateAction.PLAYER_DROP, user));
@@ -54,6 +59,8 @@ public class SyncService {
 		PLAYER_DROP,
 		PLAYER_READY,
 		PLAYER_NOT_READY,
+		COUNTDOWN_STARTED,
+		COUNTDOWN_CANCELLED,
 		MOVE_TO_FOUNDATION,
 		MOVE_TO_TABLEAU
 	}

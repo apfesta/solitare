@@ -24,9 +24,11 @@ var menu = {
 			success: function(data){
 				console.debug(data);
 				app.user = data;
-				$('.users .me')
+				$('#waitForPlayers .users .me')
 					.html(app.user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
 				$('.ready').on('change',app.readyStatusOnChange);
+				$('#scoreBoard.users .me')
+					.text(app.user.username);
 				menu.getGames();
 			}});
 		
@@ -146,6 +148,7 @@ var app = {
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				$('#scoreBar').show();
+				$('#scoreBoard').hide();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -166,6 +169,7 @@ var app = {
 				app.gameId = app.gameboard.gameId;
 				connect(app.gameId);
 				$('#scoreBar').hide();
+				$('#scoreBoard').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -500,7 +504,13 @@ var app = {
 			.attr('data-user-id',user.id)
 			.html(user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
 		userDiv.find('.ready').on('change',app.readyStatusOnChange);
-		$('.users').append(userDiv);
+		$('#waitForPlayers .users').append(userDiv);
+		
+		$('#scoreBoard.users').append(
+				$('<div>')
+					.addClass('user')
+					.attr('data-user-id',user.id)
+					.text(user.username));
 	}
 	
 	app.setupTableau = function() {
