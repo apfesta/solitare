@@ -27,8 +27,16 @@ var menu = {
 				$('#waitForPlayers .users .me')
 					.html(app.user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
 				$('.ready').on('change',app.readyStatusOnChange);
-				$('#scoreBoard.users .me')
-					.text(app.user.username);
+				$('#scoreBoard .user.me')
+							.addClass('row')
+							.attr('data-user-id',app.user.id)
+								.append(
+									$('<div>').addClass('username').addClass('col').text(app.user.username))
+								.append(
+									$('<div>').addClass('score').addClass('col').text('Score: 0'))
+								.append(
+									$('<div>').addClass('moves').addClass('col').text('Moves: 0'));
+			
 				menu.getGames();
 			}});
 		
@@ -308,8 +316,8 @@ var app = {
 				} else {
 					$('#discardPile .build').append($('#discardPile .pokercard:last'));
 				}
-				$('#score').html('Score: '+app.userboard.score.totalScore);
-				$('#moves').html('Moves: '+app.userboard.score.totalMoves);
+				$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
+				$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
 			}});
 	};
 	
@@ -508,9 +516,14 @@ var app = {
 		
 		$('#scoreBoard.users').append(
 				$('<div>')
-					.addClass('user')
+					.addClass('user').addClass('row')
 					.attr('data-user-id',user.id)
-					.text(user.username));
+						.append(
+							$('<div>').addClass('username').addClass('col').text(user.username))
+						.append(
+							$('<div>').addClass('score').addClass('col').text('Score: 0'))
+						.append(
+							$('<div>').addClass('moves').addClass('col').text('Moves: 0')));
 	}
 	
 	app.setupTableau = function() {

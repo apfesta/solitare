@@ -1,5 +1,7 @@
 package com.andrewfesta.doublesolitare.service.impl;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.andrewfesta.doublesolitare.model.Foundation;
 import com.andrewfesta.doublesolitare.model.GameBoard;
 import com.andrewfesta.doublesolitare.model.User;
+import com.andrewfesta.doublesolitare.model.UserBoard.Score;
 
 @Component
 public class SyncService {
@@ -54,6 +57,12 @@ public class SyncService {
 						cardId, null, toBuildId));
 	}
 	
+	public void notifyDiscard(GameBoard game, User user) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new GameUpdate(GameUpdateAction.DISCARD, user, game, 
+						null, null, null));
+	}
+	
 	enum GameUpdateAction {
 		PLAYER_JOIN,
 		PLAYER_DROP,
@@ -62,7 +71,8 @@ public class SyncService {
 		COUNTDOWN_STARTED,
 		COUNTDOWN_CANCELLED,
 		MOVE_TO_FOUNDATION,
-		MOVE_TO_TABLEAU
+		MOVE_TO_TABLEAU,
+		DISCARD
 	}
 
 	static class BasePayload {
@@ -88,11 +98,13 @@ public class SyncService {
 		Integer toFoundationId;
 		Integer toBuildId;
 		Integer numOfUsers;
+		Map<Integer, Score> score;
 		
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game) {
 			super(action, user);
 			this.foundation = game.getFoundation();
 			this.numOfUsers = game.getUsers().size();
+			this.score = game.getUserScores();
 		}
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game, 
 				Integer cardId, Integer toFoundationId, Integer toBuildId) {
@@ -121,6 +133,12 @@ public class SyncService {
 		}
 		public void setNumOfUsers(Integer numOfUsers) {
 			this.numOfUsers = numOfUsers;
+		}
+		public Map<Integer, Score> getScore() {
+			return score;
+		}
+		public void setScore(Map<Integer, Score> score) {
+			this.score = score;
 		}
 		
 		

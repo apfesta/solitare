@@ -195,6 +195,7 @@ public class MainController {
 		User user = users.get(userId);
 		
 		game.discard(user);
+		syncService.notifyDiscard(game, user);
 		
 		game.getDiscardPile(user).print(3);
 		game.getUserBoard(user).getScore().prettyPrint();

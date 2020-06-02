@@ -110,6 +110,7 @@ public class UserBoard {
 			Card c = stockPile.pop();
 			discardPile.push(c);
 			c.setCurrentPile(discardPile);
+			score.discard++;
 		}
 	}
 	
