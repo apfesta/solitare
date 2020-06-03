@@ -72,6 +72,7 @@ public class MainController {
 		return games.entrySet().stream()
 			.filter((e)->e.getValue().isMultiPlayer())
 			.filter((e)->!e.getValue().isInProgress())
+			.filter((e)->!e.getValue().isGameOver())
 			.map((entry)->new Game(entry.getKey(), entry.getValue().getUsers()))
 			.collect(Collectors.toList());
 	}
@@ -104,7 +105,11 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/ready", gameId);
 		GameBoard game = games.get(gameId);
 		User user = users.get(userId);
+		game.getUserBoard(user).setUserReady(ready);
 		syncService.notifyPlayerStatus(game, user, ready);
+		if (game.isReady()) {
+			game.setInProgress(true);
+		}
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/leave", method = RequestMethod.GET)

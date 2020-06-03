@@ -133,8 +133,21 @@ public class GameBoard {
 		return multiPlayer;
 	}
 
+	public void setInProgress(boolean inProgress) {
+		this.inProgress = inProgress;
+	}
+
 	public boolean isInProgress() {
 		return inProgress;
+	}
+	
+	public boolean isReady() {
+		for (UserBoard userBoard: userBoards.values()) {
+			if (!userBoard.isUserReady()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public boolean isShuffle() {

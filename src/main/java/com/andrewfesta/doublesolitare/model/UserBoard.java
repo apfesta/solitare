@@ -25,6 +25,7 @@ public class UserBoard {
 	VisiblePile discardPile = new VisiblePile();
 	boolean gameWon = false;
 	Score score = new Score();
+	boolean userReady;
 	
 	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
 	
@@ -238,6 +239,14 @@ public class UserBoard {
 
 	public void setScore(Score score) {
 		this.score = score;
+	}
+
+	public boolean isUserReady() {
+		return userReady;
+	}
+
+	public void setUserReady(boolean userReady) {
+		this.userReady = userReady;
 	}
 
 	public static class CanPush {
