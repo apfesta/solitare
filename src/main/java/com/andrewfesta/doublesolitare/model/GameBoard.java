@@ -3,6 +3,7 @@ package com.andrewfesta.doublesolitare.model;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class GameBoard {
 	int maxNumberOfCards = 3; //cards to discard
 	
 	Map<User, UserBoard> userBoards = new HashMap<>();
-	Map<Integer, Score> userScores = new HashMap<>();
+	Map<Integer, UserBoard.Score> userScores = new HashMap<>();
 	
 	public GameBoard(Integer gameId, boolean multiPlayer) {
 		super();
@@ -132,8 +133,21 @@ public class GameBoard {
 		return multiPlayer;
 	}
 
+	public void setInProgress(boolean inProgress) {
+		this.inProgress = inProgress;
+	}
+
 	public boolean isInProgress() {
 		return inProgress;
+	}
+	
+	public boolean isReady() {
+		for (UserBoard userBoard: userBoards.values()) {
+			if (!userBoard.isUserReady()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public boolean isShuffle() {
@@ -156,12 +170,10 @@ public class GameBoard {
 		return userBoards.get(user);
 	}
 	
-	public Map<Integer, Score> getUserScores() {
-		return userScores;
-	}
-
-	public void setUserScores(Map<Integer, Score> userScores) {
-		this.userScores = userScores;
+	public Map<Integer, UserBoard.Score> getUserScores() {
+		return userBoards.entrySet().stream()
+				.collect(Collectors.toMap(
+						(e)->e.getKey().getId(), (e)->e.getValue().getScore()));
 	}
 
 	public Tableau getTableau(User user) {
@@ -190,24 +202,6 @@ public class GameBoard {
 
 	public void setGameOver(boolean gameWon) {
 		this.gameOver = gameWon;
-	}
-	
-	public static class Score {
-		int toFoundation = 0;
-		int discardToTableau = 0;
-		int discard = 0;
-		
-		public int getToFoundation() {
-			return toFoundation;
-		}
-
-		public void setToFoundation(int toFoundation) {
-			this.toFoundation = toFoundation;
-		}
-		public int getTotalMoves() {
-			return toFoundation+discardToTableau+discard;
-		}
-		
 	}
 	
 }

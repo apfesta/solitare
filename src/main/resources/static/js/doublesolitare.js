@@ -24,7 +24,19 @@ var menu = {
 			success: function(data){
 				console.debug(data);
 				app.user = data;
-				$('.users .me').text(app.user.username);
+				$('#waitForPlayers .users .me')
+					.html(app.user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
+				$('.ready').on('change',app.readyStatusOnChange);
+				$('#scoreBoard .user.me')
+							.addClass('row')
+							.attr('data-user-id',app.user.id)
+								.append(
+									$('<div>').addClass('username').addClass('col').text(app.user.username))
+								.append(
+									$('<div>').addClass('score').addClass('col').text('Score: 0'))
+								.append(
+									$('<div>').addClass('moves').addClass('col').text('Moves: 0'));
+			
 				menu.getGames();
 			}});
 		
@@ -70,16 +82,16 @@ var menu = {
 					.addClass("list-group-item")
 					.addClass("list-group-item-action")
 					.text("New Single Player Game")
-					.on('click', newGameAction));
-//			.append(
-//				$("<a href='#'>")
-//					.addClass("list-group-item")
-//					.addClass("list-group-item-action")
-//					.text("New Multi-Player Game")
-//					.attr('data-toggle','modal')
-//					.attr('data-target','#waitForPlayers')
-//					.attr('data-backdrop',"static")
-//					.on('click', newMultiplayerGameAction));
+					.on('click', newGameAction))
+			.append(
+				$("<a href='#'>")
+					.addClass("list-group-item")
+					.addClass("list-group-item-action")
+					.text("New Multi-Player Game")
+					.attr('data-toggle','modal')
+					.attr('data-target','#waitForPlayers')
+					.attr('data-backdrop',"static")
+					.on('click', newMultiplayerGameAction));
 			
 		for (gameIdx in menu.games) {
 			var game = menu.games[gameIdx];
@@ -106,7 +118,8 @@ var app = {
 		userboard: {},
 		gameboard: {},
 		gameId: null,
-		canMoveData: null
+		canMoveData: null,
+		countdownTimer: null
 };
 
 
@@ -143,6 +156,7 @@ var app = {
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				$('#scoreBar').show();
+				$('#scoreBoard').hide();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -163,6 +177,7 @@ var app = {
 				app.gameId = app.gameboard.gameId;
 				connect(app.gameId);
 				$('#scoreBar').hide();
+				$('#scoreBoard').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -187,6 +202,16 @@ var app = {
 				app.setupFoundation();
 				app.setupTableau();
 			}});		
+	};
+	
+	app.readyStatus = function(gameId, ready) {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+gameId+'/ready'
+					+'?ready='+ready
+					+'&userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json"});		
 	};
 	
 	app.syncGame = function(gameId) {
@@ -291,8 +316,8 @@ var app = {
 				} else {
 					$('#discardPile .build').append($('#discardPile .pokercard:last'));
 				}
-				$('#score').html('Score: '+app.userboard.score.totalScore);
-				$('#moves').html('Moves: '+app.userboard.score.totalMoves);
+				$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
+				$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
 			}});
 	};
 	
@@ -379,6 +404,7 @@ var app = {
 	// Display functions
 	//---------------
 	
+	
 	app.flip = function(pileId) {
 		var cardDiv = $('#tableau #pile'+pileId+' .pokercard:last');
 		var build = app.userboard.tableau.build[pileId];
@@ -427,16 +453,78 @@ var app = {
 		for (i in app.gameboard.users) {
 			app.addPlayer(i);
 			if (app.gameboard.users[i].id!=app.user.id) {
-				$('.users').append(
-	    				$('<div>')
-	    					.addClass('list-group-item')
-	    					.addClass('user')
-	    					.attr('data-user-id',app.gameboard.users[i].id)
-	    					.text(app.gameboard.users[i].username));
+				app.addPlayerStatus(app.gameboard.users[i]);
 			}
 			
 		}
 	};
+	
+	app.checkReadyStatus = function() {
+		var isready = true;
+		if ($('.user .ready').length < 2) {
+			isready = false;
+			console.log('Not enough players');
+			$('#startgame_countdown_text')
+				.text('Waiting...');
+			if (app.coundownTimer!=null) clearInterval(app.countdownTimer);
+			$("#startgame_countdown").val(0);
+			return;
+		}
+		$('.user .ready').each(function(i){
+			console.log($(this))
+			if (!$(this).is(':checked')) {
+				isready = false;
+				console.log('user '+$(this).attr('data-user-id')+' is not ready');
+				$('#startgame_countdown_text')
+					.text('Waiting...');
+				if (app.coundownTimer!=null) clearInterval(app.countdownTimer);
+				$("#startgame_countdown").val(0);
+			}
+		});
+		if (isready) {
+			$('#startgame_countdown_text')
+				.text('Starting game in 5...');
+			
+			var timeleft = 5;
+			app.countdownTimer = setInterval(function(){
+			  if(timeleft <= 0){
+			    clearInterval(app.countdownTimer);
+			    $('#waitForPlayers').modal('hide');
+			  }
+			  $("#startgame_countdown").val(5 - timeleft);
+			  $('#startgame_countdown_text')
+				.text('Starting game in '+timeleft+'...');
+			  timeleft -= 1;
+			}, 1000);
+		}
+	}
+	
+	
+	app.readyStatusOnChange = function() {
+//		console.log($(this).is(':checked'));
+		app.readyStatus(app.gameId, $(this).is(':checked'));
+	}
+	
+	app.addPlayerStatus = function(user) {
+		var userDiv = $('<div>')
+			.addClass('list-group-item')
+			.addClass('user')
+			.attr('data-user-id',user.id)
+			.html(user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
+		userDiv.find('.ready').on('change',app.readyStatusOnChange);
+		$('#waitForPlayers .users').append(userDiv);
+		
+		$('#scoreBoard.users').append(
+				$('<div>')
+					.addClass('user').addClass('row')
+					.attr('data-user-id',user.id)
+						.append(
+							$('<div>').addClass('username').addClass('col').text(user.username))
+						.append(
+							$('<div>').addClass('score').addClass('col').text('Score: 0'))
+						.append(
+							$('<div>').addClass('moves').addClass('col').text('Moves: 0')));
+	}
 	
 	app.setupTableau = function() {
 		$('#tableau').addClass('row');

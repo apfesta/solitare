@@ -72,6 +72,7 @@ public class MainController {
 		return games.entrySet().stream()
 			.filter((e)->e.getValue().isMultiPlayer())
 			.filter((e)->!e.getValue().isInProgress())
+			.filter((e)->!e.getValue().isGameOver())
 			.map((entry)->new Game(entry.getKey(), entry.getValue().getUsers()))
 			.collect(Collectors.toList());
 	}
@@ -95,6 +96,20 @@ public class MainController {
 		syncService.notifyPlayerJoin(game, user);
 		
 		return game.getUserBoard(user);
+	}
+	
+	@RequestMapping(value="/api/game/{gameId}/ready", method = RequestMethod.GET)
+	public @ResponseBody void readyStatus(@PathVariable Integer gameId,
+			@RequestParam("userId") Integer userId,
+			@RequestParam("ready") boolean ready) {
+		LOG.trace("GET /api/game/{}/ready", gameId);
+		GameBoard game = games.get(gameId);
+		User user = users.get(userId);
+		game.getUserBoard(user).setUserReady(ready);
+		syncService.notifyPlayerStatus(game, user, ready);
+		if (game.isReady()) {
+			game.setInProgress(true);
+		}
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/leave", method = RequestMethod.GET)
@@ -185,6 +200,7 @@ public class MainController {
 		User user = users.get(userId);
 		
 		game.discard(user);
+		syncService.notifyDiscard(game, user);
 		
 		game.getDiscardPile(user).print(3);
 		game.getUserBoard(user).getScore().prettyPrint();

@@ -39,12 +39,22 @@
 
 	<div id="board">
 		<div id="scoreBar" class="row">
-			<div id="score" class="col">Score: 0</div>
-			<div id="moves" class="col">Moves: 0</div>
+			<div class="score col">Score: 0</div>
+			<div class="moves col">Moves: 0</div>
 		</div>
 		<div id="topSection" class="row">
-			<div id="stockPile" class="col"></div>
-			<div id="discardPile" class="col-3"></div>
+			<div id="topLeftSection" class="col">
+				<div class="row">
+					<div id="scoreBoard" class="col users">
+						<div class="user me"></div>
+					</div>
+				</div>
+				<div id="stockAndDiscardPiles" class="row">
+					<div id="stockPile" class="col"></div>
+					<div id="discardPile" class="col-8"></div>
+				</div>
+			</div>
+			
 			<div id="foundationPiles" class="col-7">
 				<div id="foundation"></div>
 			</div>
@@ -60,19 +70,16 @@
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <h5 class="modal-title" id="exampleModalLabel">Multi-Player Solitare</h5>
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	          <span aria-hidden="true">&times;</span>
-	        </button>
 	      </div>
 	      <div class="modal-body">
-	        Waiting for players to join.
+	        Waiting for 2 or more players to join.  When you're ready, check 'I'm Ready.'  When all players are ready, you'll get a 5 second countdown.
 	        <div class="list-group users">
-	        	<div class="list-group-item me">Me</div>
+	        	<div class="list-group-item user me">Me</div>
 	        </div>
 	      </div>
 	      <div class="modal-footer">
-	        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	        <button type="button" class="btn btn-primary">Save changes</button> -->
+	      	<div id="startgame_countdown_text">Waiting...</div>
+	        <progress id="startgame_countdown" max="5" value="0"></progress>
 	      </div>
 	    </div>
 	  </div>
