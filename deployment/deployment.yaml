@@ -17,7 +17,7 @@ spec:
         app: solitare
     spec:
       containers:
-      - image: apfesta/double-solitare:latest
+      - image: apfesta/double-solitare:%VERSION%
         name: solitare
         ports:
         - containerPort: 8080
