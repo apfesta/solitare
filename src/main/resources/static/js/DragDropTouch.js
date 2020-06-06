@@ -410,19 +410,22 @@ var DragDropTouch;
                 cDst.height = cSrc.height;
                 cDst.getContext('2d').drawImage(cSrc, 0, 0);
             }
-            // copy style (without transitions)
-            var cs = getComputedStyle(src);
-            for (var i = 0; i < cs.length; i++) {
-                var key = cs[i];
-                if (key.indexOf('transition') < 0) {
-                    dst.style[key] = cs[key];
-                }
-            }
-            dst.style.pointerEvents = 'none';
-            // and repeat for all children
-            for (var i = 0; i < src.children.length; i++) {
-                this._copyStyle(src.children[i], dst.children[i]);
-            }
+            // AF: remove troublesome style:
+            $(dst).find('.fan-down').removeClass('fan-down');
+            //AF: I don't need this
+//            // copy style (without transitions)
+//            var cs = getComputedStyle(src);
+//            for (var i = 0; i < cs.length; i++) {
+//                var key = cs[i];
+//                if (key.indexOf('transition') < 0) {
+//                    dst.style[key] = cs[key];
+//                }
+//            }
+//            dst.style.pointerEvents = 'none';
+//            // and repeat for all children
+//            for (var i = 0; i < src.children.length; i++) {
+//                this._copyStyle(src.children[i], dst.children[i]);
+//            }
         };
         DragDropTouch.prototype._dispatchEvent = function (e, type, target) {
             if (e && target) {
