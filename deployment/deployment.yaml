@@ -62,6 +62,11 @@ spec:
   - host: solitare.andrewfesta.com
     http:
       paths:
-      - backend:
+      - path: /
+        backend:
+          serviceName: solitare-svc
+          servicePort: 80
+      - path: /stomp/
+        backend:
           serviceName: solitare-svc
           servicePort: 80
