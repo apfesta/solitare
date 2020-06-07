@@ -1,3 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configuration
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+data:
+  use-forwarded-headers: "true"
+  compute-full-forwarded-for: "true"
+  use-proxy-protocol: "true"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -53,10 +67,6 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_http_version 1.1;
-      proxy_set_header Upgrade "websocket";
-      proxy_set_header Connection "Upgrade";
 spec:
   tls:
   - hosts:
@@ -67,10 +77,6 @@ spec:
     http:
       paths:
       - path: /
-        backend:
-          serviceName: solitare-svc
-          servicePort: 80
-      - path: /stomp/
         backend:
           serviceName: solitare-svc
           servicePort: 80
