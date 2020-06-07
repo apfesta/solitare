@@ -13,6 +13,26 @@ metadata:
     service.beta.kubernetes.io/do-loadbalancer-redirect-http-to-https: "true"
     # Use "doctl compute certificate list" to get this ID
     service.beta.kubernetes.io/do-loadbalancer-certificate-id: “a2e2e86d-45e7-43bd-a8e4-637937810fc7”
+spec:
+  clusterIP: 10.245.24.137
+  externalTrafficPolicy: Local
+  healthCheckNodePort: 32131
+  ports:
+  - name: http
+    nodePort: 31634
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - name: https
+    nodePort: 30644
+    port: 443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+  sessionAffinity: None
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: ConfigMap
