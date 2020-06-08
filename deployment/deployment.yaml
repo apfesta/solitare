@@ -71,3 +71,24 @@ spec:
         backend:
           serviceName: solitare-svc
           servicePort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ingress-controller
+  namespace: default
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-protocol: http
+    service.beta.kubernetes.io/do-loadbalancer-tls-ports: "443"
+    service.beta.kubernetes.io/do-loadbalancer-redirect-http-to-https: "true"
+    # Use "doctl compute certificate list" to get this ID
+    service.beta.kubernetes.io/do-loadbalancer-certificate-id: “a2e2e86d-45e7-43bd-a8e4-637937810fc7”
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+    - name: https
+      port: 443
+      targetPort: 80
