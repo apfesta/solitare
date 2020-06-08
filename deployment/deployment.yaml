@@ -53,11 +53,11 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/enable-cors: “true”
-    nginx.ingress.kubernetes.io/cors-allow-methods: “PUT, GET, POST, OPTIONS”
-    nginx.ingress.kubernetes.io/cors-allow-credentials: “true”
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_headers “Access-Control-Allow-Origin: $http_origin”;
+      more_set_headers "Access-Control-Allow-Origin: $http_origin";
 spec:
   tls:
   - hosts:
@@ -75,8 +75,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-ingress-controller
-  namespace: default
+  name: ingress-nginx
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
   annotations:
     service.beta.kubernetes.io/do-loadbalancer-protocol: http
     service.beta.kubernetes.io/do-loadbalancer-tls-ports: "443"
@@ -92,3 +95,6 @@ spec:
     - name: https
       port: 443
       targetPort: 80
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
