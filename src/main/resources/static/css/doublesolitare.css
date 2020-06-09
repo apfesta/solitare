@@ -27,17 +27,31 @@
 	background-color: rgba(0,0,0,0.4); 
 }
 
-
+#topLeftSection .row {
+	margin:0;
+}
 #topLeftSection #scoreBoard {
 	padding-right: 1vw;
 	padding-top: 0.5vw;
 }
 
+#scoreBoard table {
+	border-spacing: 0 1vw;
+	border-collapse: separate;
+	positon: relative;
+	left: 0;
+	width: 100%;
+}
+#scoreBoard th {
+	font-size: 3vw;
+	color: #030; 
+}
 #scoreBoard .user {
-	padding: 0.5vw;
-	margin: 0.5vw;
 	color: #FFF;
 	background-color: rgba(0,0,0,0.4); 
+}
+#scoreBoard .score, #scoreBoard .moves {
+	text-align: center;
 }
 
 #topSection {

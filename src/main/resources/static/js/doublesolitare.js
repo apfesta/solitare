@@ -28,14 +28,13 @@ var menu = {
 					.html(app.user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
 				$('.ready').on('change',app.readyStatusOnChange);
 				$('#scoreBoard .user.me')
-							.addClass('row')
 							.attr('data-user-id',app.user.id)
 								.append(
-									$('<div>').addClass('username').addClass('col').text(app.user.username))
+									$('<td>').addClass('username').text(app.user.username))
 								.append(
-									$('<div>').addClass('score').addClass('col').text('Score: 0'))
+									$('<td>').addClass('score').text('0'))
 								.append(
-									$('<div>').addClass('moves').addClass('col').text('Moves: 0'));
+									$('<td>').addClass('moves').text('0'));
 			
 				menu.getGames();
 			}});
@@ -514,16 +513,16 @@ var app = {
 		userDiv.find('.ready').on('change',app.readyStatusOnChange);
 		$('#waitForPlayers .users').append(userDiv);
 		
-		$('#scoreBoard.users').append(
-				$('<div>')
-					.addClass('user').addClass('row')
+		$('#scoreBoard.users tbody').append(
+				$('<tr>')
+					.addClass('user')
 					.attr('data-user-id',user.id)
 						.append(
-							$('<div>').addClass('username').addClass('col').text(user.username))
+							$('<td>').addClass('username').text(user.username))
 						.append(
-							$('<div>').addClass('score').addClass('col').text('Score: 0'))
+							$('<td>').addClass('score').text('0'))
 						.append(
-							$('<div>').addClass('moves').addClass('col').text('Moves: 0')));
+							$('<td>').addClass('moves').text('0')));
 	}
 	
 	app.setupTableau = function() {
