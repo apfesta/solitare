@@ -670,6 +670,9 @@ var app = {
 		
 	};
 	app.dragover = function(ev) {
+		// We'll handle this event so first stop bubbling up
+		ev.stopPropagation();
+		
 		if (app.canMoveData) {
 			var curTarget = $(ev.currentTarget);
 			var dataPileId = curTarget.attr('data-pile-id')
@@ -695,6 +698,9 @@ var app = {
 	};
 	
 	app.drag = function(ev) {
+		// We'll handle this event so first stop bubbling up
+		ev.stopPropagation();
+		
 		var cardDiv = $(ev.currentTarget.getElementsByClassName('pokercard')[0]);
 				
 		app.canMove(cardDiv.attr('data-card-id'));

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -23,11 +24,12 @@ public class GameBoard {
 	boolean gameOver = false;
 	boolean testMode;
 	
-	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
 	int maxNumberOfCards = 3; //cards to discard
 	
 	Map<User, UserBoard> userBoards = new HashMap<>();
 	Map<Integer, UserBoard.Score> userScores = new HashMap<>();
+	
+	DoubleSolitareDebugProperties debugProperties = new DoubleSolitareDebugProperties();
 	
 	public static final Card[] TEST_DECK = new Card[] {
 			//STOCK PILE (in reverse order)
@@ -107,7 +109,8 @@ public class GameBoard {
 		this.multiPlayer = multiPlayer;
 	}
 	
-	public GameBoard(User createdBy, Integer gameId, boolean multiPlayer, boolean demoMode) {
+	public GameBoard(User createdBy, Integer gameId, boolean multiPlayer, 
+			boolean demoMode) {
 		this(createdBy, gameId, multiPlayer);
 		this.testMode = demoMode;
 	}
@@ -189,7 +192,7 @@ public class GameBoard {
 			throw new RuntimeException("Cannot join single player game.");
 		}
 		UserBoard userBoard = new UserBoard(this, user);
-		userBoard.setShuffle(shuffle);
+		userBoard.setShuffle(debugProperties.isShuffle());
 		userBoard.setup();
 		userBoards.put(user, userBoard);
 				
@@ -266,14 +269,6 @@ public class GameBoard {
 		return true;
 	}
 
-	public boolean isShuffle() {
-		return shuffle;
-	}
-
-	public void setShuffle(boolean shuffle) {
-		this.shuffle = shuffle;
-	}
-
 	@JsonIgnore
 	public User getCreatedBy() {
 		return createdBy;
@@ -323,6 +318,14 @@ public class GameBoard {
 
 	public void setGameOver(boolean gameWon) {
 		this.gameOver = gameWon;
+	}
+
+	public DoubleSolitareDebugProperties getDebugProperties() {
+		return debugProperties;
+	}
+
+	public void setDebugProperties(DoubleSolitareDebugProperties debugProperties) {
+		this.debugProperties = debugProperties;
 	}
 	
 }

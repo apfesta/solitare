@@ -22,6 +22,7 @@ public class DoubleSolitareConfig {
 
 	public static class DoubleSolitareDebugProperties {
 		private boolean shuffle=true;
+		private boolean additionalResponseOutput=false;
 
 		public boolean isShuffle() {
 			return shuffle;
@@ -29,6 +30,18 @@ public class DoubleSolitareConfig {
 
 		public void setShuffle(boolean shuffle) {
 			this.shuffle = shuffle;
+		}
+
+		public boolean isAdditionalResponseOutput() {
+			return additionalResponseOutput;
+		}
+
+		/**
+		 * Adds additional properties to REST responses
+		 * @param debugOutput
+		 */
+		public void setAdditionalResponseOutput(boolean debugOutput) {
+			this.additionalResponseOutput = debugOutput;
 		}		
 		
 	}

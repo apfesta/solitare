@@ -7,6 +7,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * A user's game board.  Contains their tableau, stock and waste piles.
  * 
@@ -71,7 +74,7 @@ public class UserBoard {
 	
 	public CanPush canPush(Card card) {
 		
-		CanPush canPush = new CanPush(game.userBoards.size());
+		CanPush canPush = new CanPush(card, game.userBoards.size());
 		
 		Pile[] facedown = getTableau().getPile();
 		Build[] tableauBuild = getTableau().getBuild();
@@ -250,13 +253,19 @@ public class UserBoard {
 		this.userReady = userReady;
 	}
 
-	public static class CanPush {
-		private Boolean[] foundationPile = new Boolean[4];
+	@JsonInclude(Include.NON_NULL)
+	public class CanPush {
+		private Card card;
+		private Boolean[] foundationPile;
 		private Boolean[] tableauBuild = new Boolean[7];
 		
-		public CanPush(int numOfPlayers) {
+		public CanPush(Card card, int numOfPlayers) {
 			super();
-			foundationPile = new Boolean[4*numOfPlayers];
+			this.card = game.getDebugProperties().isAdditionalResponseOutput()?card:null;
+			this.foundationPile = new Boolean[4*numOfPlayers];
+		}
+		public Card getCard() {
+			return card;
 		}
 		public Boolean[] getFoundationPile() {
 			return foundationPile;

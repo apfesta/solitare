@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugProperties;
 import com.andrewfesta.doublesolitare.model.Build;
 import com.andrewfesta.doublesolitare.model.Card;
 import com.andrewfesta.doublesolitare.model.Foundation;
@@ -62,10 +63,13 @@ public class SamplePlayTest {
 	
 	@Test
 	public void sampleMultiplayer() {
+		DoubleSolitareDebugProperties debug = new DoubleSolitareDebugProperties();
+		debug.setShuffle(false);
+		
 		User user1 = new User(1);
 		
 		GameBoard game = new GameBoard(user1, 1, true);
-		game.setShuffle(false);
+		game.setDebugProperties(debug);
 		game.setup(user1);
 		
 		User user2 = new User(2);
@@ -114,10 +118,13 @@ public class SamplePlayTest {
 		
 	@Test
 	public void samplePlay() {
+		DoubleSolitareDebugProperties debug = new DoubleSolitareDebugProperties();
+		debug.setShuffle(false);
+		
 		User user = new User(1);
 		
 		GameBoard game = new GameBoard(user,1, false);
-		game.setShuffle(false);
+		game.setDebugProperties(debug);
 		game.setup(user);
 		
 		Tableau tableau = game.getTableau(user);
