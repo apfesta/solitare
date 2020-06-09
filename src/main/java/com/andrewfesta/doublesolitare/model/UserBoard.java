@@ -111,8 +111,8 @@ public class UserBoard {
 			Card c = stockPile.pop();
 			discardPile.push(c);
 			c.setCurrentPile(discardPile);
-			score.discard++;
 		}
+		score.discard++;
 	}
 	
 	protected Integer getPileIdToFlip(Card card) {
