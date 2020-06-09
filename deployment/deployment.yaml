@@ -23,6 +23,8 @@ spec:
         - containerPort: 8080
         resources: {}
         env:
+        - name: ALLOWED_ORIGINS
+          value: "https://solitare.andrewfesta.com"
         - name: SPRING_OPTS
           value: "--spring.profiles.active=none --server.port=8080"
       imagePullSecrets:
