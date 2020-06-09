@@ -22,8 +22,8 @@ public class SamplePlayTest {
 
 	@Test
 	public void sampleWin() {
-		GameBoard game = new GameBoard(1, false);
 		User user = new User(1);
+		GameBoard game = new GameBoard(user, 1, false);
 		game.setup(user, new Card[] {
 				//STOCK PILE (in reverse order)
 				new Card(Card.KING, Suit.HEARTS),
@@ -131,10 +131,10 @@ public class SamplePlayTest {
 	
 	@Test
 	public void sampleMultiplayer() {
-		GameBoard game = new GameBoard(1, true);
-		game.setShuffle(false);
-		
 		User user1 = new User(1);
+		
+		GameBoard game = new GameBoard(user1, 1, true);
+		game.setShuffle(false);
 		game.setup(user1);
 		
 		User user2 = new User(2);
@@ -183,9 +183,9 @@ public class SamplePlayTest {
 		
 	@Test
 	public void samplePlay() {
-		
-		GameBoard game = new GameBoard(1, false);
 		User user = new User(1);
+		
+		GameBoard game = new GameBoard(user,1, false);
 		game.setShuffle(false);
 		game.setup(user);
 		

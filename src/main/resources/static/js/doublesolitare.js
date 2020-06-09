@@ -101,7 +101,7 @@ var menu = {
 						 .attr('data-toggle','modal')
 						 .attr('data-target','#waitForPlayers')
 						 .attr('data-backdrop',"static")
-						.text("Game "+game.gameId)
+						.text("Game "+game.gameId+" - started by "+game.startedBy.username)
 						.on('click', joinGameAction));
 		}
 		

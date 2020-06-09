@@ -50,8 +50,8 @@ public class MainController {
 	public @ResponseBody UserBoard newGame(@RequestParam("multiplayer") boolean multiplayer,
 			@RequestParam Integer userId) {
 		LOG.trace("POST /api/game");
-		GameBoard game = new GameBoard(gameIdSequence.incrementAndGet(), multiplayer);
 		User user = users.get(userId);
+		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
 		game.setShuffle(debugProperties.isShuffle());
 		game.setup(user);
 		games.put(game.getGameId(), game);
@@ -73,7 +73,7 @@ public class MainController {
 			.filter((e)->e.getValue().isMultiPlayer())
 			.filter((e)->!e.getValue().isInProgress())
 			.filter((e)->!e.getValue().isGameOver())
-			.map((entry)->new Game(entry.getKey(), entry.getValue().getUsers()))
+			.map((entry)->new Game(entry.getKey(), entry.getValue().getCreatedBy(), entry.getValue().getUsers()))
 			.collect(Collectors.toList());
 	}
 	
@@ -211,10 +211,12 @@ public class MainController {
 	public static class Game {
 		Integer gameId;
 		Collection<User> users;
+		User startedBy;
 
-		public Game(Integer gameId, Collection<User> users) {
+		public Game(Integer gameId, User startedBy, Collection<User> users) {
 			super();
 			this.gameId = gameId;
+			this.startedBy = startedBy;
 			this.users = users;
 		}
 
@@ -232,6 +234,10 @@ public class MainController {
 
 		public void setUsers(List<User> users) {
 			this.users = users;
+		}
+
+		public User getStartedBy() {
+			return startedBy;
 		}
 	}
 			

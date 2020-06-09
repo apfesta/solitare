@@ -8,12 +8,15 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 public class GameBoard {
 	
 	private static final Logger GAME_LOG = LoggerFactory.getLogger("GameLog");
 
 	final Integer gameId;
+	final User createdBy;
 	Foundation foundation;
 	final boolean multiPlayer;
 	boolean inProgress = false;
@@ -25,8 +28,9 @@ public class GameBoard {
 	Map<User, UserBoard> userBoards = new HashMap<>();
 	Map<Integer, UserBoard.Score> userScores = new HashMap<>();
 	
-	public GameBoard(Integer gameId, boolean multiPlayer) {
+	public GameBoard(User createdBy, Integer gameId, boolean multiPlayer) {
 		super();
+		this.createdBy = createdBy;
 		this.gameId = gameId;
 		this.multiPlayer = multiPlayer;
 	}
@@ -156,6 +160,11 @@ public class GameBoard {
 
 	public void setShuffle(boolean shuffle) {
 		this.shuffle = shuffle;
+	}
+
+	@JsonIgnore
+	public User getCreatedBy() {
+		return createdBy;
 	}
 
 	public Integer getGameId() {
