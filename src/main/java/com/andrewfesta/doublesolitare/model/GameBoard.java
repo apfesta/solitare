@@ -21,6 +21,7 @@ public class GameBoard {
 	final boolean multiPlayer;
 	boolean inProgress = false;
 	boolean gameOver = false;
+	boolean testMode;
 	
 	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
 	int maxNumberOfCards = 3; //cards to discard
@@ -28,11 +29,102 @@ public class GameBoard {
 	Map<User, UserBoard> userBoards = new HashMap<>();
 	Map<Integer, UserBoard.Score> userScores = new HashMap<>();
 	
+	public static final Card[] TEST_DECK = new Card[] {
+			//STOCK PILE (in reverse order)
+			new Card(Card.KING, Suit.HEARTS),
+			new Card(Card.KING, Suit.CLUBS),
+			new Card(Card.KING, Suit.DIAMONDS),
+			
+			new Card(Card.QUEEN, Suit.CLUBS),
+			new Card(Card.QUEEN, Suit.DIAMONDS),
+			new Card(Card.KING, Suit.SPADES),
+			
+			new Card(Card.JACK, Suit.DIAMONDS),
+			new Card(Card.QUEEN, Suit.SPADES),
+			new Card(Card.QUEEN, Suit.HEARTS),
+			
+			new Card(Card.JACK, Suit.SPADES),
+			new Card(Card.JACK, Suit.HEARTS),
+			new Card(Card.JACK, Suit.CLUBS),
+			
+			new Card(10, Suit.HEARTS),
+			new Card(10, Suit.CLUBS),
+			new Card(10, Suit.DIAMONDS),
+			
+			new Card(9, Suit.CLUBS),
+			new Card(9, Suit.DIAMONDS),
+			new Card(10, Suit.SPADES),
+			
+			new Card(8, Suit.DIAMONDS),
+			new Card(9, Suit.SPADES),
+			new Card(9, Suit.HEARTS),
+			
+			new Card(8, Suit.SPADES),
+			new Card(8, Suit.HEARTS),
+			new Card(8, Suit.CLUBS),
+			
+			//TABLEAU (in reverse order)
+			new Card(6, Suit.HEARTS),
+			
+			new Card(6, Suit.CLUBS),
+			new Card(4, Suit.DIAMONDS),
+			
+			new Card(6, Suit.DIAMONDS),
+			new Card(5, Suit.SPADES),
+			new Card(3, Suit.CLUBS),
+			
+			new Card(7, Suit.SPADES),
+			new Card(5, Suit.HEARTS),
+			new Card(3, Suit.DIAMONDS),
+			new Card(2, Suit.CLUBS),
+			
+			new Card(7, Suit.HEARTS),
+			new Card(5, Suit.CLUBS),
+			new Card(4, Suit.SPADES),
+			new Card(2, Suit.DIAMONDS),
+			new Card(Card.ACE, Suit.CLUBS),
+			
+			new Card(7, Suit.CLUBS),
+			new Card(5, Suit.DIAMONDS),
+			new Card(4, Suit.HEARTS),
+			new Card(3, Suit.SPADES),
+			new Card(2, Suit.SPADES),
+			new Card(Card.ACE, Suit.HEARTS),
+			
+			new Card(7, Suit.DIAMONDS),
+			new Card(6, Suit.SPADES),
+			new Card(4, Suit.CLUBS),
+			new Card(3, Suit.HEARTS),
+			new Card(2, Suit.HEARTS),
+			new Card(Card.ACE, Suit.DIAMONDS),
+			new Card(Card.ACE, Suit.SPADES),
+	};
+	
 	public GameBoard(User createdBy, Integer gameId, boolean multiPlayer) {
 		super();
 		this.createdBy = createdBy;
 		this.gameId = gameId;
 		this.multiPlayer = multiPlayer;
+	}
+	
+	public GameBoard(User createdBy, Integer gameId, boolean multiPlayer, boolean demoMode) {
+		this(createdBy, gameId, multiPlayer);
+		this.testMode = demoMode;
+	}
+	
+	/**
+	 * For testing only.  Allows us to set up a game board with a set card sequence
+	 * 
+	 * @param stackedDeck
+	 */
+	public void setupTest(User user) {
+		//We need to copy since the Card object holds state
+		Card[] testDeck = new Card[52];
+		for (int i =0; i<TEST_DECK.length; i++) {
+			testDeck[i] = new Card(TEST_DECK[i]);
+		}
+		
+		setup(user, testDeck);
 	}
 
 	/**
@@ -58,6 +150,26 @@ public class GameBoard {
 		userBoards.get(user).getTableau().prettyPrint();
 	}
 	
+	/**
+	 * For testing only.  Allows us to set up a game board with a set card sequence
+	 * 
+	 * @param stackedDeck
+	 */
+	public void joinTest(User user) {
+		//We need to copy since the Card object holds state
+		Card[] testDeck = new Card[52];
+		for (int i =0; i<TEST_DECK.length; i++) {
+			testDeck[i] = new Card(TEST_DECK[i]);
+		}
+		
+		join(user, testDeck);
+	}
+	
+	/**
+	 * For testing only.  Allows us to set up a game board with a set card sequence
+	 * 
+	 * @param stackedDeck
+	 */
 	public void join(User user, Card[] stackedDeck) {
 		if (userBoards.size() >= 1 && !this.multiPlayer) {
 			throw new RuntimeException("Cannot join single player game.");

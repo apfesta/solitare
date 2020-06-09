@@ -74,8 +74,17 @@ var menu = {
 		var joinGameAction = function() {
 			app.setup(game.gameId, true);
 		};
+		var newTestAction = function() {
+			app.setupTest(null, false);
+		};
 		
 		$("#menu .list-group")
+			.append(
+				$("<a href='#'>")
+					.addClass("list-group-item")
+					.addClass("list-group-item-action")
+					.text("New Single Player TEST")
+					.on('click', newTestAction))
 			.append(
 				$("<a href='#'>")
 					.addClass("list-group-item")
@@ -137,10 +146,41 @@ var app = {
 			app.newGame();
 		}
 	};
+	app.setupTest = function(gameId, multiplayer) {
+		$('#board').show();
+		$('#menu').hide();
+		if (multiplayer && gameId!=null) {
+			app.joinGame(gameId);
+		} else if (multiplayer){
+//			app.newMultiplayerGame();
+		} else {
+			app.newTest();
+		}
+	};
 	
 	//---------------
 	// AJAX functions
 	//---------------
+	
+	app.newTest = function() {
+		$.ajax({
+			type: 'POST', 
+			url: getRelativePath('/api/game/test?multiplayer=false'
+					+'&userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.debug(data);
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
+				app.gameId = app.gameboard.gameId;
+				$('#scoreBar').show();
+				$('#scoreBoard').hide();
+				app.setupStockAndDiscardPiles();
+				app.setupFoundation();
+				app.setupTableau();
+			}});		
+	};
 	
 	app.newGame = function() {
 		$.ajax({
@@ -317,6 +357,10 @@ var app = {
 				}
 				$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
 				$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
+				if (app.gameboard.gameOver) {
+					console.log('game over');
+					$('#gameOver').modal('show');
+				}
 			}});
 	};
 	

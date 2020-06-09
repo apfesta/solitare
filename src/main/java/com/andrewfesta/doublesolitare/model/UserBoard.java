@@ -152,7 +152,8 @@ public class UserBoard {
 			}
 			if (gameWon && getStockPile().isEmpty() && getDiscardPile().isEmpty()) {
 				setGameWon(true);
-				GAME_LOG.debug("GameId:{} User:{} has been won!", game.gameId);
+				game.setGameOver(true);
+				GAME_LOG.debug("GameId:{} User:{} has won!", game.gameId);
 			}
 		}
 	}

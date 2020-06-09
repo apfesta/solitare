@@ -26,6 +26,12 @@ public class Card {
 		this.suit = suit;
 		init();
 	}
+	public Card(Card copy) {
+		super();
+		this.value = copy.value;
+		this.suit = copy.suit;
+		init();
+	}
 	
 	public static int unicodeInt(int value, Suit suit) {
 		int code = 0;

@@ -24,76 +24,7 @@ public class SamplePlayTest {
 	public void sampleWin() {
 		User user = new User(1);
 		GameBoard game = new GameBoard(user, 1, false);
-		game.setup(user, new Card[] {
-				//STOCK PILE (in reverse order)
-				new Card(Card.KING, Suit.HEARTS),
-				new Card(Card.KING, Suit.CLUBS),
-				new Card(Card.KING, Suit.DIAMONDS),
-				
-				new Card(Card.QUEEN, Suit.CLUBS),
-				new Card(Card.QUEEN, Suit.DIAMONDS),
-				new Card(Card.KING, Suit.SPADES),
-				
-				new Card(Card.JACK, Suit.DIAMONDS),
-				new Card(Card.QUEEN, Suit.SPADES),
-				new Card(Card.QUEEN, Suit.HEARTS),
-				
-				new Card(Card.JACK, Suit.SPADES),
-				new Card(Card.JACK, Suit.HEARTS),
-				new Card(Card.JACK, Suit.CLUBS),
-				
-				new Card(10, Suit.HEARTS),
-				new Card(10, Suit.CLUBS),
-				new Card(10, Suit.DIAMONDS),
-				
-				new Card(9, Suit.CLUBS),
-				new Card(9, Suit.DIAMONDS),
-				new Card(10, Suit.SPADES),
-				
-				new Card(8, Suit.DIAMONDS),
-				new Card(9, Suit.SPADES),
-				new Card(9, Suit.HEARTS),
-				
-				new Card(8, Suit.SPADES),
-				new Card(8, Suit.HEARTS),
-				new Card(8, Suit.CLUBS),
-				
-				//TABLEAU (in reverse order)
-				new Card(6, Suit.HEARTS),
-				
-				new Card(6, Suit.CLUBS),
-				new Card(4, Suit.DIAMONDS),
-				
-				new Card(6, Suit.DIAMONDS),
-				new Card(5, Suit.SPADES),
-				new Card(3, Suit.CLUBS),
-				
-				new Card(7, Suit.SPADES),
-				new Card(5, Suit.HEARTS),
-				new Card(3, Suit.DIAMONDS),
-				new Card(2, Suit.CLUBS),
-				
-				new Card(7, Suit.HEARTS),
-				new Card(5, Suit.CLUBS),
-				new Card(4, Suit.SPADES),
-				new Card(2, Suit.DIAMONDS),
-				new Card(Card.ACE, Suit.CLUBS),
-				
-				new Card(7, Suit.CLUBS),
-				new Card(5, Suit.DIAMONDS),
-				new Card(4, Suit.HEARTS),
-				new Card(3, Suit.SPADES),
-				new Card(2, Suit.SPADES),
-				new Card(Card.ACE, Suit.HEARTS),
-				
-				new Card(7, Suit.DIAMONDS),
-				new Card(6, Suit.SPADES),
-				new Card(4, Suit.CLUBS),
-				new Card(3, Suit.HEARTS),
-				new Card(2, Suit.HEARTS),
-				new Card(Card.ACE, Suit.DIAMONDS),
-				new Card(Card.ACE, Suit.SPADES),
-		});
+		game.setup(user, GameBoard.TEST_DECK);
 		
 		Map<Suit, Integer> foundationIds = new HashMap<>();
 		int f = 0;
