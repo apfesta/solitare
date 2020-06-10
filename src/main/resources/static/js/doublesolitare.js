@@ -60,10 +60,7 @@ var menu = {
 	
 	menu.showGames = function() {
 		$('#board').hide();
-		$('#menu').addClass("container").append(
-				$("<h1>").text("Double Solitare")).append(
-				$("<div>")
-					.addClass("list-group"));
+		$('#menu').addClass("container");
 		
 		var newGameAction = function() {
 			app.setup(null, false);
@@ -78,32 +75,18 @@ var menu = {
 			app.setupTest(null, false);
 		};
 		
-		$("#menu .list-group")
-			.append(
-				$("<a href='#'>")
-					.addClass("list-group-item")
-					.addClass("list-group-item-action")
-					.text("New Single Player TEST")
-					.on('click', newTestAction))
-			.append(
-				$("<a href='#'>")
-					.addClass("list-group-item")
-					.addClass("list-group-item-action")
-					.text("New Single Player Game")
-					.on('click', newGameAction))
-			.append(
-				$("<a href='#'>")
-					.addClass("list-group-item")
-					.addClass("list-group-item-action")
-					.text("New Multi-Player Game")
-					.attr('data-toggle','modal')
-					.attr('data-target','#waitForPlayers')
-					.attr('data-backdrop',"static")
-					.on('click', newMultiplayerGameAction));
-			
+		$('#newSinglePlayerTestAction').on('click', newTestAction);
+		$('#newSinglePlayerGameAction').on('click', newGameAction);
+		$('#newMultiPlayerGameAction')
+			.attr('data-toggle','modal')
+			.attr('data-target','#waitForPlayers')
+			.attr('data-backdrop',"static")
+			.on('click', newMultiplayerGameAction);
+					
+		$("#availableGamesToJoin").empty();
 		for (gameIdx in menu.games) {
 			var game = menu.games[gameIdx];
-			$("#menu .list-group").append(
+			$("#availableGamesToJoin").append(
 					$("<a href='#'>")
 						.addClass("list-group-item")
 						.addClass("list-group-item-action")
@@ -360,6 +343,9 @@ var app = {
 				$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
 				if (app.gameboard.gameOver) {
 					console.log('game over');
+					$('#gameOverTitle').text('You Win!');
+					$('#gameOver .modal-body').html('Score: '+app.userboard.score.totalScore)
+					
 					$('#gameOver').modal('show');
 				}
 			}});
@@ -729,6 +715,9 @@ var app = {
 	};
 		
 	
+	$('#gameOver').on('hidden.bs.modal', function (e) {
+		window.location.replace("/");
+	});
 	
 	
 	//Service worker
