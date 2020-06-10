@@ -349,7 +349,8 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				if (pileId!=null) {
-					if (app.userboard.tableau.pile[pileId].numberOfCards>0) {
+					if (app.userboard.tableau.pile[pileId].numberOfCards>=0 && 
+							app.userboard.tableau.build[pileId].numberOfCards==1) {
 						app.flip(pileId);
 					}
 				} else {
@@ -386,7 +387,8 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				if (fromPileId!=null) {
-					if (app.userboard.tableau.build[fromPileId].numberOfCards>0) {
+					if (app.userboard.tableau.pile[fromPileId].numberOfCards>=0 && 
+							app.userboard.tableau.build[fromPileId].numberOfCards==1) {
 						app.flip(fromPileId);
 					}
 				} else {
@@ -411,8 +413,11 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				$('#discard-pile').empty();
-				for (var c=0; c<3; c++) {
-					var card = app.userboard.discardPile.cards[2-c];
+				console.log(app.userboard.discardPile.cards.length);
+				var maxcards = app.userboard.discardPile.cards.length>=3 ? 3 : app.userboard.discardPile.cards.length
+				console.log(maxcards);
+				for (var c=0; c<maxcards; c++) {
+					var card = app.userboard.discardPile.cards[maxcards-1-c];
 					var cardDiv = $('<div>')
 						.addClass('pokercard').addClass('front')
 						.attr('data-card-id',card.unicodeInt)

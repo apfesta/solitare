@@ -53,7 +53,9 @@ public class MainController {
 		LOG.trace("POST /api/game");
 		User user = users.get(userId);
 		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
-		game.setDebugProperties(debugProperties);
+		if (debugProperties!=null) {
+			game.setDebugProperties(debugProperties);
+		}
 		game.setup(user);
 		games.put(game.getGameId(), game);
 		
@@ -77,7 +79,9 @@ public class MainController {
 		LOG.trace("POST /api/game");
 		User user = users.get(userId);
 		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
-		game.setDebugProperties(debugProperties);
+		if (debugProperties!=null) {
+			game.setDebugProperties(debugProperties);
+		}
 		game.setupTest(user);
 		games.put(game.getGameId(), game);
 		
