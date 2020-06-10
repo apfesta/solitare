@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugProperties;
 import com.andrewfesta.doublesolitare.model.Card;
 import com.andrewfesta.doublesolitare.model.GameBoard;
+import com.andrewfesta.doublesolitare.model.Suit;
 import com.andrewfesta.doublesolitare.model.User;
 import com.andrewfesta.doublesolitare.model.UserBoard;
 import com.andrewfesta.doublesolitare.model.UserBoard.CanPush;
@@ -50,11 +51,67 @@ public class MainController {
 	public @ResponseBody UserBoard newGame(@RequestParam("multiplayer") boolean multiplayer,
 			@RequestParam Integer userId) {
 		LOG.trace("POST /api/game");
-		GameBoard game = new GameBoard(gameIdSequence.incrementAndGet(), multiplayer);
 		User user = users.get(userId);
-		game.setShuffle(debugProperties.isShuffle());
+		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
+		if (debugProperties!=null) {
+			game.setDebugProperties(debugProperties);
+		}
 		game.setup(user);
 		games.put(game.getGameId(), game);
+		
+		return game.getUserBoard(user);
+	}
+	
+	private int cardId(int value, Suit suit) {
+		return Card.unicodeInt(value, suit);
+	}
+	
+	/**
+	 * Testing mode to fast forward to the end.
+	 * 
+	 * @param multiplayer
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value="/api/game/test", method = RequestMethod.POST)
+	public @ResponseBody UserBoard newTestGame(@RequestParam("multiplayer") boolean multiplayer,
+			@RequestParam Integer userId) {
+		LOG.trace("POST /api/game");
+		User user = users.get(userId);
+		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
+		if (debugProperties!=null) {
+			game.setDebugProperties(debugProperties);
+		}
+		game.setupTest(user);
+		games.put(game.getGameId(), game);
+		
+		Map<Suit, Integer> foundationIds = new HashMap<>();
+		int f = 0;
+		for (int v=Card.ACE; v<=7; v++) {
+			for (Suit s: Suit.values()) {
+				if (!foundationIds.containsKey(s)) {
+					foundationIds.put(s, f++);
+				}
+				moveToFoundation(game.getGameId(), cardId(v,s), 
+						foundationIds.get(s), userId);
+			}
+		}
+		
+		int i=0;
+		//STOP SHORT of winning
+		for (int v=8; v<=10; v++) {
+			for (Suit s: Suit.values()) {
+				if (i==0) {
+					discard(game.getGameId(), userId);
+				}
+				moveToFoundation(game.getGameId(), cardId(v,s), 
+						foundationIds.get(s), userId);
+				i++;
+				if (i==3) {
+					i=0;
+				}
+			}
+		}
 		
 		return game.getUserBoard(user);
 	}
@@ -73,7 +130,7 @@ public class MainController {
 			.filter((e)->e.getValue().isMultiPlayer())
 			.filter((e)->!e.getValue().isInProgress())
 			.filter((e)->!e.getValue().isGameOver())
-			.map((entry)->new Game(entry.getKey(), entry.getValue().getUsers()))
+			.map((entry)->new Game(entry.getKey(), entry.getValue().getCreatedBy(), entry.getValue().getUsers()))
 			.collect(Collectors.toList());
 	}
 	
@@ -211,10 +268,12 @@ public class MainController {
 	public static class Game {
 		Integer gameId;
 		Collection<User> users;
+		User startedBy;
 
-		public Game(Integer gameId, Collection<User> users) {
+		public Game(Integer gameId, User startedBy, Collection<User> users) {
 			super();
 			this.gameId = gameId;
+			this.startedBy = startedBy;
 			this.users = users;
 		}
 
@@ -232,6 +291,10 @@ public class MainController {
 
 		public void setUsers(List<User> users) {
 			this.users = users;
+		}
+
+		public User getStartedBy() {
+			return startedBy;
 		}
 	}
 			

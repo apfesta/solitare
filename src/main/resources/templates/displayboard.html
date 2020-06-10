@@ -35,7 +35,16 @@
 </head>
 <body onload="disconnect()">
 
-	<div id="menu"></div>
+	<div id="menu">
+		<h1>Double Solitare</h1>
+		<div class="list-group">
+			<a hidden href='#' id="newSinglePlayerTestAction" class="list-group-item list-group-item-action">New Single Player TEST</a>
+			<a href='#' id="newSinglePlayerGameAction" class="list-group-item list-group-item-action">New Single Player Game</a>
+			<a href='#' id="newMultiPlayerGameAction" class="list-group-item list-group-item-action">New Multi-Player Game</a>
+			<div id="availableGamesToJoin">
+			</div>
+		</div>
+	</div>
 
 	<div id="board">
 		<div id="scoreBar" class="row">
@@ -46,7 +55,14 @@
 			<div id="topLeftSection" class="col">
 				<div class="row">
 					<div id="scoreBoard" class="col users">
-						<div class="user me"></div>
+						<table>
+						<thead>
+							<tr><th></th><th>Score</th><th>Moves</th></tr>
+						</thead>
+						<tbody>
+							<tr class="user me"></tr>
+						</tbody>
+						</table>
 					</div>
 				</div>
 				<div id="stockAndDiscardPiles" class="row">
@@ -64,7 +80,7 @@
 	
 	</div>
 	
-	<!-- Modal -->
+	<!-- Modals -->
 	<div class="modal fade" id="waitForPlayers" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
@@ -80,6 +96,25 @@
 	      <div class="modal-footer">
 	      	<div id="startgame_countdown_text">Waiting...</div>
 	        <progress id="startgame_countdown" max="5" value="0"></progress>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	<div class="modal fade" id="gameOver" tabindex="-1" role="dialog" aria-labelledby="gameOverTitle" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="gameOverTitle">Game Over</h5>
+	        <button type="button" class="close mainMenuBtn" data-dismiss="modal" aria-label="Close">
+          		<span aria-hidden="true">&times;</span>
+        	</button>
+	      </div>
+	      <div class="modal-body">
+	        Game Over
+	      </div>
+	      <div class="modal-footer">
+	      	<button type="button" class="btn btn-primary mainMenuBtn" data-dismiss="modal">New Game</button>
 	      </div>
 	    </div>
 	  </div>

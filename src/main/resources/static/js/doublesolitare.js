@@ -28,14 +28,13 @@ var menu = {
 					.html(app.user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
 				$('.ready').on('change',app.readyStatusOnChange);
 				$('#scoreBoard .user.me')
-							.addClass('row')
 							.attr('data-user-id',app.user.id)
 								.append(
-									$('<div>').addClass('username').addClass('col').text(app.user.username))
+									$('<td>').addClass('username').text(app.user.username))
 								.append(
-									$('<div>').addClass('score').addClass('col').text('Score: 0'))
+									$('<td>').addClass('score').text('0'))
 								.append(
-									$('<div>').addClass('moves').addClass('col').text('Moves: 0'));
+									$('<td>').addClass('moves').text('0'));
 			
 				menu.getGames();
 			}});
@@ -61,10 +60,7 @@ var menu = {
 	
 	menu.showGames = function() {
 		$('#board').hide();
-		$('#menu').addClass("container").append(
-				$("<h1>").text("Double Solitare")).append(
-				$("<div>")
-					.addClass("list-group"));
+		$('#menu').addClass("container");
 		
 		var newGameAction = function() {
 			app.setup(null, false);
@@ -75,34 +71,29 @@ var menu = {
 		var joinGameAction = function() {
 			app.setup(game.gameId, true);
 		};
+		var newTestAction = function() {
+			app.setupTest(null, false);
+		};
 		
-		$("#menu .list-group")
-			.append(
-				$("<a href='#'>")
-					.addClass("list-group-item")
-					.addClass("list-group-item-action")
-					.text("New Single Player Game")
-					.on('click', newGameAction))
-			.append(
-				$("<a href='#'>")
-					.addClass("list-group-item")
-					.addClass("list-group-item-action")
-					.text("New Multi-Player Game")
-					.attr('data-toggle','modal')
-					.attr('data-target','#waitForPlayers')
-					.attr('data-backdrop',"static")
-					.on('click', newMultiplayerGameAction));
-			
+		$('#newSinglePlayerTestAction').on('click', newTestAction);
+		$('#newSinglePlayerGameAction').on('click', newGameAction);
+		$('#newMultiPlayerGameAction')
+			.attr('data-toggle','modal')
+			.attr('data-target','#waitForPlayers')
+			.attr('data-backdrop',"static")
+			.on('click', newMultiplayerGameAction);
+					
+		$("#availableGamesToJoin").empty();
 		for (gameIdx in menu.games) {
 			var game = menu.games[gameIdx];
-			$("#menu .list-group").append(
+			$("#availableGamesToJoin").append(
 					$("<a href='#'>")
 						.addClass("list-group-item")
 						.addClass("list-group-item-action")
 						 .attr('data-toggle','modal')
 						 .attr('data-target','#waitForPlayers')
 						 .attr('data-backdrop',"static")
-						.text("Game "+game.gameId)
+						.text("Game "+game.gameId+" - started by "+game.startedBy.username)
 						.on('click', joinGameAction));
 		}
 		
@@ -138,10 +129,41 @@ var app = {
 			app.newGame();
 		}
 	};
+	app.setupTest = function(gameId, multiplayer) {
+		$('#board').show();
+		$('#menu').hide();
+		if (multiplayer && gameId!=null) {
+			app.joinGame(gameId);
+		} else if (multiplayer){
+//			app.newMultiplayerGame();
+		} else {
+			app.newTest();
+		}
+	};
 	
 	//---------------
 	// AJAX functions
 	//---------------
+	
+	app.newTest = function() {
+		$.ajax({
+			type: 'POST', 
+			url: getRelativePath('/api/game/test?multiplayer=false'
+					+'&userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json",
+			success: function(data){
+				console.debug(data);
+				app.userboard = data;
+				app.gameboard = app.userboard.game;
+				app.gameId = app.gameboard.gameId;
+				$('#scoreBar').show();
+				$('#scoreBoard').hide();
+				app.setupStockAndDiscardPiles();
+				app.setupFoundation();
+				app.setupTableau();
+			}});		
+	};
 	
 	app.newGame = function() {
 		$.ajax({
@@ -310,7 +332,8 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				if (pileId!=null) {
-					if (app.userboard.tableau.pile[pileId].numberOfCards>0) {
+					if (app.userboard.tableau.pile[pileId].numberOfCards>=0 && 
+							app.userboard.tableau.build[pileId].numberOfCards==1) {
 						app.flip(pileId);
 					}
 				} else {
@@ -318,6 +341,13 @@ var app = {
 				}
 				$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
 				$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
+				if (app.gameboard.gameOver) {
+					console.log('game over');
+					$('#gameOverTitle').text('You Win!');
+					$('#gameOver .modal-body').html('Score: '+app.userboard.score.totalScore)
+					
+					$('#gameOver').modal('show');
+				}
 			}});
 	};
 	
@@ -343,7 +373,8 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				if (fromPileId!=null) {
-					if (app.userboard.tableau.build[fromPileId].numberOfCards>0) {
+					if (app.userboard.tableau.pile[fromPileId].numberOfCards>=0 && 
+							app.userboard.tableau.build[fromPileId].numberOfCards==1) {
 						app.flip(fromPileId);
 					}
 				} else {
@@ -368,8 +399,11 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				$('#discard-pile').empty();
-				for (var c=0; c<3; c++) {
-					var card = app.userboard.discardPile.cards[2-c];
+				console.log(app.userboard.discardPile.cards.length);
+				var maxcards = app.userboard.discardPile.cards.length>=3 ? 3 : app.userboard.discardPile.cards.length
+				console.log(maxcards);
+				for (var c=0; c<maxcards; c++) {
+					var card = app.userboard.discardPile.cards[maxcards-1-c];
 					var cardDiv = $('<div>')
 						.addClass('pokercard').addClass('front')
 						.attr('data-card-id',card.unicodeInt)
@@ -514,16 +548,16 @@ var app = {
 		userDiv.find('.ready').on('change',app.readyStatusOnChange);
 		$('#waitForPlayers .users').append(userDiv);
 		
-		$('#scoreBoard.users').append(
-				$('<div>')
-					.addClass('user').addClass('row')
+		$('#scoreBoard.users tbody').append(
+				$('<tr>')
+					.addClass('user')
 					.attr('data-user-id',user.id)
 						.append(
-							$('<div>').addClass('username').addClass('col').text(user.username))
+							$('<td>').addClass('username').text(user.username))
 						.append(
-							$('<div>').addClass('score').addClass('col').text('Score: 0'))
+							$('<td>').addClass('score').text('0'))
 						.append(
-							$('<div>').addClass('moves').addClass('col').text('Moves: 0')));
+							$('<td>').addClass('moves').text('0')));
 	}
 	
 	app.setupTableau = function() {
@@ -627,6 +661,9 @@ var app = {
 		
 	};
 	app.dragover = function(ev) {
+		// We'll handle this event so first stop bubbling up
+		ev.stopPropagation();
+		
 		if (app.canMoveData) {
 			var curTarget = $(ev.currentTarget);
 			var dataPileId = curTarget.attr('data-pile-id')
@@ -652,6 +689,9 @@ var app = {
 	};
 	
 	app.drag = function(ev) {
+		// We'll handle this event so first stop bubbling up
+		ev.stopPropagation();
+		
 		var cardDiv = $(ev.currentTarget.getElementsByClassName('pokercard')[0]);
 				
 		app.canMove(cardDiv.attr('data-card-id'));
@@ -675,6 +715,9 @@ var app = {
 	};
 		
 	
+	$('#gameOver').on('hidden.bs.modal', function (e) {
+		window.location.replace("/");
+	});
 	
 	
 	//Service worker

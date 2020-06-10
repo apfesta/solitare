@@ -7,6 +7,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * A user's game board.  Contains their tableau, stock and waste piles.
  * 
@@ -24,7 +27,7 @@ public class UserBoard {
 	Pile stockPile;
 	VisiblePile discardPile = new VisiblePile();
 	boolean gameWon = false;
-	Score score = new Score();
+	Score score;
 	boolean userReady;
 	
 	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
@@ -50,6 +53,7 @@ public class UserBoard {
 		
 		tableau = new Tableau();
 		stockPile = tableau.setup(d);
+		score = new Score();
 	}
 	
 	public void setup() {
@@ -63,6 +67,7 @@ public class UserBoard {
 		
 		tableau = new Tableau();
 		stockPile = tableau.setup(d);
+		score = new Score();
 	}
 	
 	public Card lookupCard(Integer cardId) {
@@ -71,7 +76,7 @@ public class UserBoard {
 	
 	public CanPush canPush(Card card) {
 		
-		CanPush canPush = new CanPush(game.userBoards.size());
+		CanPush canPush = new CanPush(card, game.userBoards.size());
 		
 		Pile[] facedown = getTableau().getPile();
 		Build[] tableauBuild = getTableau().getBuild();
@@ -111,8 +116,8 @@ public class UserBoard {
 			Card c = stockPile.pop();
 			discardPile.push(c);
 			c.setCurrentPile(discardPile);
-			score.discard++;
 		}
+		score.discard++;
 	}
 	
 	protected Integer getPileIdToFlip(Card card) {
@@ -135,7 +140,9 @@ public class UserBoard {
 		game.getFoundation().getPile().get(toFoundationId).push(card);
 		score.toFoundation++;
 		
-		if (pileIdToFlip!=null && !getTableau().getPile()[pileIdToFlip].isEmpty()) {
+		if (pileIdToFlip!=null && 
+				!getTableau().getPile()[pileIdToFlip].isEmpty() &&
+				getTableau().getBuild()[pileIdToFlip].isEmpty()) {
 			getTableau().flipTopPileCard(pileIdToFlip);
 			score.tableauFlip++;
 			GAME_LOG.debug("GameId:{} User:{} Flip pile {} reveals {}",
@@ -152,7 +159,8 @@ public class UserBoard {
 			}
 			if (gameWon && getStockPile().isEmpty() && getDiscardPile().isEmpty()) {
 				setGameWon(true);
-				GAME_LOG.debug("GameId:{} User:{} has been won!", game.gameId);
+				game.setGameOver(true);
+				GAME_LOG.debug("GameId:{} User:{} has won!", game.gameId);
 			}
 		}
 	}
@@ -249,13 +257,19 @@ public class UserBoard {
 		this.userReady = userReady;
 	}
 
-	public static class CanPush {
-		private Boolean[] foundationPile = new Boolean[4];
+	@JsonInclude(Include.NON_NULL)
+	public class CanPush {
+		private Card card;
+		private Boolean[] foundationPile;
 		private Boolean[] tableauBuild = new Boolean[7];
 		
-		public CanPush(int numOfPlayers) {
+		public CanPush(Card card, int numOfPlayers) {
 			super();
-			foundationPile = new Boolean[4*numOfPlayers];
+			this.card = game.getDebugProperties().isAdditionalResponseOutput()?card:null;
+			this.foundationPile = new Boolean[4*numOfPlayers];
+		}
+		public Card getCard() {
+			return card;
 		}
 		public Boolean[] getFoundationPile() {
 			return foundationPile;
@@ -269,27 +283,32 @@ public class UserBoard {
 		}
 	}
 	
+	@JsonInclude(Include.NON_NULL)
 	public class Score {
 		int toFoundation = 0;
 		int discardToTableau = 0;
 		int tableauFlip = 0;
 		int discard = 0;
 		int deckPassthrough = 0;
+		boolean additionalResponseOutput;
 		
+		Score() {
+			additionalResponseOutput = game.getDebugProperties().isAdditionalResponseOutput();
+		}
 		public int getToFoundation() {
 			return toFoundation;
 		}
-		public int getDiscardToTableau() {
-			return discardToTableau;
+		public Integer getDiscardToTableau() {
+			return additionalResponseOutput?discardToTableau:null;
 		}
-		public int getTableauFlip() {
-			return tableauFlip;
+		public Integer getTableauFlip() {
+			return additionalResponseOutput?tableauFlip:null;
 		}
-		public int getDiscard() {
-			return discard;
+		public Integer getDiscard() {
+			return additionalResponseOutput?discard:null;
 		}
-		public int getDeckPassthrough() {
-			return deckPassthrough;
+		public Integer getDeckPassthrough() {
+			return additionalResponseOutput?deckPassthrough:null;
 		}
 		public int getTotalScore() {
 			return (toFoundation*10)+

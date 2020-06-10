@@ -33,15 +33,15 @@ function setConnected(connected, gameId) {
     		console.log(data.score);
     		for (var i in data.score) {
     			console.log(i);
-    			$('#scoreBoard .user[data-user-id='+i+'] .score').text('Score: '+data.score[i].toFoundation);
-    			$('#scoreBoard .user[data-user-id='+i+'] .moves').text('Moves: '+data.score[i].totalMoves);
+    			$('#scoreBoard .user[data-user-id='+i+'] .score').text(data.score[i].toFoundation);
+    			$('#scoreBoard .user[data-user-id='+i+'] .moves').text(data.score[i].totalMoves);
     		}
     		app.syncFoundation(data.cardId, data.foundation.pile[data.toFoundationId].cards[0], data.toFoundationId);
     	} else if (data.action=='MOVE_TO_TABLEAU' || data.action=='DISCARD') {
     		for (var i in data.score) {
     			console.log(i);
-    			$('#scoreBoard .user[data-user-id='+i+'] .score').text('Score: '+data.score[i].toFoundation);
-    			$('#scoreBoard .user[data-user-id='+i+'] .moves').text('Moves: '+data.score[i].totalMoves);
+    			$('#scoreBoard .user[data-user-id='+i+'] .score').text(data.score[i].toFoundation);
+    			$('#scoreBoard .user[data-user-id='+i+'] .moves').text(data.score[i].totalMoves);
     		}
     	}
     	if (data.action=='PLAYER_JOIN') {
