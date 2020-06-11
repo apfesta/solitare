@@ -719,6 +719,11 @@ var app = {
 		window.location.replace("/");
 	});
 	
+	$('.cancelBtn').on('click', function(){
+		app.leaveGame();
+		window.location.replace("/");
+	})
+	
 	
 	//Service worker
     if ('serviceWorker' in navigator && 'PushManager' in window) {
