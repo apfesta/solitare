@@ -59,6 +59,16 @@ function setConnected(connected, gameId) {
     		$('.ready[data-user-id='+data.user.id+']').prop('checked', false);
     		app.checkReadyStatus();
     	}
+    	if (data.action=='PLAY_IS_BLOCKED') {
+    		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').addClass('blocked');
+    	} else if (data.action=='PLAY_NOT_BLOCKED') {
+    		if (data.user.id == app.user.id) {
+    			$('#blockBtn')
+    			.prop('checked',false)
+    			.closest('label').removeClass('active');
+    		}
+    		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').removeClass('blocked');
+    	}
     });
   }
 }

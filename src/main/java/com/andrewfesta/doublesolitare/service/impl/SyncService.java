@@ -28,12 +28,14 @@ public class SyncService {
 	
 	public void notifyPlayerStatus(GameBoard game, User user, boolean isReady) {
 		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
-				new BasePayload(isReady?GameUpdateAction.PLAYER_READY:GameUpdateAction.PLAYER_NOT_READY, user));
+				new BasePayload(isReady?GameUpdateAction.PLAYER_READY:GameUpdateAction.PLAYER_NOT_READY, 
+						user));
 	}
 	
 	public void notifyCountdown(GameBoard game, User user, boolean isCountdown) {
 		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
-				new BasePayload(isCountdown?GameUpdateAction.COUNTDOWN_STARTED:GameUpdateAction.COUNTDOWN_CANCELLED, user));
+				new BasePayload(isCountdown?GameUpdateAction.COUNTDOWN_STARTED:GameUpdateAction.COUNTDOWN_CANCELLED, 
+						user));
 	}
 	
 	public void notifyPlayerDrop(GameBoard game, User user) {
@@ -63,6 +65,12 @@ public class SyncService {
 						null, null, null));
 	}
 	
+	public void notifyBlocked(GameBoard game, User user, boolean blocked) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new GameUpdate(blocked?GameUpdateAction.PLAY_IS_BLOCKED:GameUpdateAction.PLAY_NOT_BLOCKED, 
+						user, game, null, null, null));
+	}
+	
 	enum GameUpdateAction {
 		PLAYER_JOIN,
 		PLAYER_DROP,
@@ -72,7 +80,9 @@ public class SyncService {
 		COUNTDOWN_CANCELLED,
 		MOVE_TO_FOUNDATION,
 		MOVE_TO_TABLEAU,
-		DISCARD
+		DISCARD,
+		PLAY_IS_BLOCKED,
+		PLAY_NOT_BLOCKED,
 	}
 
 	static class BasePayload {

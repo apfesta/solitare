@@ -2,7 +2,9 @@ package com.andrewfesta.doublesolitare.model;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ public class GameBoard {
 	
 	Map<User, UserBoard> userBoards = new HashMap<>();
 	Map<Integer, UserBoard.Score> userScores = new HashMap<>();
+	Set<Integer> blocked = new HashSet<>();
 	
 	DoubleSolitareDebugProperties debugProperties = new DoubleSolitareDebugProperties();
 	
@@ -246,6 +249,18 @@ public class GameBoard {
 	 */
 	public void moveToTableau(User user, Integer cardId, Integer toBuildId) {
 		userBoards.get(user).moveToTableau(cardId, toBuildId);
+	}
+	
+	public void userBlocked(User user, boolean blocked) {
+		if (blocked) {
+			this.blocked.add(user.getId());
+		} else {
+			this.blocked.remove(user.getId());
+		}
+	}
+	
+	public boolean isUserBlocked(User user) {
+		return this.blocked.contains(user.getId());
 	}
 	
 	public boolean isMultiPlayer() {
