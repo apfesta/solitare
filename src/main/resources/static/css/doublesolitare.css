@@ -177,3 +177,11 @@
 progress#startgame_countdown {
 	width:100%;
 }
+
+#gameOver table {
+	width: 100%;
+}
+#gameOver .score, #gameOver .moves {
+	text-align: center;
+}
+

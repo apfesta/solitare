@@ -29,7 +29,6 @@ public class GameBoard {
 	int maxNumberOfCards = 3; //cards to discard
 	
 	Map<User, UserBoard> userBoards = new HashMap<>();
-	Map<Integer, UserBoard.Score> userScores = new HashMap<>();
 	Set<Integer> blocked = new HashSet<>();
 	
 	DoubleSolitareDebugProperties debugProperties = new DoubleSolitareDebugProperties();
