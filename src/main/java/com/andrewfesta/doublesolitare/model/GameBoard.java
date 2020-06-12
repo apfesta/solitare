@@ -226,17 +226,7 @@ public class GameBoard {
 	public void discard(User user) {
 		userBoards.get(user).discard(maxNumberOfCards);
 	}
-	
-//	protected Integer getPileIdToFlip(Card card) {
-//		Integer pileIdToFlip = null;
-//		for (int i=0; i<getTableau().getPile().length; i++) {
-//			if (card.getCurrentBuild()==getTableau().getBuild()[i]) {
-//				pileIdToFlip = i;
-//			}
-//		}
-//		return pileIdToFlip;
-//	}
-	
+		
 	public void moveToFoundation(User user, Integer cardId, Integer toFoundationId) {
 		userBoards.get(user).moveToFoundation(cardId, toFoundationId);
 	}
