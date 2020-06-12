@@ -1,4 +1,9 @@
 
+$('#board').hide();
+$('#scoreBar').hide();
+$('#scoreBoard').hide();
+$('#blockBtn').hide();
+
 var menu = {
 		games: []
 };
@@ -159,6 +164,7 @@ var app = {
 				app.gameId = app.gameboard.gameId;
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
+				$('#blockBtn').hide();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -179,6 +185,7 @@ var app = {
 				app.gameId = app.gameboard.gameId;
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
+				$('#blockBtn').hide();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -200,6 +207,7 @@ var app = {
 				connect(app.gameId);
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
+				$('#blockBtn').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -217,6 +225,8 @@ var app = {
 				console.debug(data);
 				connect(gameId);
 				$('#scoreBar').hide();
+				$('#scoreBoard').show();
+				$('#blockBtn').show();
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
@@ -231,6 +241,16 @@ var app = {
 			type: 'GET', 
 			url: getRelativePath('/api/game/'+gameId+'/ready'
 					+'?ready='+ready
+					+'&userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json"});		
+	};
+	
+	app.toggleBlock = function(gameId, blocked) {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+gameId+'/toggle'
+					+'?blocked='+blocked
 					+'&userId='+app.user.id),
 			contentType: "application/json",
 			dataType: "json"});		
@@ -341,7 +361,7 @@ var app = {
 				}
 				$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
 				$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
-				if (app.gameboard.gameOver) {
+				if (app.gameboard.multiPlayer && app.gameboard.gameOver) {
 					console.log('game over');
 					$('#gameOverTitle').text('You Win!');
 					$('#gameOver .modal-body').html('Score: '+app.userboard.score.totalScore)
@@ -715,8 +735,19 @@ var app = {
 	};
 		
 	
-	$('#gameOver').on('hidden.bs.modal', function (e) {
+	app.mainMenu = function() {
+		app.leaveGame();
 		window.location.replace("/");
+	};
+	
+	$('#gameOver').on('hidden.bs.modal', app.mainMenu);
+	$('.cancelBtn').on('click', app.mainMenu);
+	$('#quitBtn').on('click', app.mainMenu);
+	
+	$('#blockBtn').on('change',function(){
+		app.toggleBlock(app.gameId, $(this).prop("checked") == true);
+		$(this).blur();
+		$('#quitBtn').focus();
 	});
 	
 	

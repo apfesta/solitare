@@ -3,6 +3,7 @@ package com.andrewfesta.doublesolitare.model;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,37 +133,45 @@ public class UserBoard {
 	
 	public void moveToFoundation(Integer cardId, Integer toFoundationId) {
 		
-		Card card = lookupCard(cardId);
-		Integer pileIdToFlip = getPileIdToFlip(card);
+		Lock lock = game.getFoundation().getLocks().get(toFoundationId);
+		lock.lock();
 		
-		GAME_LOG.debug("GameId:{} User:{} Move {} to foundation pile {}",
-				game.gameId, user, card.abbrev(), toFoundationId);
-		game.getFoundation().getPile().get(toFoundationId).push(card);
-		score.toFoundation++;
-		
-		if (pileIdToFlip!=null && 
-				!getTableau().getPile()[pileIdToFlip].isEmpty() &&
-				getTableau().getBuild()[pileIdToFlip].isEmpty()) {
-			getTableau().flipTopPileCard(pileIdToFlip);
-			score.tableauFlip++;
-			GAME_LOG.debug("GameId:{} User:{} Flip pile {} reveals {}",
-					game.gameId, user, pileIdToFlip, card.abbrev());
-		}
-		
-		boolean gameWon = true;
-		if (card.getValue() == Card.KING) {
-			//Check tableau and stock pile to see if the game has been won
-			for (Build b: getTableau().getBuild()) {
-				if (!b.isEmpty()) {
-					gameWon = false;
+		try {
+			Card card = lookupCard(cardId);
+			Integer pileIdToFlip = getPileIdToFlip(card);
+			
+			GAME_LOG.debug("GameId:{} User:{} Move {} to foundation pile {}",
+					game.gameId, user, card.abbrev(), toFoundationId);
+			game.getFoundation().getPile().get(toFoundationId).push(card);
+			score.toFoundation++;
+			
+			if (pileIdToFlip!=null && 
+					!getTableau().getPile()[pileIdToFlip].isEmpty() &&
+					getTableau().getBuild()[pileIdToFlip].isEmpty()) {
+				getTableau().flipTopPileCard(pileIdToFlip);
+				score.tableauFlip++;
+				GAME_LOG.debug("GameId:{} User:{} Flip pile {} reveals {}",
+						game.gameId, user, pileIdToFlip, card.abbrev());
+			}
+			
+			boolean gameWon = true;
+			if (card.getValue() == Card.KING) {
+				//Check tableau and stock pile to see if the game has been won
+				for (Build b: getTableau().getBuild()) {
+					if (!b.isEmpty()) {
+						gameWon = false;
+					}
+				}
+				if (gameWon && getStockPile().isEmpty() && getDiscardPile().isEmpty()) {
+					setGameWon(true);
+					game.setGameOver(true);
+					GAME_LOG.debug("GameId:{} User:{} has won!", game.gameId);
 				}
 			}
-			if (gameWon && getStockPile().isEmpty() && getDiscardPile().isEmpty()) {
-				setGameWon(true);
-				game.setGameOver(true);
-				GAME_LOG.debug("GameId:{} User:{} has won!", game.gameId);
-			}
+		} finally {
+			lock.unlock();
 		}
+		
 	}
 	
 	/**

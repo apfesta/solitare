@@ -77,6 +77,21 @@
 		</div>
 	
 		<div id="tableau"></div>
+		
+		<nav class="navbar fixed-bottom navbar-dark bg-dark justify-content-between">
+		  <div class="navbar-nav">
+		  	<form class="form-inline">
+		  		<div class="btn-group-toggle" data-toggle="buttons">
+		  		<label class="btn btn-sm btn-outline-warning mx-2">
+				    <input id="blockBtn" type="checkbox" autocomplete="off"> I'm Stuck
+				 </label>
+				 </div>
+			</form>
+		  </div>
+		  <div class="nav navbar-right">
+		  		<button id="quitBtn" class="btn btn-sm btn-danger" type="button">Quit</button>
+		  </div>
+		</nav>
 	
 	</div>
 	
@@ -96,6 +111,7 @@
 	      <div class="modal-footer">
 	      	<div id="startgame_countdown_text">Waiting...</div>
 	        <progress id="startgame_countdown" max="5" value="0"></progress>
+	        <button type="button" class="btn btn-default cancelBtn" data-dismiss="modal">Cancel</button>
 	      </div>
 	    </div>
 	  </div>

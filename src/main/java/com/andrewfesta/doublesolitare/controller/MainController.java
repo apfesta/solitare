@@ -48,9 +48,10 @@ public class MainController {
 	}
 		
 	@RequestMapping(value="/api/game", method = RequestMethod.POST)
-	public @ResponseBody UserBoard newGame(@RequestParam("multiplayer") boolean multiplayer,
-			@RequestParam Integer userId) {
-		LOG.trace("POST /api/game");
+	public @ResponseBody UserBoard newGame(
+			@RequestParam("multiplayer") boolean multiplayer,
+			@RequestParam("userId") Integer userId) {
+		LOG.trace("POST /api/game?multiplayer={}",multiplayer);
 		User user = users.get(userId);
 		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
 		if (debugProperties!=null) {
@@ -74,9 +75,10 @@ public class MainController {
 	 * @return
 	 */
 	@RequestMapping(value="/api/game/test", method = RequestMethod.POST)
-	public @ResponseBody UserBoard newTestGame(@RequestParam("multiplayer") boolean multiplayer,
-			@RequestParam Integer userId) {
-		LOG.trace("POST /api/game");
+	public @ResponseBody UserBoard newTestGame(
+			@RequestParam("multiplayer") boolean multiplayer,
+			@RequestParam("userId") Integer userId) {
+		LOG.trace("POST /api/game?multiplayer={}",multiplayer);
 		User user = users.get(userId);
 		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
 		if (debugProperties!=null) {
@@ -159,7 +161,7 @@ public class MainController {
 	public @ResponseBody void readyStatus(@PathVariable Integer gameId,
 			@RequestParam("userId") Integer userId,
 			@RequestParam("ready") boolean ready) {
-		LOG.trace("GET /api/game/{}/ready", gameId);
+		LOG.trace("GET /api/game/{}/ready?ready=", gameId, ready);
 		GameBoard game = games.get(gameId);
 		User user = users.get(userId);
 		game.getUserBoard(user).setUserReady(ready);
@@ -210,6 +212,11 @@ public class MainController {
 		game.moveToFoundation(user, cardId, toFoundationId);
 		syncService.notifyMoveToFoundation(game, user, cardId, toFoundationId);
 		
+		if (game.isUserBlocked(user)) {
+			game.userBlocked(user, false);
+			syncService.notifyBlocked(game, user, false);
+		}
+		
 		game.getFoundation().prettyPrint();
 		game.getTableau(user).prettyPrint();
 		game.getDiscardPile(user).print(3);
@@ -238,6 +245,11 @@ public class MainController {
 		
 		game.moveToTableau(user, cardId, toBuildId);
 		syncService.notifyMoveToTableau(game, user, cardId, toBuildId);
+		
+		if (game.isUserBlocked(user)) {
+			game.userBlocked(user, false);
+			syncService.notifyBlocked(game, user, false);
+		}
 						
 		game.getFoundation().prettyPrint();
 		game.getTableau(user).prettyPrint();
@@ -263,6 +275,19 @@ public class MainController {
 		game.getUserBoard(user).getScore().prettyPrint();
 		
 		return game.getUserBoard(user);
+	}
+	
+	@RequestMapping(value="/api/game/{gameId}/toggle", method = RequestMethod.GET)
+	public @ResponseBody void toggleBlocked(@PathVariable Integer gameId, 
+			@RequestParam("userId") Integer userId,
+			@RequestParam("blocked") boolean blocked) {
+		LOG.trace("GET /api/game/{}/toggle?blocked={}", gameId, blocked);
+		
+		GameBoard game = games.get(gameId);
+		User user = users.get(userId);
+		
+		game.userBlocked(user, blocked);
+		syncService.notifyBlocked(game, user, blocked);
 	}
 	
 	public static class Game {
