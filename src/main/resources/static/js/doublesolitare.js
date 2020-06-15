@@ -55,7 +55,17 @@ var menu = {
 			success: function(data){
 				console.debug(data);
 				menu.games = data;
-				menu.showGames();
+				var hash = $(location).attr('hash')
+				if (hash.length>0) {
+					var gameId = hash.substring(1)
+					$('#waitForPlayers').modal({
+						  backdrop: 'static',
+						  show: true
+						});
+					app.setup(gameId, true);
+				} else {
+					menu.showGames();
+				}
 			}});
 	};
 	
@@ -212,6 +222,9 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				$('#inviteLink')
+					.attr('href','#'+app.gameId)
+					.text($(location).attr('href').split('#')[0]+'#'+app.gameId);
 				connect(app.gameId);
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
@@ -234,6 +247,9 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				$('#inviteLink')
+					.attr('href','#'+app.gameId)
+					.text($(location).attr('href').split('#')[0]+'#'+app.gameId);
 				connect(app.gameId);
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
