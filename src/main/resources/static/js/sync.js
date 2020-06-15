@@ -26,13 +26,11 @@ function setConnected(connected, gameId) {
 	app.handleBeforeUnload
 	app.handleUnload();
     stompClient.subscribe('/topic/game/'+gameId+'/activity', function(result){ 
-    	console.log(result);
+    	console.debug(result);
     	var data = JSON.parse(result.body);
+    	console.debug(data);
     	if (data.action=='MOVE_TO_FOUNDATION') {
-    		console.log(data.foundation.pile[data.toFoundationId]);
-    		console.log(data.score);
     		for (var i in data.score) {
-    			console.log(i);
     			app.gameboard.userScores[data.user.id] = data.score[i]
     			$('#scoreBoard .user[data-user-id='+i+'] .score').text(data.score[i].toFoundation);
     			$('#scoreBoard .user[data-user-id='+i+'] .moves').text(data.score[i].totalMoves);
@@ -40,7 +38,6 @@ function setConnected(connected, gameId) {
     		app.syncFoundation(data.cardId, data.foundation.pile[data.toFoundationId].cards[0], data.toFoundationId);
     	} else if (data.action=='MOVE_TO_TABLEAU' || data.action=='DISCARD') {
     		for (var i in data.score) {
-    			console.log(i);
     			app.gameboard.userScores[data.user.id] = data.score[i]
     			$('#scoreBoard .user[data-user-id='+i+'] .score').text(data.score[i].toFoundation);
     			$('#scoreBoard .user[data-user-id='+i+'] .moves').text(data.score[i].totalMoves);
@@ -54,7 +51,6 @@ function setConnected(connected, gameId) {
     		app.removePlayer();
     		$('.users .user[data-user-id='+data.user.id+']').remove();
     		if (app.gameboard.inProgress) {
-    			console.log('game over');
 				$('#gameOverTitle').text(data.user.username+' left game');
 				$('#gameOver .modal-body').empty().append(
 						$('<table>').append(
@@ -78,7 +74,6 @@ function setConnected(connected, gameId) {
     		}
     	}
     	if (data.action=='GAME_WON') {
-    		console.log('game over');
 			$('#gameOverTitle').text(data.user.username+' won game');
 			$('#gameOver .modal-body').empty().append(
 					$('<table>').append(
