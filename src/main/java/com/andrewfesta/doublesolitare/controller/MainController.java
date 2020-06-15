@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugProperties;
+import com.andrewfesta.doublesolitare.exception.GameInProgressException;
 import com.andrewfesta.doublesolitare.model.Card;
 import com.andrewfesta.doublesolitare.model.GameBoard;
 import com.andrewfesta.doublesolitare.model.Suit;
@@ -150,11 +151,14 @@ public class MainController {
 			@RequestParam("userId") Integer userId) {
 		LOG.trace("POST /api/game/{}/join", gameId);
 		GameBoard game = games.get(gameId);
-		User user = users.get(userId);
-		game.join(user);
-		syncService.notifyPlayerJoin(game, user);
-		
-		return game.getUserBoard(user);
+		if (!game.isInProgress()) {
+			User user = users.get(userId);
+			game.join(user);
+			syncService.notifyPlayerJoin(game, user);
+			
+			return game.getUserBoard(user);
+		}
+		throw new GameInProgressException("Game "+gameId+" is already in progress");
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/ready", method = RequestMethod.GET)
@@ -211,10 +215,14 @@ public class MainController {
 		
 		game.moveToFoundation(user, cardId, toFoundationId);
 		syncService.notifyMoveToFoundation(game, user, cardId, toFoundationId);
-		
+			
 		if (game.isUserBlocked(user)) {
 			game.userBlocked(user, false);
 			syncService.notifyBlocked(game, user, false);
+		}
+		
+		if (game.getUserBoard(user).isGameWon()) {
+			syncService.notifyGameWon(game, user);
 		}
 		
 		game.getFoundation().prettyPrint();
