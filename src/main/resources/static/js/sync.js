@@ -77,6 +77,29 @@ function setConnected(connected, gameId) {
 				$('#gameOver').modal('show');
     		}
     	}
+    	if (data.action=='GAME_WON') {
+    		console.log('game over');
+			$('#gameOverTitle').text(data.user.username+' won game');
+			$('#gameOver .modal-body').empty().append(
+					$('<table>').append(
+						$('<thead>').append(
+							$('<tr>').append(
+								$('<th>').html('User')).append(
+								$('<th>').html('Score')).append(
+								$('<th>').html('Moves'))
+						)
+					).append($('<tbody>')));
+			for (i in app.gameboard.users) {	
+				var user = app.gameboard.users[i];
+				$('#gameOver .modal-body tbody').append(
+					$('<tr>').append(
+						$('<td>').addClass('username').html(user.username)).append(
+						$('<td>').addClass('score').html(app.gameboard.userScores[user.id].toFoundation)).append(
+						$('<td>').addClass('moves').html(app.gameboard.userScores[user.id].totalMoves))
+				);
+			}					
+			$('#gameOver').modal('show');
+    	}
     	if (data.action=='PLAYER_READY') {
     		$('.ready[data-user-id='+data.user.id+']').prop('checked', true);
     		app.checkReadyStatus();

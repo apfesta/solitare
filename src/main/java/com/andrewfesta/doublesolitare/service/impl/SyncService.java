@@ -10,12 +10,14 @@ import com.andrewfesta.doublesolitare.model.Foundation;
 import com.andrewfesta.doublesolitare.model.GameBoard;
 import com.andrewfesta.doublesolitare.model.User;
 import com.andrewfesta.doublesolitare.model.UserBoard.Score;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @Component
 public class SyncService {
 
 	private SimpMessageSendingOperations simpMessageSending;
-
+	
 	@Autowired
 	public void setSimpMessageSending(SimpMessageSendingOperations simpMessageSending) {
 		this.simpMessageSending = simpMessageSending;
@@ -71,6 +73,12 @@ public class SyncService {
 						user, game, null, null, null));
 	}
 	
+	public void notifyGameWon(GameBoard game, User user) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new GameUpdate(GameUpdateAction.GAME_WON, 
+						user, game, null, null, null));
+	}
+	
 	enum GameUpdateAction {
 		PLAYER_JOIN,
 		PLAYER_DROP,
@@ -83,6 +91,7 @@ public class SyncService {
 		DISCARD,
 		PLAY_IS_BLOCKED,
 		PLAY_NOT_BLOCKED,
+		GAME_WON
 	}
 
 	static class BasePayload {
@@ -102,6 +111,7 @@ public class SyncService {
 		}
 	}
 		
+	@JsonInclude(Include.NON_NULL)
 	static class GameUpdate extends BasePayload {
 		final Foundation foundation;
 		Integer cardId;
@@ -109,19 +119,23 @@ public class SyncService {
 		Integer toBuildId;
 		Integer numOfUsers;
 		Map<Integer, Score> score;
+		Boolean gameWon;
 		
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game) {
 			super(action, user);
 			this.foundation = game.getFoundation();
 			this.numOfUsers = game.getUsers().size();
 			this.score = game.getUserScores();
+			if (game.getUserBoard(user).isGameWon() || game.getDebugProperties().isAdditionalResponseOutput()) {
+				gameWon = game.getUserBoard(user).isGameWon();
+			}
 		}
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game, 
 				Integer cardId, Integer toFoundationId, Integer toBuildId) {
 			this(action, user, game);
 			this.cardId = cardId;
 			this.toFoundationId = toFoundationId;
-			this.toBuildId = toBuildId;
+			this.toBuildId = game.getDebugProperties().isAdditionalResponseOutput()?toBuildId:null;
 		}
 		public Foundation getFoundation() {
 			return foundation;
@@ -149,6 +163,18 @@ public class SyncService {
 		}
 		public void setScore(Map<Integer, Score> score) {
 			this.score = score;
+		}
+		public Boolean getGameWon() {
+			return gameWon;
+		}
+		public void setGameWon(Boolean gameWon) {
+			this.gameWon = gameWon;
+		}
+		public Integer getToBuildId() {
+			return toBuildId;
+		}
+		public void setToBuildId(Integer toBuildId) {
+			this.toBuildId = toBuildId;
 		}
 		
 		

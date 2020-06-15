@@ -211,10 +211,14 @@ public class MainController {
 		
 		game.moveToFoundation(user, cardId, toFoundationId);
 		syncService.notifyMoveToFoundation(game, user, cardId, toFoundationId);
-		
+			
 		if (game.isUserBlocked(user)) {
 			game.userBlocked(user, false);
 			syncService.notifyBlocked(game, user, false);
+		}
+		
+		if (game.getUserBoard(user).isGameWon()) {
+			syncService.notifyGameWon(game, user);
 		}
 		
 		game.getFoundation().prettyPrint();
