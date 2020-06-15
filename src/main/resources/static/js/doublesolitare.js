@@ -279,6 +279,10 @@ var app = {
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
+			},
+			error: function(jqXHR, textStatus, errorThrown){
+				alert('Unable to join game');
+				$('.cancelBtn').click();
 			}});		
 	};
 	
