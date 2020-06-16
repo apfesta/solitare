@@ -222,9 +222,23 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
-				$('#inviteLink')
-					.attr('href','#'+app.gameId)
-					.text($(location).attr('href').split('#')[0]+'#'+app.gameId);
+				$('#inviteLink .url')
+					.val($(location).attr('href').split('#')[0]+'#'+app.gameId);
+//				$('#inviteLink').append(
+//						$('<div class="input-group-append">').append(
+//								$('<button class="btn btn-outline-primary" type="button"><i class="fa fa-share-alt"></i></button>')));
+				if (navigator.share) {
+					$('#inviteLink').append(
+							$('<div class="input-group-append">').append(
+									$('<button class="btn btn-outline-primary" type="button"><i class="fa fa-share-alt"></i></button>')
+									.on('click',function(){
+										navigator.share({
+											title: 'Double Solitare',
+											text: 'Join me in a game of Double Solitare',
+											url: $(location).attr('href').split('#')[0]+'#'+app.gameId
+										}).then(()=> console.log('Successful share'));
+									})));
+				} 
 				connect(app.gameId);
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
