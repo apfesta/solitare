@@ -25,6 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
     <meta http-equiv="Content-Language" content="en" />
     <link th:href="@{|/webjars/bootstrap/css/bootstrap.min.css|}" rel="stylesheet"/>
+    <link th:href="@{|/webjars/fontawesome/css/font-awesome.min.css|}" rel="stylesheet"/>
     <link rel="stylesheet" type="text/css" th:href="@{|/css/doublesolitare.css|}" href="../css/doublesolitare.css" />
 
 	<!-- PWA Manifest -->
@@ -105,7 +106,10 @@
 	      </div>
 	      <div class="modal-body">
 	        Waiting for 2 or more players to join.  When you're ready, check 'I'm Ready.'  When all players are ready, you'll get a 5 second countdown.  
-	        Invite players to join with this link: <a id="inviteLink" href="#"></a>
+	        <label for="inviteUrl">Invite players to join with this link</label>
+	        <div id="inviteLink" class="input-group mb-3 input-group-sm">
+	        	<input id="inviteUrl" class="url form-control" readonly="readonly"/>
+	        </div>
 	        <div class="list-group users">
 	        	<div class="list-group-item user me">Me</div>
 	        </div>
