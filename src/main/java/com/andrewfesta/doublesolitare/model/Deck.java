@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class Deck extends Pile {
 
-	Random rand = new Random(); 
+	static Random rand = new Random(); 
 	
 	private Deck() {
 		super();
@@ -34,7 +34,14 @@ public class Deck extends Pile {
 		return deck;
 	}
 	
-	public void shuffle() {
+	public static ArrayDeque<Card> shuffle(ArrayDeque<Card> cards, int n) {
+		for (int i=0; i<n; i++) {
+			cards = shuffle(cards);
+		}
+		return cards;
+	}
+	
+	public static ArrayDeque<Card> shuffle(ArrayDeque<Card> cards) {
 		ArrayList<Card> oldOrder = new ArrayList<>(cards);
 		ArrayDeque<Card> newOrder = new ArrayDeque<>();
 		for (int i = 0; i < 52; i++) {
@@ -42,7 +49,11 @@ public class Deck extends Pile {
 			Card c = oldOrder.remove(index);
 			newOrder.add(c);
 		}
-		cards = newOrder;
+		return newOrder;
+	}
+	
+	public void shuffle() {
+		cards = shuffle(cards, rand.nextInt(4)+1);
 	}
 	
 }
