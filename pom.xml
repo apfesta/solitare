@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.andrewfesta</groupId>
 	<artifactId>double-solitare</artifactId>
-	<version>0.9.2</version>
+	<version>0.10.0</version>
 	<name>double-solitare</name>
 	<description>Demo project for Spring Boot</description>
 	
@@ -47,6 +47,7 @@
 		<version.jquery>3.2.1</version.jquery>
 		<version.sockjs-client>1.1.2</version.sockjs-client>
 		<version.stomp-websocket>2.3.3-1</version.stomp-websocket>
+		<version.fontawesome>4.7.0</version.fontawesome>
 		
 		<docker.repository.name>apfesta</docker.repository.name>
 		<docker.image.name>${project.artifactId}</docker.image.name>
@@ -102,6 +103,11 @@
 		    <groupId>org.webjars</groupId>
 		    <artifactId>stomp-websocket</artifactId>
 		    <version>${version.stomp-websocket}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.webjars.bower</groupId>
+		    <artifactId>fontawesome</artifactId>
+		    <version>${version.fontawesome}</version>
 		</dependency>
 
 		<!-- Dev tools -->

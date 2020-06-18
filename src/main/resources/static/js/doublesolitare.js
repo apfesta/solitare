@@ -2,7 +2,7 @@
 $('#board').hide();
 $('#scoreBar').hide();
 $('#scoreBoard').hide();
-$('#blockBtn').hide();
+$('#blockToggleButton').hide();
 
 var menu = {
 		games: []
@@ -182,7 +182,7 @@ var app = {
 				app.gameId = app.gameboard.gameId;
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
-				$('#blockBtn').hide();
+				$('#blockToggleButton').hide();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -203,7 +203,7 @@ var app = {
 				app.gameId = app.gameboard.gameId;
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
-				$('#blockBtn').hide();
+				$('#blockToggleButton').hide();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -213,7 +213,7 @@ var app = {
 	app.updateInviteLink = function() {
 		$('#inviteLink .url')
 			.val($(location).attr('href').split('#')[0]+'#'+this.gameId);
-		if (navigator.share) {
+		if ('serviceWorker' in navigator && navigator.share) {
 			$('#inviteLink').append(
 					$('<div class="input-group-append">').append(
 							$('<button class="btn btn-outline-primary" type="button" title="Share URL..."><i class="fa fa-share-alt"></i></button>')
@@ -221,7 +221,7 @@ var app = {
 								navigator.share({
 									title: 'Double Solitare',
 									text: 'Join me in a game of Double Solitare',
-									url: $(location).attr('href').split('#')[0]+'#'+this.gameId
+									url: $(location).attr('href').split('#')[0]+'#'+app.gameId
 								}).then(()=> console.log('Successful share'));
 							})));
 		} else {
@@ -253,7 +253,7 @@ var app = {
 				connect(app.gameId);
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
-				$('#blockBtn').show();
+				$('#blockToggleButton').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -276,7 +276,7 @@ var app = {
 				connect(app.gameId);
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
-				$('#blockBtn').show();
+				$('#blockToggleButton').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -295,7 +295,7 @@ var app = {
 				connect(gameId);
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
-				$('#blockBtn').show();
+				$('#blockToggleButton').show();
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;

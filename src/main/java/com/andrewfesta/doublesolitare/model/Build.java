@@ -39,22 +39,13 @@ public class Build extends VisiblePile {
 				Sequence.RANK.equals(sequence) && card.getValue()==Card.ACE;
 	}
 	
-	public boolean canMove(Card card) {
+	private boolean canMove(Card card) {
 		return (card.getCurrentBuild()!=null && //Is in a build
 				card.getCurrentBuild().contains(card)) ||
 				(card.getCurrentPile()!=null &&
 				card.getCurrentPile().contains(card));  //Is top of the discard pile
 	}
-	
-	public boolean canPush(Build build) {
-		if (Sequence.ALTERNATE_COLOR.equals(sequence)) {
-			//can only move builds onto alt-color builds
-			return canPush(build.peekFromBottom(0));
-		} else {
-			return false;
-		}
-	}
-	
+		
 	public Build popBuild(Card card) {
 		//pop all cards until you get to c
 		ArrayDeque<Card> temp = new ArrayDeque<>();
