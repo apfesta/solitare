@@ -221,7 +221,7 @@ var app = {
 								navigator.share({
 									title: 'Double Solitare',
 									text: 'Join me in a game of Double Solitare',
-									url: $(location).attr('href').split('#')[0]+'#'+this.gameId
+									url: $(location).attr('href').split('#')[0]+'#'+app.gameId
 								}).then(()=> console.log('Successful share'));
 							})));
 		} else {
