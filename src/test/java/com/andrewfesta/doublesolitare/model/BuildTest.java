@@ -34,24 +34,7 @@ public class BuildTest {
 		
 		build.push(c2);
 	}
-	
-	@Test
-	public void testCanPushBuilds() {
-		Build build1 = new Build(Sequence.ALTERNATE_COLOR);
-		build1.cards.push(new Card(10, Suit.HEARTS));
-		build1.cards.push(new Card(9, Suit.CLUBS));
 		
-		Build build2 = new Build(Sequence.ALTERNATE_COLOR);
-		build2.cards.push(new Card(Card.JACK, Suit.SPADES));
-		
-		Build build3 = new Build(Sequence.ALTERNATE_COLOR);
-		build3.cards.push(new Card(8, Suit.DIAMONDS));
-		
-		assertTrue(build2.canPush(build1));
-		assertFalse(build1.canPush(build2));
-		assertTrue(build1.canPush(build3));
-	}
-	
 	@Test
 	public void testCanPushRank() {
 		
@@ -77,6 +60,15 @@ public class BuildTest {
 		assertFalse(build.canPush(c3));
 		assertFalse(build.canPush(c4));
 		
+	}
+	
+	public void testCanPushSubBuilds() {
+		Build build1 = new Build(Sequence.ALTERNATE_COLOR);
+		build1.cards.push(new Card(10, Suit.HEARTS));
+		build1.cards.push(new Card(9, Suit.CLUBS));
+		
+		Build build2 = new Build(Sequence.ALTERNATE_COLOR);
+		build2.cards.push(new Card(Card.JACK, Suit.SPADES));
 	}
 	
 }
