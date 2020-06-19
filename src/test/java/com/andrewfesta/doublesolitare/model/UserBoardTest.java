@@ -1,5 +1,6 @@
 package com.andrewfesta.doublesolitare.model;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -84,6 +85,9 @@ public class UserBoardTest {
 		
 		userBoard.moveToTableau(127162, 2);
 		userBoard.getTableau().prettyPrint();
+		
+		assertEquals(1, userBoard.tableau.getBuild()[1].size());
+		assertEquals(4, userBoard.tableau.getBuild()[2].size());
 	}
 	
 }
