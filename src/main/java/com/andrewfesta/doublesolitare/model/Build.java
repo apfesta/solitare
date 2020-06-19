@@ -89,9 +89,10 @@ public class Build extends VisiblePile {
 	
 	public void push(Build b, Card bottomCard) {
 		boolean inBuild = false;
-		do {
+		for (Iterator<Card> it = b.cards.descendingIterator(); it.hasNext();) {
 			//Find bottom card to start a sub-build
-			Card c = b.cards.peekLast();
+			
+			Card c = it.next();
 			if (!inBuild && !bottomCard.equals(c)) {
 				continue;
 			}
@@ -100,7 +101,7 @@ public class Build extends VisiblePile {
 			//start pushing cards
 			if (canPush(c)) {
 				if (canMove(c)) {
-					b.cards.removeLast();
+					b.cards.remove(c);
 					
 					super.push(c);
 					
@@ -109,7 +110,7 @@ public class Build extends VisiblePile {
 					throw new RuntimeException("Card "+c+" cannot move.");
 				}
 			}
-		} while (!b.isEmpty());
+		} 
 	}
 	
 }
