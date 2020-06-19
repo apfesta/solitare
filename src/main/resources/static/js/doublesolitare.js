@@ -423,6 +423,10 @@ var app = {
 				nextBuildDiv.remove();
 				cardDiv.removeClass('fan-down')
 				cardDiv.removeClass('fan-right');
+				if (app.gameboard.multiPlayer && app.gameboard.foundation.pile[foundationId].numberOfCards==12) {
+					cardDiv.addClass('back');
+					cardDiv.find("img").attr('src',getRelativePath('/img/back1.png'));
+				}
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				if (pileId!=null) {
