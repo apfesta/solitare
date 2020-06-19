@@ -497,9 +497,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				$('#discard-pile').empty();
-				console.log(app.userboard.discardPile.cards.length);
 				var maxcards = app.userboard.discardPile.cards.length>=3 ? 3 : app.userboard.discardPile.cards.length
-				console.log(maxcards);
 				for (var c=0; c<maxcards; c++) {
 					var card = app.userboard.discardPile.cards[maxcards-1-c];
 					var cardDiv = $('<div>')
