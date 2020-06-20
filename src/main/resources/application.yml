@@ -9,6 +9,7 @@ logging:
   level: 
     root: WARN
     org.springframework.web: INFO
+    org.springframework.security: INFO
     com.andrewfesta.doublesolitare: DEBUG
 #    com.andrewfesta.doublesolitare.controller: TRACE
     GameLog: DEBUG

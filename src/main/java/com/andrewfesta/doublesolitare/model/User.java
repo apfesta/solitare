@@ -1,18 +1,25 @@
 package com.andrewfesta.doublesolitare.model;
 
-public class User {
+import java.util.Collections;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+public class User extends org.springframework.security.core.userdetails.User {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1571362421820222821L;
 	
 	Integer id;
-	String username;
 
-	public User() {
-		super();
-	}
-
-	public User(Integer id) {
-		super();
+	public User(Integer id, String username) {
+		super(username, "", Collections.singletonList(new SimpleGrantedAuthority("GUEST_ROLE")));
 		this.id = id;
-		this.username = "User "+id;
+	}
+	
+	public User(Integer id) {
+		this(id, "Guest "+id);
 	}
 
 	public Integer getId() {
@@ -21,14 +28,6 @@ public class User {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
 	}
 
 	@Override

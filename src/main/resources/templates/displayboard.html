@@ -33,6 +33,10 @@
 		
 	<meta rel="icon" sizes="192x192" th:href="@{|/img/icon-192x192.png|}" href="/img/icon-192x192.png" />
 	<meta name="theme-color" content="#008800"/>
+	
+	<!-- CSRF -->
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body onload="disconnect()">
 
@@ -175,6 +179,18 @@
 	  		} 
 	  		return ctx+uri;
   		}
+  		
+  		/**
+  		 * This allows us to dynmically set the ajax headers
+  		 */
+  		var token = $("meta[name='_csrf']").attr("content");
+  	    var header = $("meta[name='_csrf_header']").attr("content");
+  	    
+  	  	$.ajaxSetup({
+        	beforeSend: function (jqXHR, settings) {
+        		jqXHR.setRequestHeader(header, token);
+          	}
+		});
   		
   	/*]]>*/
   	</script>
