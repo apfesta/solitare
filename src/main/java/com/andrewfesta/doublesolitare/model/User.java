@@ -15,10 +15,14 @@ public class User {
 		super();
 	}
 
-	public User(Integer id) {
+	public User(Integer id, String username) {
 		super();
 		this.id = id;
-		this.username = "User "+id;
+		this.username = username;
+	}
+	
+	public User(Integer id) {
+		this(id, "Guest "+id);
 	}
 
 	public Integer getId() {
