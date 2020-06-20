@@ -33,7 +33,7 @@ public class UserBoard {
 	
 	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
 	
-	private Map<Integer, Card> cards = new HashMap<>(); //card by ID
+	Map<Integer, Card> cards = new HashMap<>(); //card by ID
 	
 	public UserBoard(GameBoard game, User user) {
 		super();
@@ -198,7 +198,9 @@ public class UserBoard {
 			score.discardToTableau++;
 		}
 		
-		if (pileIdToFlip!=null && !getTableau().getPile()[pileIdToFlip].isEmpty()) {
+		if (pileIdToFlip!=null && 
+				!getTableau().getPile()[pileIdToFlip].isEmpty() &&
+				getTableau().getBuild()[pileIdToFlip].isEmpty()) {
 			getTableau().flipTopPileCard(pileIdToFlip);
 			score.tableauFlip++;
 			GAME_LOG.debug("GameId:{} User:{} Flip pile {} reveals {}",

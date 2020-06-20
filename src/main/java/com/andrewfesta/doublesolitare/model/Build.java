@@ -1,6 +1,7 @@
 package com.andrewfesta.doublesolitare.model;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Build extends VisiblePile {
@@ -89,18 +90,23 @@ public class Build extends VisiblePile {
 	
 	public void push(Build b, Card bottomCard) {
 		boolean inBuild = false;
-		do {
+		ArrayList<Card> subBuild = new ArrayList<>();
+		for (Iterator<Card> it = b.cards.descendingIterator(); it.hasNext();) {
 			//Find bottom card to start a sub-build
-			Card c = b.cards.peekLast();
+			
+			Card c = it.next();
 			if (!inBuild && !bottomCard.equals(c)) {
 				continue;
 			}
 			if (!inBuild) inBuild = true;
 			
-			//start pushing cards
+			//add to list of cards to move
+			subBuild.add(c);
+		} 
+		for (Card c: subBuild) {
 			if (canPush(c)) {
 				if (canMove(c)) {
-					b.cards.removeLast();
+					b.cards.remove(c);
 					
 					super.push(c);
 					
@@ -109,7 +115,7 @@ public class Build extends VisiblePile {
 					throw new RuntimeException("Card "+c+" cannot move.");
 				}
 			}
-		} while (!b.isEmpty());
+		}
 	}
 	
 }

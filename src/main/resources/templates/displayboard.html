@@ -33,11 +33,16 @@
 		
 	<meta rel="icon" sizes="192x192" th:href="@{|/img/icon-192x192.png|}" href="/img/icon-192x192.png" />
 	<meta name="theme-color" content="#008800"/>
+	
+	<!-- CSRF -->
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body onload="disconnect()">
 
 	<div id="menu">
 		<h1>Double Solitare</h1>
+		<small>Version <span th:text="#{version}"></span>.</small>
 		<div class="list-group">
 			<a hidden href='#' id="newSinglePlayerTestAction" class="list-group-item list-group-item-action">New Single Player TEST</a>
 			<a hidden href='#' id="newMultiPlayerTestAction" class="list-group-item list-group-item-action">New Multi-Player TEST</a>
@@ -174,6 +179,18 @@
 	  		} 
 	  		return ctx+uri;
   		}
+  		
+  		/**
+  		 * This allows us to dynmically set the ajax headers
+  		 */
+  		var token = $("meta[name='_csrf']").attr("content");
+  	    var header = $("meta[name='_csrf_header']").attr("content");
+  	    
+  	  	$.ajaxSetup({
+        	beforeSend: function (jqXHR, settings) {
+        		jqXHR.setRequestHeader(header, token);
+          	}
+		});
   		
   	/*]]>*/
   	</script>

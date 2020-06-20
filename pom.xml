@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.andrewfesta</groupId>
 	<artifactId>double-solitare</artifactId>
-	<version>0.10.0</version>
+	<version>0.11.0</version>
 	<name>double-solitare</name>
 	<description>Demo project for Spring Boot</description>
 	
@@ -69,10 +69,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency> -->
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
