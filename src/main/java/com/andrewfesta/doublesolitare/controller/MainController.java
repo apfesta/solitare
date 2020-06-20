@@ -10,9 +10,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +26,7 @@ import com.andrewfesta.doublesolitare.model.User;
 import com.andrewfesta.doublesolitare.model.UserBoard;
 import com.andrewfesta.doublesolitare.model.UserBoard.CanPush;
 import com.andrewfesta.doublesolitare.service.impl.SyncService;
+import com.andrewfesta.doublesolitare.service.impl.UserService;
 
 @Controller
 public class MainController {
@@ -37,8 +35,9 @@ public class MainController {
 	
 	Map<Integer, GameBoard> games = new HashMap<>();
 	AtomicInteger gameIdSequence = new AtomicInteger(0);
-	Map<Integer, User> users = new HashMap<>();
-	AtomicInteger userIdSequence = new AtomicInteger(0);
+	
+	@Autowired
+	UserService userService;
 	
 	@Autowired
 	SyncService syncService;
@@ -55,7 +54,7 @@ public class MainController {
 	public @ResponseBody UserBoard newGame(
 			@RequestParam("multiplayer") boolean multiplayer) {
 		LOG.trace("POST /api/game?multiplayer={}",multiplayer);
-		User user = getUser();
+		User user = userService.getUser();
 		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
 		if (debugProperties!=null) {
 			game.setDebugProperties(debugProperties);
@@ -81,7 +80,7 @@ public class MainController {
 	public @ResponseBody UserBoard newTestGame(
 			@RequestParam("multiplayer") boolean multiplayer) {
 		LOG.trace("POST /api/game?multiplayer={}",multiplayer);
-		User user = getUser();
+		User user = userService.getUser();
 		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
 		if (debugProperties!=null) {
 			game.setDebugProperties(debugProperties);
@@ -120,28 +119,10 @@ public class MainController {
 		return game.getUserBoard(user);
 	}
 	
-	private User getUser() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication instanceof AnonymousAuthenticationToken) {
-			AnonymousAuthenticationToken auth = (AnonymousAuthenticationToken) authentication;
-			return users.get(auth.getKeyHash());
-		}
-		return (User) authentication.getPrincipal();
-	}
-	
 	@RequestMapping(value="/api/user", method = RequestMethod.POST)
 	public @ResponseBody User newTestUser() {
 		LOG.trace("POST /api/user");
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication instanceof AnonymousAuthenticationToken) {
-			AnonymousAuthenticationToken auth = (AnonymousAuthenticationToken) authentication;
-			if (!users.containsKey(auth.getKeyHash())) {
-				User user = new User(userIdSequence.incrementAndGet());
-				users.put(auth.getKeyHash(), user);
-			}
-			return users.get(auth.getKeyHash());
-		}
-		return (User) authentication.getPrincipal();
+		return userService.getUser();
 	}
 	
 	@RequestMapping(value="/api/game", method = RequestMethod.GET)
@@ -158,7 +139,7 @@ public class MainController {
 	public @ResponseBody UserBoard getGame(@PathVariable Integer gameId) {
 		LOG.trace("GET /api/game/{}", gameId);
 		GameBoard game = games.get(gameId);
-		User user = getUser();
+		User user = userService.getUser();
 		return game.getUserBoard(user);
 	}
 	
@@ -167,7 +148,7 @@ public class MainController {
 		LOG.trace("POST /api/game/{}/join", gameId);
 		GameBoard game = games.get(gameId);
 		if (!game.isInProgress()) {
-			User user = getUser();
+			User user = userService.getUser();
 			game.join(user);
 			syncService.notifyPlayerJoin(game, user);
 			
@@ -181,7 +162,7 @@ public class MainController {
 			@RequestParam("ready") boolean ready) {
 		LOG.trace("GET /api/game/{}/ready?ready=", gameId, ready);
 		GameBoard game = games.get(gameId);
-		User user = getUser();
+		User user = userService.getUser();
 		game.getUserBoard(user).setUserReady(ready);
 		syncService.notifyPlayerStatus(game, user, ready);
 		if (game.isReady()) {
@@ -193,7 +174,7 @@ public class MainController {
 	public @ResponseBody void leaveGame(@PathVariable Integer gameId) {
 		LOG.trace("POST /api/game/{}/leave", gameId);
 		GameBoard game = games.get(gameId);
-		User user = getUser();
+		User user = userService.getUser();
 		game.leave(user);
 		syncService.notifyPlayerDrop(game, user);
 		if (game.getUsers().isEmpty()) {
@@ -208,7 +189,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/canmove/{}", gameId, cardId);
 		
 		GameBoard game = games.get(gameId);
-		User user = getUser();
+		User user = userService.getUser();
 		Card card = game.lookupCard(user, cardId);
 		
 		return game.canPush(user, card);
@@ -222,7 +203,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/move/{}/toFoundation/{}", gameId, cardId, toFoundationId);
 		
 		GameBoard game = games.get(gameId);
-		User user = getUser();
+		User user = userService.getUser();
 		
 		game.moveToFoundation(user, cardId, toFoundationId);
 		syncService.notifyMoveToFoundation(game, user, cardId, toFoundationId);
@@ -259,7 +240,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/move/{}/toTableau/{}", gameId, cardId, toBuildId);
 		
 		GameBoard game = games.get(gameId);
-		User user = getUser();
+		User user = userService.getUser();
 		
 		game.moveToTableau(user, cardId, toBuildId);
 		syncService.notifyMoveToTableau(game, user, cardId, toBuildId);
@@ -283,7 +264,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/discard", gameId);
 		
 		GameBoard game = games.get(gameId);
-		User user = getUser();
+		User user = userService.getUser();
 		
 		game.discard(user);
 		syncService.notifyDiscard(game, user);
@@ -300,7 +281,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/toggle?blocked={}", gameId, blocked);
 		
 		GameBoard game = games.get(gameId);
-		User user = getUser();
+		User user = userService.getUser();
 		
 		game.userBlocked(user, blocked);
 		syncService.notifyBlocked(game, user, blocked);
