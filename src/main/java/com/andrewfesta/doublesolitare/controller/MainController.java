@@ -295,7 +295,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/toggle?sleep={}", gameId, sleep);
 		
 		GameBoard game = games.get(gameId);
-		User user = getUser();
+		User user = userService.getUser();
 		
 		syncService.notifyPlayerSleep(game, user, sleep);
 	}
