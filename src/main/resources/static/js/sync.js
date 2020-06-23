@@ -117,9 +117,11 @@ function setConnected(connected, gameId) {
     	if (data.action=='PLAYER_SLEEP') {
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').addClass('sleep');
     		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').text("Away...");
+    		$('#waitForPlayers .user[data-user-id='+data.user.id+'] .status').text('Away...');
     	} else if (data.action=='PLAYER_AWAKE') {
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').removeClass('sleep');
     		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').text("");
+    		$('#waitForPlayers .user[data-user-id='+data.user.id+'] .status').text('');
     	}
     });
   }
