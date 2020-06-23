@@ -276,7 +276,7 @@ public class MainController {
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/toggle", method = RequestMethod.GET,
-			params= {"blocked"})
+			params={"blocked"})
 	public @ResponseBody void toggleBlocked(@PathVariable Integer gameId, 
 			@RequestParam("blocked") boolean blocked) {
 		LOG.trace("GET /api/game/{}/toggle?blocked={}", gameId, blocked);
@@ -289,7 +289,7 @@ public class MainController {
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/toggle", method = RequestMethod.GET,
-			params= {"sleep"})
+			params={"sleep"})
 	public @ResponseBody void toggleSleep(@PathVariable Integer gameId, 
 			@RequestParam("sleep") boolean sleep) {
 		LOG.trace("GET /api/game/{}/toggle?sleep={}", gameId, sleep);

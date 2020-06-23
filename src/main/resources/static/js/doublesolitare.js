@@ -30,7 +30,7 @@ var menu = {
 				console.debug(data);
 				app.user = data;
 				$('#waitForPlayers .users .me')
-					.html(app.user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
+					.html(app.user.username+ " <label>I'm Ready: <span class='status'></span><input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
 				$('.ready').on('change',app.readyStatusOnChange);
 				$('#scoreBoard .user.me')
 							.attr('data-user-id',app.user.id)
@@ -656,7 +656,7 @@ var app = {
 			.addClass('list-group-item')
 			.addClass('user')
 			.attr('data-user-id',user.id)
-			.html(user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
+			.html(user.username+ " <small class='status'></small><label>I'm Ready: <input class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
 		userDiv.find('.ready').on('change',app.readyStatusOnChange);
 		$('#waitForPlayers .users').append(userDiv);
 		
