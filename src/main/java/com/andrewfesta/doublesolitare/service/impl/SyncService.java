@@ -73,6 +73,12 @@ public class SyncService {
 						user, game, null, null, null));
 	}
 	
+	public void notifyPlayerSleep(GameBoard game, User user, boolean sleep) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new GameUpdate(sleep?GameUpdateAction.PLAYER_SLEEP:GameUpdateAction.PLAYER_AWAKE,
+						user, game, null, null, null));
+	}
+	
 	public void notifyGameWon(GameBoard game, User user) {
 		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameUpdate(GameUpdateAction.GAME_WON, 
@@ -82,6 +88,8 @@ public class SyncService {
 	enum GameUpdateAction {
 		PLAYER_JOIN,
 		PLAYER_DROP,
+		PLAYER_SLEEP,
+		PLAYER_AWAKE,
 		PLAYER_READY,
 		PLAYER_NOT_READY,
 		COUNTDOWN_STARTED,

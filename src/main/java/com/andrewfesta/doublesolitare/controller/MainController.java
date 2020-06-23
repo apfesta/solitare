@@ -275,7 +275,8 @@ public class MainController {
 		return game.getUserBoard(user);
 	}
 	
-	@RequestMapping(value="/api/game/{gameId}/toggle", method = RequestMethod.GET)
+	@RequestMapping(value="/api/game/{gameId}/toggle", method = RequestMethod.GET,
+			params= {"blocked"})
 	public @ResponseBody void toggleBlocked(@PathVariable Integer gameId, 
 			@RequestParam("blocked") boolean blocked) {
 		LOG.trace("GET /api/game/{}/toggle?blocked={}", gameId, blocked);
@@ -285,6 +286,18 @@ public class MainController {
 		
 		game.userBlocked(user, blocked);
 		syncService.notifyBlocked(game, user, blocked);
+	}
+	
+	@RequestMapping(value="/api/game/{gameId}/toggle", method = RequestMethod.GET,
+			params= {"sleep"})
+	public @ResponseBody void toggleSleep(@PathVariable Integer gameId, 
+			@RequestParam("sleep") boolean sleep) {
+		LOG.trace("GET /api/game/{}/toggle?sleep={}", gameId, sleep);
+		
+		GameBoard game = games.get(gameId);
+		User user = getUser();
+		
+		syncService.notifyPlayerSleep(game, user, sleep);
 	}
 	
 	public static class Game {
