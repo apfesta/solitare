@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.andrewfesta</groupId>
 	<artifactId>double-solitare</artifactId>
-	<version>0.12.0</version>
+	<version>0.12.1-SNAPSHOT</version>
 	<name>double-solitare</name>
 	<description>Demo project for Spring Boot</description>
 	
@@ -23,7 +23,7 @@
 		<connection>scm:git:ssh://git@github.com/apfesta/solitare.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/apfesta/solitare.git</developerConnection>
 		<url>https://github.com/apfesta/solitare</url>
-		<tag>double-solitare-0.12.0</tag>
+		<tag>0.12.x</tag>
     </scm>
     
     <distributionManagement>
