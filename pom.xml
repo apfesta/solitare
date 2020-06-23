@@ -23,7 +23,7 @@
 		<connection>scm:git:ssh://git@github.com/apfesta/solitare.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/apfesta/solitare.git</developerConnection>
 		<url>https://github.com/apfesta/solitare</url>
-		<tag>HEAD</tag>
+		<tag>0.12.x</tag>
     </scm>
     
     <distributionManagement>
