@@ -20,6 +20,7 @@ public class GameBoard {
 
 	final Integer gameId;
 	final User createdBy;
+	String gameName;
 	Foundation foundation;
 	final boolean multiPlayer;
 	boolean inProgress = false;
@@ -108,6 +109,7 @@ public class GameBoard {
 		super();
 		this.createdBy = createdBy;
 		this.gameId = gameId;
+		this.gameName = "Game "+gameId;
 		this.multiPlayer = multiPlayer;
 	}
 	
@@ -280,6 +282,14 @@ public class GameBoard {
 
 	public Integer getGameId() {
 		return gameId;
+	}
+
+	public String getGameName() {
+		return gameName;
+	}
+
+	public void setGameName(String gameName) {
+		this.gameName = gameName;
 	}
 
 	public Collection<User> getUsers() {

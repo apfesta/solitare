@@ -1,5 +1,6 @@
 package com.andrewfesta.doublesolitare.service.impl;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,10 @@ public class SyncService {
 	public void notifyPlayerJoin(GameBoard game, User user) {
 		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameUpdate(GameUpdateAction.PLAYER_JOIN, user, game));
+		
+		simpMessageSending.convertAndSend("/topic/games/activity", 
+				new AppUpdate(GameUpdateAction.GAME_RENAME, 
+						user, game.getGameId(), game.getGameName(), game.getUsers()));
 	}
 	
 	public void notifyPlayerStatus(GameBoard game, User user, boolean isReady) {
@@ -43,6 +48,30 @@ public class SyncService {
 	public void notifyPlayerDrop(GameBoard game, User user) {
 		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new BasePayload(GameUpdateAction.PLAYER_DROP, user));
+		
+		simpMessageSending.convertAndSend("/topic/games/activity", 
+				new AppUpdate(GameUpdateAction.GAME_RENAME, 
+						user, game.getGameId(), game.getGameName(), game.getUsers()));
+	}
+	
+	public void notifyPlayerRename(GameBoard game, User user) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new BasePayload(GameUpdateAction.PLAYER_RENAME, 
+						user));
+		
+		simpMessageSending.convertAndSend("/topic/games/activity", 
+				new AppUpdate(GameUpdateAction.GAME_RENAME, 
+						user, game.getGameId(), game.getGameName(), game.getUsers()));
+	}
+	
+	public void notifyGameRename(GameBoard game, User user) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new BasePayload(GameUpdateAction.GAME_RENAME, 
+						user));
+		
+		simpMessageSending.convertAndSend("/topic/games/activity", 
+				new AppUpdate(GameUpdateAction.GAME_RENAME, 
+						user, game.getGameId(), game.getGameName(), game.getUsers()));
 	}
 	
 	public void notifyMoveToFoundation(GameBoard game, User user,
@@ -92,6 +121,7 @@ public class SyncService {
 		PLAYER_AWAKE,
 		PLAYER_READY,
 		PLAYER_NOT_READY,
+		PLAYER_RENAME,
 		COUNTDOWN_STARTED,
 		COUNTDOWN_CANCELLED,
 		MOVE_TO_FOUNDATION,
@@ -99,9 +129,12 @@ public class SyncService {
 		DISCARD,
 		PLAY_IS_BLOCKED,
 		PLAY_NOT_BLOCKED,
-		GAME_WON
+		GAME_WON,
+		GAME_RENAME,
+		PUBLIC_GAME_AVAILABLE
 	}
-
+	
+	
 	static class BasePayload {
 		final GameUpdateAction action;
 		final User user;
@@ -116,6 +149,22 @@ public class SyncService {
 		}
 		public User getUser() {
 			return user;
+		}
+	}
+	
+	static class AppUpdate extends BasePayload {
+		
+		Integer gameId;
+		String gameName;
+		Collection<User> users;
+		User startedBy;
+		
+		public AppUpdate(GameUpdateAction action, User user, 
+				Integer gameId, String gameName, Collection<User> users) {
+			super(action, user);
+			this.gameId = gameId;
+			this.gameName = gameName;
+			this.users = users;
 		}
 	}
 		
