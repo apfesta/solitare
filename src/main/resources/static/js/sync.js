@@ -23,8 +23,8 @@ function disconnect() {
 
 function setConnected(connected, gameId) {
   if (connected) {
-	app.handleBeforeUnload
 	app.handleUnload();
+	app.handleVisibilityChange();
     stompClient.subscribe('/topic/game/'+gameId+'/activity', function(result){ 
     	console.debug(result);
     	var data = JSON.parse(result.body);
@@ -57,7 +57,7 @@ function setConnected(connected, gameId) {
 							$('<thead>').append(
 								$('<tr>').append(
 									$('<th>').html('User')).append(
-									$('<th>').html('Score')).append(
+									$('<th>').html('Status')).append(
 									$('<th>').html('Moves'))
 							)
 						).append($('<tbody>')));
@@ -66,7 +66,7 @@ function setConnected(connected, gameId) {
 					$('#gameOver .modal-body tbody').append(
 						$('<tr>').append(
 							$('<td>').addClass('username').html(user.username)).append(
-							$('<td>').addClass('score').html(app.gameboard.userScores[user.id].toFoundation)).append(
+							$('<td>').addClass('status').html("")).append(
 							$('<td>').addClass('moves').html(app.gameboard.userScores[user.id].totalMoves))
 					);
 				}					
@@ -80,7 +80,7 @@ function setConnected(connected, gameId) {
 						$('<thead>').append(
 							$('<tr>').append(
 								$('<th>').html('User')).append(
-								$('<th>').html('Score')).append(
+								$('<th>').html('Status')).append(
 								$('<th>').html('Moves'))
 						)
 					).append($('<tbody>')));
@@ -89,7 +89,7 @@ function setConnected(connected, gameId) {
 				$('#gameOver .modal-body tbody').append(
 					$('<tr>').append(
 						$('<td>').addClass('username').html(user.username)).append(
-						$('<td>').addClass('score').html(app.gameboard.userScores[user.id].toFoundation)).append(
+						$('<td>').addClass('status').html("")).append(
 						$('<td>').addClass('moves').html(app.gameboard.userScores[user.id].totalMoves))
 				);
 			}					
@@ -104,6 +104,7 @@ function setConnected(connected, gameId) {
     	}
     	if (data.action=='PLAY_IS_BLOCKED') {
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').addClass('blocked');
+    		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').html("I'm Stuck!");
     	} else if (data.action=='PLAY_NOT_BLOCKED') {
     		if (data.user.id == app.user.id) {
     			$('#blockBtn')
@@ -111,6 +112,14 @@ function setConnected(connected, gameId) {
     			.closest('label').removeClass('active');
     		}
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').removeClass('blocked');
+    		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').html("");
+    	}
+    	if (data.action=='PLAYER_SLEEP') {
+    		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').addClass('sleep');
+    		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').text("Away...");
+    	} else if (data.action=='PLAYER_AWAKE') {
+    		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').removeClass('sleep');
+    		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').text("");
     	}
     });
   }

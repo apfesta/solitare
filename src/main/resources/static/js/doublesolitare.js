@@ -37,7 +37,7 @@ var menu = {
 								.append(
 									$('<td>').addClass('username').text(app.user.username))
 								.append(
-									$('<td>').addClass('score').text('0'))
+									$('<td>').addClass('status').text(''))
 								.append(
 									$('<td>').addClass('moves').text('0'));
 			
@@ -354,18 +354,34 @@ var app = {
 			dataType: "json"});	
 	};
 	
-	app.handleBeforeUnload = function(){
-		$(window).on("beforeunload", function(e) {
-			app.leaveGame();
-		    return e.originalEvent.returnValue = "Are you sure you want to leave the game?";
-		});
-	};
+	app.toggleSleep = function(gameId, sleep) {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+gameId+'/toggle'
+					+'?sleep='+sleep
+					+'&userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json"});		
+	}
+	
 	
 	app.handleUnload = function() {
 		$(window).on('unload', function(){
 	    	app.leaveGame();
 	    });
-	}
+	};
+	
+	app.handleVisibilityChange = function() {
+		
+		document.addEventListener("visibilitychange", function() {
+			if (document.hidden) {
+				app.toggleSleep(app.gameId, true);
+			} else {
+				app.toggleSleep(app.gameId, false);
+			}
+		}, false);
+	};
+		
 	
 	app.canMove = function(cardId) {
 		$.ajax({
@@ -651,7 +667,7 @@ var app = {
 						.append(
 							$('<td>').addClass('username').text(user.username))
 						.append(
-							$('<td>').addClass('score').text('0'))
+							$('<td>').addClass('status').text(''))
 						.append(
 							$('<td>').addClass('moves').text('0')));
 	}

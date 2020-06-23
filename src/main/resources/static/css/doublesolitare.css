@@ -54,6 +54,10 @@
 	color: #000;
 	background-color: #ffc107; 
 }
+#scoreBoard .user.sleep {
+	color: #FFF;
+	background-color: rgba(0,0,0,0.6); 
+}
 #scoreBoard .score, #scoreBoard .moves {
 	text-align: center;
 }
