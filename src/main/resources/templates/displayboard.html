@@ -43,6 +43,18 @@
 	<div id="menu">
 		<h1>Double Solitare</h1>
 		<small hidden>Version <span th:text="#{version}"></span>.</small>
+		<p>Your are logged in as 
+			<span class="staticUsername">
+				<strong sec:authentication="name" class="username"></strong> 
+				<button class="btn btn-sm btn-outline-primary editUsernameBtn"><i class="fa fa-pencil"></i> Edit</button>
+			</span>
+			<div class="editUsername input-group mb-3 input-group-sm">
+        		<input class="url form-control" name="usernameInput"/>
+        		<div class="input-group-append">
+        			<button class="btn btn-sm btn-success saveUsernameBtn">Save</button>
+        		</div>
+        	</div>
+		</p>
 		<div class="list-group">
 			<a hidden href='#' id="newSinglePlayerTestAction" class="list-group-item list-group-item-action">New Single Player TEST</a>
 			<a hidden href='#' id="newMultiPlayerTestAction" class="list-group-item list-group-item-action">New Multi-Player TEST</a>

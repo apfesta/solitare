@@ -3,6 +3,7 @@ $('#board').hide();
 $('#scoreBar').hide();
 $('#scoreBoard').hide();
 $('#blockToggleButton').hide();
+$('.editUsername').hide();
 
 var menu = {
 		games: []
@@ -20,6 +21,22 @@ var menu = {
 	// AJAX functions
 	//---------------
 	
+	menu.setUser = function(data) {
+		app.user = data;
+		$('.username').html(app.user.username);
+		$('.editUsername [name=usernameInput]').val(app.user.username);
+		$('#waitForPlayers .users .me')
+			.html(app.user.username+ " <label>I'm Ready: <span class='status'></span><input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
+		$('.ready').on('change',app.readyStatusOnChange);
+		$('#scoreBoard .user.me')
+					.attr('data-user-id',app.user.id)
+						.append(
+							$('<td>').addClass('username').text(app.user.username))
+						.append(
+							$('<td>').addClass('status').text(''))
+						.append(
+							$('<td>').addClass('moves').text('0'));
+	};
 	menu.getUser = function() {
 		$.ajax({
 			type: 'POST', 
@@ -28,22 +45,22 @@ var menu = {
 			dataType: "json",
 			success: function(data){
 				console.debug(data);
-				app.user = data;
-				$('#waitForPlayers .users .me')
-					.html(app.user.username+ " <label>I'm Ready: <span class='status'></span><input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
-				$('.ready').on('change',app.readyStatusOnChange);
-				$('#scoreBoard .user.me')
-							.attr('data-user-id',app.user.id)
-								.append(
-									$('<td>').addClass('username').text(app.user.username))
-								.append(
-									$('<td>').addClass('status').text(''))
-								.append(
-									$('<td>').addClass('moves').text('0'));
-			
+				menu.setUser(data);
 				menu.getGames();
 			}});
-		
+	};
+	menu.updateUser = function(username) {
+		var data = {'username':username};
+		$.ajax({
+			type: 'PUT', 
+			url: getRelativePath('/api/user/'+app.user.id),
+			contentType: "application/json",
+			dataType: "json",
+			data: JSON.stringify(data),
+			success: function(data){
+				console.debug(data);
+				menu.setUser(data);
+			}});
 	};
 	
 	menu.getGames = function() {
@@ -216,7 +233,7 @@ var app = {
 		if ('serviceWorker' in navigator && navigator.share) {
 			$('#inviteLink').append(
 					$('<div class="input-group-append">').append(
-							$('<button class="btn btn-outline-primary" type="button" title="Share URL..."><i class="fa fa-share-alt"></i></button>')
+							$('<button class="btn btn-outline-primary" type="button" title="Share URL..."><i class="fa fa-share-alt"></i> Share</button>')
 							.on('click',function(){
 								navigator.share({
 									title: 'Double Solitare',
@@ -227,7 +244,7 @@ var app = {
 		} else {
 			$('#inviteLink').append(
 					$('<div class="input-group-append">').append(
-							$('<button class="btn btn-outline-primary" type="button" title="Copy to clipboard"><i class="fa fa-clipboard"></i></button>')
+							$('<button class="btn btn-outline-primary" type="button" title="Copy to clipboard"><i class="fa fa-clipboard"></i> Copy</button>')
 							.on('click',function(){
 								var copyText = $('#inviteLink .url').get(0);
 								copyText.select();
@@ -656,7 +673,7 @@ var app = {
 			.addClass('list-group-item')
 			.addClass('user')
 			.attr('data-user-id',user.id)
-			.html(user.username+ " <small class='status'></small><label>I'm Ready: <input class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
+			.html('<span class="username">'+user.username+"</span> <small class='status'></small><label>I'm Ready: <input class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
 		userDiv.find('.ready').on('change',app.readyStatusOnChange);
 		$('#waitForPlayers .users').append(userDiv);
 		
@@ -840,6 +857,16 @@ var app = {
 		app.toggleBlock(app.gameId, $(this).prop("checked") == true);
 		$(this).blur();
 		$('#quitBtn').focus();
+	});
+	
+	$('.editUsernameBtn').on('click', function(){
+		$('.editUsername').show();
+		$('.staticUsername').hide();
+	});
+	$('.saveUsernameBtn').on('click', function(){
+		$('.editUsername').hide();
+		$('.staticUsername').show();
+		menu.updateUser($('.editUsername [name=usernameInput]').val());
 	});
 	
 	

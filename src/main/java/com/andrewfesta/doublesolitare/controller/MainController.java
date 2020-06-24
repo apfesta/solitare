@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -120,27 +121,68 @@ public class MainController {
 	}
 	
 	@RequestMapping(value="/api/user", method = RequestMethod.POST)
-	public @ResponseBody User newTestUser() {
+	public @ResponseBody User getUser() {
 		LOG.trace("POST /api/user");
 		return userService.getUser();
 	}
 	
+	@RequestMapping(value="/api/user/{userId}", method = RequestMethod.PUT)
+	public @ResponseBody User putUser(@PathVariable Integer userId, 
+			@RequestBody User userUpdate) {
+		LOG.trace("PUT /api/user/{}", userId);
+		User user = userService.getUser();
+		
+		//Can only change the User Name
+		user.setUsername(userUpdate.getUsername());
+		syncService.notifyPlayerRename(getUsersActiveGames(user), user);
+		
+		return userService.getUser();
+	}
+		
 	@RequestMapping(value="/api/game", method = RequestMethod.GET)
 	public @ResponseBody List<Game> getGamesToJoin() {
 		return games.entrySet().stream()
 			.filter((e)->e.getValue().isMultiPlayer())
 			.filter((e)->!e.getValue().isInProgress())
 			.filter((e)->!e.getValue().isGameOver())
-			.map((entry)->new Game(entry.getKey(), entry.getValue().getCreatedBy(), entry.getValue().getUsers()))
+			.map((entry)->new Game(entry.getKey(), 
+					entry.getValue().getCreatedBy(), 
+					entry.getValue().getGameName(),
+					entry.getValue().getUsers()))
+			.collect(Collectors.toList());
+	}
+	
+	private List<GameBoard> getUsersActiveGames(User user) {
+		return games.entrySet().stream()
+			.filter((e)->e.getValue().isMultiPlayer())
+			.filter((e)->!e.getValue().isInProgress())
+			.filter((e)->!e.getValue().isGameOver())
+			.filter((e)->e.getValue().getUsers().contains(user))
+			.map(Map.Entry::getValue)
 			.collect(Collectors.toList());
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}", method = RequestMethod.GET)
-	public @ResponseBody UserBoard getGame(@PathVariable Integer gameId) {
+	public @ResponseBody Game getGame(@PathVariable Integer gameId) {
 		LOG.trace("GET /api/game/{}", gameId);
 		GameBoard game = games.get(gameId);
+		return new Game(game.getGameId(), 
+				game.getCreatedBy(), 
+				game.getGameName(), 
+				game.getUsers());
+	}
+	
+	@RequestMapping(value="/api/game/{gameId}", method = RequestMethod.PUT)
+	public @ResponseBody Game putGame(@PathVariable Integer gameId, @RequestBody Game game) {
+		LOG.trace("PUT /api/game/{}", gameId);
+		GameBoard existingGame = games.get(gameId);
 		User user = userService.getUser();
-		return game.getUserBoard(user);
+		
+		//Can only change the Game Name
+		existingGame.setGameName(game.getGameName());
+		syncService.notifyGameRename(existingGame, user);
+		
+		return new Game(existingGame);
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/join", method = RequestMethod.POST)
@@ -302,13 +344,19 @@ public class MainController {
 	
 	public static class Game {
 		Integer gameId;
+		String gameName;
 		Collection<User> users;
 		User startedBy;
 
-		public Game(Integer gameId, User startedBy, Collection<User> users) {
+		public Game(GameBoard gameBoard) {
+			this(gameBoard.getGameId(), gameBoard.getCreatedBy(), 
+					gameBoard.getGameName(), gameBoard.getUsers());
+		}
+		public Game(Integer gameId, User startedBy, String gameName, Collection<User> users) {
 			super();
 			this.gameId = gameId;
 			this.startedBy = startedBy;
+			this.gameName = gameName;
 			this.users = users;
 		}
 
@@ -318,6 +366,22 @@ public class MainController {
 
 		public void setGameId(Integer gameId) {
 			this.gameId = gameId;
+		}
+
+		public String getGameName() {
+			return gameName;
+		}
+
+		public void setGameName(String gameName) {
+			this.gameName = gameName;
+		}
+
+		public void setUsers(Collection<User> users) {
+			this.users = users;
+		}
+
+		public void setStartedBy(User startedBy) {
+			this.startedBy = startedBy;
 		}
 
 		public Collection<User> getUsers() {
