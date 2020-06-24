@@ -121,11 +121,24 @@ public class MainController {
 	}
 	
 	@RequestMapping(value="/api/user", method = RequestMethod.POST)
-	public @ResponseBody User newTestUser() {
+	public @ResponseBody User getUser() {
 		LOG.trace("POST /api/user");
 		return userService.getUser();
 	}
 	
+	@RequestMapping(value="/api/user/{userId}", method = RequestMethod.PUT)
+	public @ResponseBody User putUser(@PathVariable Integer userId, 
+			@RequestBody User userUpdate) {
+		LOG.trace("PUT /api/user/{}", userId);
+		User user = userService.getUser();
+		
+		//Can only change the User Name
+		user.setUsername(userUpdate.getUsername());
+		syncService.notifyPlayerRename(getUsersActiveGames(user), user);
+		
+		return userService.getUser();
+	}
+		
 	@RequestMapping(value="/api/game", method = RequestMethod.GET)
 	public @ResponseBody List<Game> getGamesToJoin() {
 		return games.entrySet().stream()
@@ -136,6 +149,16 @@ public class MainController {
 					entry.getValue().getCreatedBy(), 
 					entry.getValue().getGameName(),
 					entry.getValue().getUsers()))
+			.collect(Collectors.toList());
+	}
+	
+	private List<GameBoard> getUsersActiveGames(User user) {
+		return games.entrySet().stream()
+			.filter((e)->e.getValue().isMultiPlayer())
+			.filter((e)->!e.getValue().isInProgress())
+			.filter((e)->!e.getValue().isGameOver())
+			.filter((e)->e.getValue().getUsers().contains(user))
+			.map(Map.Entry::getValue)
 			.collect(Collectors.toList());
 	}
 	

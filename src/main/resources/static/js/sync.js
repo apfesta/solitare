@@ -123,6 +123,9 @@ function setConnected(connected, gameId) {
     		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').text("");
     		$('#waitForPlayers .user[data-user-id='+data.user.id+'] .status').text('');
     	}
+    	if (data.action=='PLAYER_RENAME'){
+    		$('.user[data-user-id='+data.user.id+'] .username').html(data.user.username);
+    	}
     });
   }
 }

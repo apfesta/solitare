@@ -54,14 +54,15 @@ public class SyncService {
 						user, game.getGameId(), game.getGameName(), game.getUsers()));
 	}
 	
-	public void notifyPlayerRename(GameBoard game, User user) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
-				new BasePayload(GameUpdateAction.PLAYER_RENAME, 
-						user));
+	public void notifyPlayerRename(Collection<GameBoard> games, User user) {
+		for (GameBoard game: games) {
+			simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+					new BasePayload(GameUpdateAction.PLAYER_RENAME, 
+							user));
+		}
 		
 		simpMessageSending.convertAndSend("/topic/games/activity", 
-				new AppUpdate(GameUpdateAction.GAME_RENAME, 
-						user, game.getGameId(), game.getGameName(), game.getUsers()));
+				new BasePayload(GameUpdateAction.PLAYER_RENAME, user));
 	}
 	
 	public void notifyGameRename(GameBoard game, User user) {
