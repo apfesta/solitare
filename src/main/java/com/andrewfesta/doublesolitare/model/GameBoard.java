@@ -1,5 +1,8 @@
 package com.andrewfesta.doublesolitare.model;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +23,7 @@ public class GameBoard {
 
 	final Integer gameId;
 	final User createdBy;
+	final ZonedDateTime createdOn;
 	String gameName;
 	Foundation foundation;
 	final boolean multiPlayer;
@@ -108,6 +112,7 @@ public class GameBoard {
 	public GameBoard(User createdBy, Integer gameId, boolean multiPlayer) {
 		super();
 		this.createdBy = createdBy;
+		this.createdOn = ZonedDateTime.now();
 		this.gameId = gameId;
 		this.gameName = "Game "+gameId;
 		this.multiPlayer = multiPlayer;
@@ -274,10 +279,27 @@ public class GameBoard {
 		}
 		return true;
 	}
+	
+	public Instant getLastMoveTimestamp() {
+		return userBoards.values().stream()
+			.max((a,b)->a.getLastMoveInstant().compareTo(b.getLastMoveInstant()))
+			.map((userBoard)->userBoard.getLastMoveInstant())
+			.orElse(createdOn.toInstant());
+	}
+	
+	public boolean isExpired() {
+		return Duration.between(getLastMoveTimestamp(),Instant.now())
+				.toHours() >= 1;
+	}
 
 	@JsonIgnore
 	public User getCreatedBy() {
 		return createdBy;
+	}
+
+	@JsonIgnore
+	public ZonedDateTime getCreatedOn() {
+		return createdOn;
 	}
 
 	public Integer getGameId() {

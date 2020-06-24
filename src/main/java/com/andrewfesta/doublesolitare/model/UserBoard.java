@@ -1,5 +1,6 @@
 package com.andrewfesta.doublesolitare.model;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class UserBoard {
 	boolean gameWon = false;
 	Score score;
 	boolean userReady;
+	Instant lastMoveInstant;
 	
 	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
 	
@@ -119,6 +121,7 @@ public class UserBoard {
 			c.setCurrentPile(discardPile);
 		}
 		score.discard++;
+		lastMoveInstant = Instant.now();
 	}
 	
 	protected Integer getPileIdToFlip(Card card) {
@@ -144,6 +147,7 @@ public class UserBoard {
 					game.gameId, user, card.abbrev(), toFoundationId);
 			game.getFoundation().getPile().get(toFoundationId).push(card);
 			score.toFoundation++;
+			lastMoveInstant = Instant.now();
 			
 			if (pileIdToFlip!=null && 
 					!getTableau().getPile()[pileIdToFlip].isEmpty() &&
@@ -190,6 +194,7 @@ public class UserBoard {
 			GAME_LOG.debug("GameId:{} User:{} Move build ({}-{}) to tableau pile {}",
 					game.gameId, user, card.abbrev(), card.getCurrentBuild().peek().abbrev(), toBuildId);
 			getTableau().getBuild()[toBuildId].push(card.getCurrentBuild(), card);
+			score.tableauToTableau++;
 		} else {
 			//Move card from pile or discard pile to tableau pile
 			GAME_LOG.debug("GameId:{} User:{} Move {} to tableau pile {}",
@@ -197,6 +202,7 @@ public class UserBoard {
 			getTableau().getBuild()[toBuildId].push(card);
 			score.discardToTableau++;
 		}
+		lastMoveInstant = Instant.now();
 		
 		if (pileIdToFlip!=null && 
 				!getTableau().getPile()[pileIdToFlip].isEmpty() &&
@@ -268,6 +274,14 @@ public class UserBoard {
 		this.userReady = userReady;
 	}
 
+	public Instant getLastMoveInstant() {
+		return lastMoveInstant;
+	}
+
+	public void setLastMoveInstant(Instant lastMoveInstant) {
+		this.lastMoveInstant = lastMoveInstant;
+	}
+
 	@JsonInclude(Include.NON_NULL)
 	public class CanPush {
 		private Card card;
@@ -298,6 +312,7 @@ public class UserBoard {
 	public class Score {
 		int toFoundation = 0;
 		int discardToTableau = 0;
+		int tableauToTableau = 0;
 		int tableauFlip = 0;
 		int discard = 0;
 		int deckPassthrough = 0;
@@ -324,11 +339,12 @@ public class UserBoard {
 		public int getTotalScore() {
 			return (toFoundation*10)+
 					(discardToTableau*5)+
+//					(tableauToTableau*3)+
 					(tableauFlip*5)+
 					(deckPassthrough*-20);
 		}
 		public int getTotalMoves() {
-			return toFoundation+discardToTableau+discard;
+			return toFoundation+discardToTableau+tableauToTableau+discard;
 		}
 		
 		public void prettyPrint() {

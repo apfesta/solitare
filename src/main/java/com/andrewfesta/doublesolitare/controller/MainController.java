@@ -145,6 +145,7 @@ public class MainController {
 			.filter((e)->e.getValue().isMultiPlayer())
 			.filter((e)->!e.getValue().isInProgress())
 			.filter((e)->!e.getValue().isGameOver())
+			.filter((e)->!e.getValue().isExpired())
 			.map((entry)->new Game(entry.getKey(), 
 					entry.getValue().getCreatedBy(), 
 					entry.getValue().getGameName(),
