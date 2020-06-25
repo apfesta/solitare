@@ -46,6 +46,7 @@ function setConnected(connected, gameId) {
     	if (data.action=='PLAYER_JOIN') {
     		app.addPlayer(data.numOfUsers-1);
     		app.addPlayerStatus(data.user);
+    		app.gameboard.foundation=data.foundation;
     	}
     	if (data.action=='PLAYER_DROP') {
     		app.removePlayer();
@@ -125,6 +126,9 @@ function setConnected(connected, gameId) {
     	}
     	if (data.action=='PLAYER_RENAME'){
     		$('.user[data-user-id='+data.user.id+'] .username').html(data.user.username);
+    	}
+    	if (data.action=='GAME_RENAME') {
+    		$('.gamename').html(data.gameName);
     	}
     });
   }

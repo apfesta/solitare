@@ -67,8 +67,8 @@ public class SyncService {
 	
 	public void notifyGameRename(GameBoard game, User user) {
 		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
-				new BasePayload(GameUpdateAction.GAME_RENAME, 
-						user));
+				new GameNameUpdate(GameUpdateAction.GAME_RENAME, 
+						user, game));
 		
 		simpMessageSending.convertAndSend("/topic/games/activity", 
 				new AppUpdate(GameUpdateAction.GAME_RENAME, 
@@ -168,6 +168,20 @@ public class SyncService {
 			this.users = users;
 		}
 	}
+	
+	static class GameNameUpdate extends BasePayload {
+		final String gameName; 
+		
+		public GameNameUpdate(GameUpdateAction action, User user, GameBoard game) {
+			super(action, user);
+			this.gameName = game.getGameName();
+		}
+
+		public String getGameName() {
+			return gameName;
+		}
+
+	}
 		
 	@JsonInclude(Include.NON_NULL)
 	static class GameUpdate extends BasePayload {
@@ -175,8 +189,8 @@ public class SyncService {
 		Integer cardId;
 		Integer toFoundationId;
 		Integer toBuildId;
-		Integer numOfUsers;
-		Map<Integer, Score> score;
+		final Integer numOfUsers;
+		final Map<Integer, Score> score;
 		Boolean gameWon;
 		
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game) {
@@ -213,14 +227,8 @@ public class SyncService {
 		public Integer getNumOfUsers() {
 			return numOfUsers;
 		}
-		public void setNumOfUsers(Integer numOfUsers) {
-			this.numOfUsers = numOfUsers;
-		}
 		public Map<Integer, Score> getScore() {
 			return score;
-		}
-		public void setScore(Map<Integer, Score> score) {
-			this.score = score;
 		}
 		public Boolean getGameWon() {
 			return gameWon;

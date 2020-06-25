@@ -33,6 +33,7 @@ public class UserService implements UserDetailsService {
 				.password("password")
 				.authorities(new SimpleGrantedAuthority("GUEST_ROLE"))
 				.build();
+		user.setPrincipal(userDetails);
 		users.put(userDetails, user);
 		usersByUsername.put(user.getUsername(), userDetails);
 		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

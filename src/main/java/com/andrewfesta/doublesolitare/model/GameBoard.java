@@ -1,5 +1,8 @@
 package com.andrewfesta.doublesolitare.model;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,6 +25,7 @@ public class GameBoard {
 
 	final Integer gameId;
 	final User createdBy;
+	final ZonedDateTime createdOn;
 	String gameName;
 	Foundation foundation;
 	final boolean multiPlayer;
@@ -108,6 +114,7 @@ public class GameBoard {
 	public GameBoard(User createdBy, Integer gameId, boolean multiPlayer) {
 		super();
 		this.createdBy = createdBy;
+		this.createdOn = ZonedDateTime.now();
 		this.gameId = gameId;
 		this.gameName = "Game "+gameId;
 		this.multiPlayer = multiPlayer;
@@ -242,6 +249,12 @@ public class GameBoard {
 		userBoards.get(user).moveToTableau(cardId, toBuildId);
 	}
 	
+	public boolean isHost() {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return createdBy.equalsPrincipal(
+				(UserDetails) principal);
+	}
+		
 	public void userBlocked(User user, boolean blocked) {
 		if (blocked) {
 			this.blocked.add(user.getId());
@@ -274,10 +287,28 @@ public class GameBoard {
 		}
 		return true;
 	}
+	
+	public Instant getLastMoveTimestamp() {
+		return userBoards.values().stream()
+			.max((a, b) -> (a.getLastMoveInstant() != null ? a.getLastMoveInstant() : createdOn.toInstant())
+					.compareTo((b.getLastMoveInstant() != null ? b.getLastMoveInstant() : createdOn.toInstant())))
+			.map((userBoard)->userBoard.getLastMoveInstant())
+			.orElse(createdOn.toInstant());
+	}
+	
+	public boolean isExpired() {
+		return Duration.between(getLastMoveTimestamp(),Instant.now())
+				.toHours() >= 1;
+	}
 
 	@JsonIgnore
 	public User getCreatedBy() {
 		return createdBy;
+	}
+
+	@JsonIgnore
+	public ZonedDateTime getCreatedOn() {
+		return createdOn;
 	}
 
 	public Integer getGameId() {

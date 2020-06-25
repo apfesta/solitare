@@ -4,6 +4,8 @@ $('#scoreBar').hide();
 $('#scoreBoard').hide();
 $('#blockToggleButton').hide();
 $('.editUsername').hide();
+$('.editGamename').hide();
+$('.editGamenameBtn').hide();
 
 var menu = {
 		games: []
@@ -60,6 +62,19 @@ var menu = {
 			success: function(data){
 				console.debug(data);
 				menu.setUser(data);
+			}});
+	};
+	menu.updateGame = function(gamename) {
+		var data = {'gameName':gamename};
+		$.ajax({
+			type: 'PUT', 
+			url: getRelativePath('/api/game/'+app.gameId),
+			contentType: "application/json",
+			dataType: "json",
+			data: JSON.stringify(data),
+			success: function(data){
+				console.debug(data);
+				app.gameName = data.gameName
 			}});
 	};
 	
@@ -133,7 +148,7 @@ var menu = {
 						 .attr('data-toggle','modal')
 						 .attr('data-target','#waitForPlayers')
 						 .attr('data-backdrop',"static")
-						.text("Game "+game.gameId+" - started by "+game.startedBy.username)
+						.text(game.gameName+" - started by "+game.startedBy.username)
 						.on('click', joinGameAction));
 		}
 		
@@ -149,6 +164,7 @@ var app = {
 		userboard: {},
 		gameboard: {},
 		gameId: null,
+		gameName: null,
 		canMoveData: null,
 		countdownTimer: null
 };
@@ -197,6 +213,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				app.gameName = app.gameboard.gameName;
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
 				$('#blockToggleButton').hide();
@@ -218,6 +235,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				app.gameName = app.gameboard.gameName;
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
 				$('#blockToggleButton').hide();
@@ -230,6 +248,11 @@ var app = {
 	app.updateInviteLink = function() {
 		$('#inviteLink .url')
 			.val($(location).attr('href').split('#')[0]+'#'+this.gameId);
+		$('.gamename').html(app.gameName);
+		if (app.gameboard.host) {
+			$('.editGamenameBtn').show();
+		}
+		$('.editGamename [name=gamenameInput]').val(app.gameName);
 		if ('serviceWorker' in navigator && navigator.share) {
 			$('#inviteLink').append(
 					$('<div class="input-group-append">').append(
@@ -266,6 +289,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				app.gameName = app.gameboard.gameName;
 				app.updateInviteLink();
 				connect(app.gameId);
 				$('#scoreBar').hide();
@@ -289,6 +313,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				app.gameName = app.gameboard.gameName;
 				app.updateInviteLink();
 				connect(app.gameId);
 				$('#scoreBar').hide();
@@ -316,6 +341,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				app.gameName = app.gameboard.gameName;
 				app.updateInviteLink();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
@@ -867,6 +893,15 @@ var app = {
 		$('.editUsername').hide();
 		$('.staticUsername').show();
 		menu.updateUser($('.editUsername [name=usernameInput]').val());
+	});
+	$('.editGamenameBtn').on('click', function(){
+		$('.editGamename').show();
+		$('.editGamenameBtn').hide();
+	});
+	$('.saveGamenameBtn').on('click', function(){
+		$('.editGamename').hide();
+		$('.editGamenameBtn').show();
+		menu.updateGame($('.editGamename [name=gamenameInput]').val());
 	});
 	
 	

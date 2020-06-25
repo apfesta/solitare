@@ -145,6 +145,7 @@ public class MainController {
 			.filter((e)->e.getValue().isMultiPlayer())
 			.filter((e)->!e.getValue().isInProgress())
 			.filter((e)->!e.getValue().isGameOver())
+			.filter((e)->!e.getValue().isExpired())
 			.map((entry)->new Game(entry.getKey(), 
 					entry.getValue().getCreatedBy(), 
 					entry.getValue().getGameName(),
@@ -173,7 +174,8 @@ public class MainController {
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}", method = RequestMethod.PUT)
-	public @ResponseBody Game putGame(@PathVariable Integer gameId, @RequestBody Game game) {
+	public @ResponseBody Game putGame(@PathVariable Integer gameId, 
+			@RequestBody Game game) {
 		LOG.trace("PUT /api/game/{}", gameId);
 		GameBoard existingGame = games.get(gameId);
 		User user = userService.getUser();
@@ -348,6 +350,9 @@ public class MainController {
 		Collection<User> users;
 		User startedBy;
 
+		public Game() {
+			super();
+		}
 		public Game(GameBoard gameBoard) {
 			this(gameBoard.getGameId(), gameBoard.getCreatedBy(), 
 					gameBoard.getGameName(), gameBoard.getUsers());
@@ -386,10 +391,6 @@ public class MainController {
 
 		public Collection<User> getUsers() {
 			return users;
-		}
-
-		public void setUsers(List<User> users) {
-			this.users = users;
 		}
 
 		public User getStartedBy() {

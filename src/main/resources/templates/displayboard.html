@@ -119,9 +119,18 @@
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <h5 class="modal-title" id="exampleModalLabel">Multi-Player Solitare</h5>
+	        <h5 class="modal-title" id="exampleModalLabel">Multi-Player Solitare - 
+	        	<span class="gamename"></span> 
+				<button class="btn btn-sm btn-outline-primary editGamenameBtn"><i class="fa fa-pencil"></i> Edit Name</button>
+	        </h5>
 	      </div>
 	      <div class="modal-body">
+	      	<div class="editGamename input-group mb-3 input-group-sm">
+        		<input class="url form-control" name="gamenameInput"/>
+        		<div class="input-group-append">
+        			<button class="btn btn-sm btn-success saveGamenameBtn">Save</button>
+        		</div>
+        	</div>
 	        Waiting for 2 or more players to join.  When you're ready, check 'I'm Ready.'  When all players are ready, you'll get a 5 second countdown.  
 	        <label for="inviteUrl">Invite players to join with this link</label>
 	        <div id="inviteLink" class="input-group mb-3 input-group-sm">
