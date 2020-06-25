@@ -59,6 +59,7 @@ public class UserBoardTest {
 		
 		UserBoard userBoard = new UserBoard(game, user);
 		userBoard.tableau = new Tableau();
+		userBoard.score = userBoard.new Score();
 		
 		//We're going to move the 10 from build1 to build2
 		
