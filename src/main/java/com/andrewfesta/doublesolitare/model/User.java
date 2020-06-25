@@ -1,5 +1,7 @@
 package com.andrewfesta.doublesolitare.model;
 
+import org.springframework.security.core.userdetails.UserDetails;
+
 /**
  * User DTO that only exposes the necessary fields to the client
  * 
@@ -10,6 +12,7 @@ public class User {
 	
 	Integer id;
 	String username;
+	UserDetails principal;
 
 	public User() {
 		super();
@@ -37,6 +40,10 @@ public class User {
 		this.username = username;
 	}
 
+	public void setPrincipal(UserDetails principal) {
+		this.principal = principal;
+	}
+
 	@Override
 	public int hashCode() {
 		return id.hashCode();
@@ -49,6 +56,10 @@ public class User {
 			return id.equals(user.id);
 		}
 		return false;
+	}
+	
+	public boolean equalsPrincipal(UserDetails principal) {
+		return this.principal.equals(principal);
 	}
 	
 	

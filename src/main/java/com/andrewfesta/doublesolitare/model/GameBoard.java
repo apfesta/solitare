@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -247,6 +249,12 @@ public class GameBoard {
 		userBoards.get(user).moveToTableau(cardId, toBuildId);
 	}
 	
+	public boolean isHost() {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return createdBy.equalsPrincipal(
+				(UserDetails) principal);
+	}
+		
 	public void userBlocked(User user, boolean blocked) {
 		if (blocked) {
 			this.blocked.add(user.getId());
@@ -282,7 +290,8 @@ public class GameBoard {
 	
 	public Instant getLastMoveTimestamp() {
 		return userBoards.values().stream()
-			.max((a,b)->a.getLastMoveInstant().compareTo(b.getLastMoveInstant()))
+			.max((a, b) -> (a.getLastMoveInstant() != null ? a.getLastMoveInstant() : createdOn.toInstant())
+					.compareTo((b.getLastMoveInstant() != null ? b.getLastMoveInstant() : createdOn.toInstant())))
 			.map((userBoard)->userBoard.getLastMoveInstant())
 			.orElse(createdOn.toInstant());
 	}
