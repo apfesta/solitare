@@ -229,6 +229,16 @@ public class MainController {
 		syncService.notifyPlayerDrop(game, user);
 	}
 	
+	@RequestMapping(value="/api/game/{gameId}/end", method = RequestMethod.GET)
+	public @ResponseBody void endGame(@PathVariable Integer gameId) {
+		LOG.trace("POST /api/game/{}/end", gameId);
+		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
+		UserBoard winner = game.end();
+		
+		syncService.notifyGameWon(game, winner.getUser());
+	}
+	
 	@RequestMapping(value="/api/game/{gameId}/canmove/{cardId}", method = RequestMethod.GET)
 	public @ResponseBody CanPush canMoveCard(
 			@PathVariable Integer gameId, 

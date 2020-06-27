@@ -214,7 +214,7 @@ public class GameBoard {
 		
 		GAME_LOG.info("GameId:{} User:{} joined game", gameId, user);
 	}
-	
+		
 	public void leave(User user) {
 		if (inProgress) {
 			inProgress = false;
@@ -223,6 +223,29 @@ public class GameBoard {
 			//Game hasn't started yet.  Remove them.
 			userBoards.remove(user);
 		}
+	}
+	
+	/**
+	 * Ends the game.  
+	 * @return winning UserBoard
+	 */
+	public UserBoard end() {
+		UserBoard winner = userBoards.values().stream()
+			//Winner is highest Total Score
+			.max((a, b) -> Integer.compare(a.score.getTotalScore(),b.score.getTotalScore()))
+			.map((userBoard)->{
+				userBoard.gameWon=true;
+				return userBoard;
+				})
+			.orElse(userBoards.values().stream()
+					//Or fewest moves
+					.min((a, b) -> Integer.compare(a.score.getTotalMoves(),b.score.getTotalMoves()))
+					.orElse(
+							//Or just fall back to the first player in the HashMap
+							userBoards.values().iterator().next()));
+		inProgress = false;
+		gameOver = true;
+		return winner;
 	}
 	
 	public Card lookupCard(User user, Integer cardId) {

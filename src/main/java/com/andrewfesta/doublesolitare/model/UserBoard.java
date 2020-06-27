@@ -9,6 +9,7 @@ import java.util.concurrent.locks.Lock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -214,6 +215,11 @@ public class UserBoard {
 		}
 	}
 	
+	@JsonIgnore
+	public User getUser() {
+		return user;
+	}
+
 	public GameBoard getGame() {
 		return game;
 	}

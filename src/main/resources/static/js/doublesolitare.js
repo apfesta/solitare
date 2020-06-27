@@ -6,6 +6,7 @@ $('#blockToggleButton').hide();
 $('.editUsername').hide();
 $('.editGamename').hide();
 $('.editGamenameBtn').hide();
+$('#endGameBtn').hide();
 
 var menu = {
 		games: []
@@ -396,6 +397,16 @@ var app = {
 			contentType: "application/json",
 			dataType: "json"});	
 	};
+	
+	app.endGame = function() {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+app.gameId+'/end'
+					+'?userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json"});	
+	};
+	
 	
 	app.toggleSleep = function(gameId, sleep) {
 		$.ajax({
@@ -882,6 +893,7 @@ var app = {
 	});
 	$('.cancelBtn').on('click', app.quitGame);
 	$('#quitBtn').on('click', app.quitGame);
+	$('#endGameBtn').on('click', app.endGame);
 	
 	$('#blockBtn').on('change',function(){
 		app.toggleBlock(app.gameId, $(this).prop("checked") == true);
