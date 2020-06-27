@@ -216,10 +216,12 @@ public class GameBoard {
 	}
 	
 	public void leave(User user) {
-		userBoards.remove(user);
 		if (inProgress) {
 			inProgress = false;
 			gameOver = true;
+		} else if (!inProgress && !gameOver) {
+			//Game hasn't started yet.  Remove them.
+			userBoards.remove(user);
 		}
 	}
 	
