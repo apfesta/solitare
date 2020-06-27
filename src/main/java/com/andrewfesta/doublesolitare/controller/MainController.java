@@ -234,7 +234,8 @@ public class MainController {
 		LOG.trace("POST /api/game/{}/end", gameId);
 		GameBoard game = games.get(gameId);
 		assertGameNotNull(gameId, game);
-		UserBoard winner = game.end();
+		User user = userService.getUser();
+		UserBoard winner = game.end(user);
 		
 		syncService.notifyGameWon(game, winner.getUser());
 	}

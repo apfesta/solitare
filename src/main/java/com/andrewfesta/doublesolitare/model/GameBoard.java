@@ -212,7 +212,9 @@ public class GameBoard {
 		foundation.prettyPrint();
 		userBoard.getTableau().prettyPrint();
 		
-		GAME_LOG.info("GameId:{} User:{} joined game", gameId, user);
+		GAME_LOG.info("GameId:({}){} User:({}){} joined game", 
+				gameId, gameName, 
+				user.id, user.username);
 	}
 		
 	public void leave(User user) {
@@ -229,7 +231,11 @@ public class GameBoard {
 	 * Ends the game.  
 	 * @return winning UserBoard
 	 */
-	public UserBoard end() {
+	public UserBoard end(User user) {
+		GAME_LOG.debug("GameId:({}){} User:({}){} has chosen to end the game!", 
+				gameId, gameName, 
+				user.id, user.username);
+		
 		UserBoard winner = userBoards.values().stream()
 			//Winner is highest Total Score
 			.max((a, b) -> Integer.compare(a.score.getTotalScore(),b.score.getTotalScore()))
@@ -245,6 +251,9 @@ public class GameBoard {
 							userBoards.values().iterator().next()));
 		inProgress = false;
 		gameOver = true;
+		GAME_LOG.debug("GameId:({}){} User:({}){} has won!", 
+				gameId, gameName, 
+				winner.user.id, winner.user.username);
 		return winner;
 	}
 	

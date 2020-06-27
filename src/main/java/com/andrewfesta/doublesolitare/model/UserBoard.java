@@ -103,8 +103,9 @@ public class UserBoard {
 	}
 	
 	public void discard(int maxNumberOfCards) {
-		GAME_LOG.debug("GameId:{} User:{} discard",
-				game.gameId, user);
+		GAME_LOG.debug("GameId:({}){} User:({}){} discard",
+				game.gameId, game.gameName, 
+				user.id, user.username);
 		if (stockPile.isEmpty()) {
 			score.deckPassthrough++;
 			do {
@@ -144,8 +145,10 @@ public class UserBoard {
 			Card card = lookupCard(cardId);
 			Integer pileIdToFlip = getPileIdToFlip(card);
 			
-			GAME_LOG.debug("GameId:{} User:{} Move {} to foundation pile {}",
-					game.gameId, user, card.abbrev(), toFoundationId);
+			GAME_LOG.debug("GameId:({}){} User:({}){} Move {} to foundation pile {}",
+					game.gameId, game.gameName, 
+					user.id, user.username,
+					card.abbrev(), toFoundationId);
 			game.getFoundation().getPile().get(toFoundationId).push(card);
 			score.toFoundation++;
 			lastMoveInstant = Instant.now();
@@ -155,8 +158,10 @@ public class UserBoard {
 					getTableau().getBuild()[pileIdToFlip].isEmpty()) {
 				getTableau().flipTopPileCard(pileIdToFlip);
 				score.tableauFlip++;
-				GAME_LOG.debug("GameId:{} User:{} Flip pile {} reveals {}",
-						game.gameId, user, pileIdToFlip, card.abbrev());
+				GAME_LOG.debug("GameId:({}){} User:({}){} Flip pile {} reveals {}",
+						game.gameId, game.gameName, 
+						user.id, user.username, 
+						pileIdToFlip, card.abbrev());
 			}
 			
 			boolean gameWon = true;
@@ -170,7 +175,9 @@ public class UserBoard {
 				if (gameWon && getStockPile().isEmpty() && getDiscardPile().isEmpty()) {
 					setGameWon(true);
 					game.setGameOver(true);
-					GAME_LOG.debug("GameId:{} User:{} has won!", game.gameId);
+					GAME_LOG.debug("GameId:({}){} User:({}){} has won!", 
+							game.gameId, game.gameName, 
+							user.id, user.username);
 				}
 			}
 		} finally {
@@ -192,14 +199,18 @@ public class UserBoard {
 		
 		if (card.getCurrentBuild()!=null && !card.equals(card.getCurrentBuild().peek())) {
 			//Move Build of cards from pile to pile
-			GAME_LOG.debug("GameId:{} User:{} Move build ({}-{}) to tableau pile {}",
-					game.gameId, user, card.abbrev(), card.getCurrentBuild().peek().abbrev(), toBuildId);
+			GAME_LOG.debug("GameId:({}){} User:({}){} Move build ({}-{}) to tableau pile {}",
+					game.gameId, game.gameName, 
+					user.id, user.username, 
+					card.abbrev(), card.getCurrentBuild().peek().abbrev(), toBuildId);
 			getTableau().getBuild()[toBuildId].push(card.getCurrentBuild(), card);
 			score.tableauToTableau++;
 		} else {
 			//Move card from pile or discard pile to tableau pile
-			GAME_LOG.debug("GameId:{} User:{} Move {} to tableau pile {}",
-					game.gameId, user, card.abbrev(), toBuildId);
+			GAME_LOG.debug("GameId:({}){} User:({}){} Move {} to tableau pile {}",
+					game.gameId, game.gameName, 
+					user.id, user.username,
+					card.abbrev(), toBuildId);
 			getTableau().getBuild()[toBuildId].push(card);
 			score.discardToTableau++;
 		}
@@ -210,8 +221,10 @@ public class UserBoard {
 				getTableau().getBuild()[pileIdToFlip].isEmpty()) {
 			getTableau().flipTopPileCard(pileIdToFlip);
 			score.tableauFlip++;
-			GAME_LOG.debug("GameId:{} User:{} Flip pile {} reveals {}",
-					game.gameId, user, pileIdToFlip, card.abbrev());
+			GAME_LOG.debug("GameId:({}){} User:({}){} Flip pile {} reveals {}",
+					game.gameId, game.gameName, 
+					user.id, user.username, 
+					pileIdToFlip, card.abbrev());
 		}
 	}
 	
