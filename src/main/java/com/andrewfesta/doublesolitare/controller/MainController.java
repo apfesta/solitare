@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugProperties;
 import com.andrewfesta.doublesolitare.exception.GameInProgressException;
+import com.andrewfesta.doublesolitare.exception.GameNotFoundException;
 import com.andrewfesta.doublesolitare.model.Card;
 import com.andrewfesta.doublesolitare.model.GameBoard;
 import com.andrewfesta.doublesolitare.model.Suit;
@@ -167,6 +168,7 @@ public class MainController {
 	public @ResponseBody Game getGame(@PathVariable Integer gameId) {
 		LOG.trace("GET /api/game/{}", gameId);
 		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
 		return new Game(game.getGameId(), 
 				game.getCreatedBy(), 
 				game.getGameName(), 
@@ -178,6 +180,7 @@ public class MainController {
 			@RequestBody Game game) {
 		LOG.trace("PUT /api/game/{}", gameId);
 		GameBoard existingGame = games.get(gameId);
+		assertGameNotNull(gameId, existingGame);
 		User user = userService.getUser();
 		
 		//Can only change the Game Name
@@ -191,6 +194,7 @@ public class MainController {
 	public @ResponseBody UserBoard joinGame(@PathVariable Integer gameId) {
 		LOG.trace("POST /api/game/{}/join", gameId);
 		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
 		if (!game.isInProgress()) {
 			User user = userService.getUser();
 			game.join(user);
@@ -206,6 +210,7 @@ public class MainController {
 			@RequestParam("ready") boolean ready) {
 		LOG.trace("GET /api/game/{}/ready?ready=", gameId, ready);
 		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
 		User user = userService.getUser();
 		game.getUserBoard(user).setUserReady(ready);
 		syncService.notifyPlayerStatus(game, user, ready);
@@ -218,12 +223,10 @@ public class MainController {
 	public @ResponseBody void leaveGame(@PathVariable Integer gameId) {
 		LOG.trace("POST /api/game/{}/leave", gameId);
 		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
 		User user = userService.getUser();
 		game.leave(user);
 		syncService.notifyPlayerDrop(game, user);
-		if (game.getUsers().isEmpty()) {
-			games.remove(game.getGameId());
-		}
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/canmove/{cardId}", method = RequestMethod.GET)
@@ -233,6 +236,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/canmove/{}", gameId, cardId);
 		
 		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
 		User user = userService.getUser();
 		Card card = game.lookupCard(user, cardId);
 		
@@ -247,6 +251,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/move/{}/toFoundation/{}", gameId, cardId, toFoundationId);
 		
 		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
 		User user = userService.getUser();
 		
 		game.moveToFoundation(user, cardId, toFoundationId);
@@ -284,6 +289,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/move/{}/toTableau/{}", gameId, cardId, toBuildId);
 		
 		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
 		User user = userService.getUser();
 		
 		game.moveToTableau(user, cardId, toBuildId);
@@ -308,6 +314,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/discard", gameId);
 		
 		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
 		User user = userService.getUser();
 		
 		game.discard(user);
@@ -326,6 +333,7 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/toggle?blocked={}", gameId, blocked);
 		
 		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
 		User user = userService.getUser();
 		
 		game.userBlocked(user, blocked);
@@ -339,9 +347,16 @@ public class MainController {
 		LOG.trace("GET /api/game/{}/toggle?sleep={}", gameId, sleep);
 		
 		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
 		User user = userService.getUser();
 		
 		syncService.notifyPlayerSleep(game, user, sleep);
+	}
+	
+	private void assertGameNotNull(Integer gameId, GameBoard game) {
+		if (game==null) {
+			throw new GameNotFoundException("Game "+gameId+" not found");
+		}
 	}
 	
 	public static class Game {
