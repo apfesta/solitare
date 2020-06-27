@@ -67,7 +67,7 @@ function setConnected(connected, gameId) {
 					$('#gameOver .modal-body tbody').append(
 						$('<tr>').append(
 							$('<td>').addClass('username').html(user.username)).append(
-							$('<td>').addClass('score').html("")).append(
+							$('<td>').addClass('score').html(app.gameboard.userScores[user.id].toFoundation)).append(
 							$('<td>').addClass('moves').html(app.gameboard.userScores[user.id].totalMoves))
 					);
 				}					
@@ -75,6 +75,7 @@ function setConnected(connected, gameId) {
     		}
     	}
     	if (data.action=='GAME_WON') {
+    		console.log(data.score);
 			$('#gameOverTitle').text(data.user.username+' won game');
 			$('#gameOver .modal-body').empty().append(
 					$('<table>').append(
@@ -90,8 +91,8 @@ function setConnected(connected, gameId) {
 				$('#gameOver .modal-body tbody').append(
 					$('<tr>').append(
 						$('<td>').addClass('username').html(user.username)).append(
-						$('<td>').addClass('score').html(app.gameboard.userScores[user.id].toFoundation)).append(
-						$('<td>').addClass('moves').html(app.gameboard.userScores[user.id].totalMoves))
+						$('<td>').addClass('score').html(data.score[user.id].toFoundation)).append(
+						$('<td>').addClass('moves').html(data.score[user.id].totalMoves))
 				);
 			}					
 			$('#gameOver').modal('show');
@@ -106,6 +107,16 @@ function setConnected(connected, gameId) {
     	if (data.action=='PLAY_IS_BLOCKED') {
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').addClass('blocked');
     		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').html("I'm Stuck!");
+    		var allStuck=true;
+    		$('#scoreBoard.users .user').each(function(){
+    			$('#endGameBtn').hide();
+    			if (!$(this).hasClass('blocked')) {
+    				allStuck=false;
+    			}
+    			if (allStuck) {
+    				$('#endGameBtn').show();
+    			}
+    		});
     	} else if (data.action=='PLAY_NOT_BLOCKED') {
     		if (data.user.id == app.user.id) {
     			$('#blockBtn')
@@ -114,6 +125,7 @@ function setConnected(connected, gameId) {
     		}
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').removeClass('blocked');
     		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').html("");
+    		$('#endGameBtn').hide();
     	}
     	if (data.action=='PLAYER_SLEEP') {
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').addClass('sleep');

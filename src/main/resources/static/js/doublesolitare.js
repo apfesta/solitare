@@ -6,6 +6,7 @@ $('#blockToggleButton').hide();
 $('.editUsername').hide();
 $('.editGamename').hide();
 $('.editGamenameBtn').hide();
+$('#endGameBtn').hide();
 
 var menu = {
 		games: []
@@ -396,6 +397,16 @@ var app = {
 			contentType: "application/json",
 			dataType: "json"});	
 	};
+	
+	app.endGame = function() {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+app.gameId+'/end'
+					+'?userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json"});	
+	};
+	
 	
 	app.toggleSleep = function(gameId, sleep) {
 		$.ajax({
@@ -870,14 +881,23 @@ var app = {
 	};
 		
 	
-	app.mainMenu = function() {
+	$('#gameOver').on('hidden.bs.modal', function(){
+		window.location.replace("/");
+	});
+	
+	$('.cancelBtn').on('click', function(){
 		app.leaveGame();
 		window.location.replace("/");
-	};
+	});
 	
-	$('#gameOver').on('hidden.bs.modal', app.mainMenu);
-	$('.cancelBtn').on('click', app.mainMenu);
-	$('#quitBtn').on('click', app.mainMenu);
+	$('#quitBtn').on('click', function(){
+		app.leaveGame();
+		if (!app.gameBoard.multiPlayer) {
+			window.location.replace("/");
+		}
+	});
+	
+	$('#endGameBtn').on('click', app.endGame);
 	
 	$('#blockBtn').on('change',function(){
 		app.toggleBlock(app.gameId, $(this).prop("checked") == true);
