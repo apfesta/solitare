@@ -870,14 +870,18 @@ var app = {
 	};
 		
 	
-	app.mainMenu = function() {
+	app.quitGame = function() {
 		app.leaveGame();
-		window.location.replace("/");
+		if (!app.gameBoard.multiPlayer) {
+			window.location.replace("/");
+		}
 	};
 	
-	$('#gameOver').on('hidden.bs.modal', app.mainMenu);
-	$('.cancelBtn').on('click', app.mainMenu);
-	$('#quitBtn').on('click', app.mainMenu);
+	$('#gameOver').on('hidden.bs.modal', function(){
+		window.location.replace("/");
+	});
+	$('.cancelBtn').on('click', app.quitGame);
+	$('#quitBtn').on('click', app.quitGame);
 	
 	$('#blockBtn').on('change',function(){
 		app.toggleBlock(app.gameId, $(this).prop("checked") == true);
