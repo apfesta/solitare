@@ -67,7 +67,7 @@ function setConnected(connected, gameId) {
 					$('#gameOver .modal-body tbody').append(
 						$('<tr>').append(
 							$('<td>').addClass('username').html(user.username)).append(
-							$('<td>').addClass('score').html("")).append(
+							$('<td>').addClass('score').html(app.gameboard.userScores[user.id].toFoundation)).append(
 							$('<td>').addClass('moves').html(app.gameboard.userScores[user.id].totalMoves))
 					);
 				}					
