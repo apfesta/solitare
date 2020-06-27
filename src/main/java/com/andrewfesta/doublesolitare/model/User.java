@@ -1,25 +1,27 @@
 package com.andrewfesta.doublesolitare.model;
 
-import java.util.Collections;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-public class User extends org.springframework.security.core.userdetails.User {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1571362421820222821L;
+/**
+ * User DTO that only exposes the necessary fields to the client
+ * 
+ * @author apfesta
+ *
+ */
+public class User {
 	
 	Integer id;
+	String username;
+	UserDetails principal;
 
-	public User(Integer id, String username) {
-		super(username, "", Collections.singletonList(new SimpleGrantedAuthority("GUEST_ROLE")));
-		this.id = id;
+	public User() {
+		super();
 	}
-	
+
 	public User(Integer id) {
-		this(id, "Guest "+id);
+		super();
+		this.id = id;
+		this.username = "User "+id;
 	}
 
 	public Integer getId() {
@@ -28,6 +30,18 @@ public class User extends org.springframework.security.core.userdetails.User {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setPrincipal(UserDetails principal) {
+		this.principal = principal;
 	}
 
 	@Override
@@ -42,6 +56,10 @@ public class User extends org.springframework.security.core.userdetails.User {
 			return id.equals(user.id);
 		}
 		return false;
+	}
+	
+	public boolean equalsPrincipal(UserDetails principal) {
+		return this.principal.equals(principal);
 	}
 	
 	

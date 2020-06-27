@@ -1,5 +1,8 @@
 package com.andrewfesta.doublesolitare.model;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,6 +25,8 @@ public class GameBoard {
 
 	final Integer gameId;
 	final User createdBy;
+	final ZonedDateTime createdOn;
+	String gameName;
 	Foundation foundation;
 	final boolean multiPlayer;
 	boolean inProgress = false;
@@ -107,7 +114,9 @@ public class GameBoard {
 	public GameBoard(User createdBy, Integer gameId, boolean multiPlayer) {
 		super();
 		this.createdBy = createdBy;
+		this.createdOn = ZonedDateTime.now();
 		this.gameId = gameId;
+		this.gameName = "Game "+gameId;
 		this.multiPlayer = multiPlayer;
 	}
 	
@@ -203,15 +212,49 @@ public class GameBoard {
 		foundation.prettyPrint();
 		userBoard.getTableau().prettyPrint();
 		
-		GAME_LOG.info("GameId:{} User:{} joined game", gameId, user);
+		GAME_LOG.info("GameId:({}){} User:({}){} joined game", 
+				gameId, gameName, 
+				user.id, user.username);
 	}
-	
+		
 	public void leave(User user) {
-		userBoards.remove(user);
 		if (inProgress) {
 			inProgress = false;
 			gameOver = true;
+		} else if (!inProgress && !gameOver) {
+			//Game hasn't started yet.  Remove them.
+			userBoards.remove(user);
 		}
+	}
+	
+	/**
+	 * Ends the game.  
+	 * @return winning UserBoard
+	 */
+	public UserBoard end(User user) {
+		GAME_LOG.debug("GameId:({}){} User:({}){} has chosen to end the game!", 
+				gameId, gameName, 
+				user.id, user.username);
+		
+		UserBoard winner = userBoards.values().stream()
+			//Winner is highest Total Score
+			.max((a, b) -> Integer.compare(a.score.getTotalScore(),b.score.getTotalScore()))
+			.map((userBoard)->{
+				userBoard.gameWon=true;
+				return userBoard;
+				})
+			.orElse(userBoards.values().stream()
+					//Or fewest moves
+					.min((a, b) -> Integer.compare(a.score.getTotalMoves(),b.score.getTotalMoves()))
+					.orElse(
+							//Or just fall back to the first player in the HashMap
+							userBoards.values().iterator().next()));
+		inProgress = false;
+		gameOver = true;
+		GAME_LOG.debug("GameId:({}){} User:({}){} has won!", 
+				gameId, gameName, 
+				winner.user.id, winner.user.username);
+		return winner;
 	}
 	
 	public Card lookupCard(User user, Integer cardId) {
@@ -240,6 +283,12 @@ public class GameBoard {
 		userBoards.get(user).moveToTableau(cardId, toBuildId);
 	}
 	
+	public boolean isHost() {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return createdBy.equalsPrincipal(
+				(UserDetails) principal);
+	}
+		
 	public void userBlocked(User user, boolean blocked) {
 		if (blocked) {
 			this.blocked.add(user.getId());
@@ -272,14 +321,40 @@ public class GameBoard {
 		}
 		return true;
 	}
+	
+	public Instant getLastMoveTimestamp() {
+		return userBoards.values().stream()
+			.max((a, b) -> (a.getLastMoveInstant() != null ? a.getLastMoveInstant() : createdOn.toInstant())
+					.compareTo((b.getLastMoveInstant() != null ? b.getLastMoveInstant() : createdOn.toInstant())))
+			.map((userBoard)->userBoard.getLastMoveInstant())
+			.orElse(createdOn.toInstant());
+	}
+	
+	public boolean isExpired() {
+		return Duration.between(getLastMoveTimestamp(),Instant.now())
+				.toHours() >= 1;
+	}
 
 	@JsonIgnore
 	public User getCreatedBy() {
 		return createdBy;
 	}
 
+	@JsonIgnore
+	public ZonedDateTime getCreatedOn() {
+		return createdOn;
+	}
+
 	public Integer getGameId() {
 		return gameId;
+	}
+
+	public String getGameName() {
+		return gameName;
+	}
+
+	public void setGameName(String gameName) {
+		this.gameName = gameName;
 	}
 
 	public Collection<User> getUsers() {

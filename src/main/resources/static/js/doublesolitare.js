@@ -3,6 +3,10 @@ $('#board').hide();
 $('#scoreBar').hide();
 $('#scoreBoard').hide();
 $('#blockToggleButton').hide();
+$('.editUsername').hide();
+$('.editGamename').hide();
+$('.editGamenameBtn').hide();
+$('#endGameBtn').hide();
 
 var menu = {
 		games: []
@@ -20,6 +24,22 @@ var menu = {
 	// AJAX functions
 	//---------------
 	
+	menu.setUser = function(data) {
+		app.user = data;
+		$('.username').html(app.user.username);
+		$('.editUsername [name=usernameInput]').val(app.user.username);
+		$('#waitForPlayers .users .me')
+			.html(app.user.username+ " <label>I'm Ready: <span class='status'></span><input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
+		$('.ready').on('change',app.readyStatusOnChange);
+		$('#scoreBoard .user.me')
+					.attr('data-user-id',app.user.id)
+						.append(
+							$('<td>').addClass('username').text(app.user.username))
+						.append(
+							$('<td>').addClass('status').text(''))
+						.append(
+							$('<td>').addClass('moves').text('0'));
+	};
 	menu.getUser = function() {
 		$.ajax({
 			type: 'POST', 
@@ -28,22 +48,35 @@ var menu = {
 			dataType: "json",
 			success: function(data){
 				console.debug(data);
-				app.user = data;
-				$('#waitForPlayers .users .me')
-					.html(app.user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' type='checkbox' data-user-id='"+app.user.id+"' /></label>");
-				$('.ready').on('change',app.readyStatusOnChange);
-				$('#scoreBoard .user.me')
-							.attr('data-user-id',app.user.id)
-								.append(
-									$('<td>').addClass('username').text(app.user.username))
-								.append(
-									$('<td>').addClass('status').text(''))
-								.append(
-									$('<td>').addClass('moves').text('0'));
-			
+				menu.setUser(data);
 				menu.getGames();
 			}});
-		
+	};
+	menu.updateUser = function(username) {
+		var data = {'username':username};
+		$.ajax({
+			type: 'PUT', 
+			url: getRelativePath('/api/user/'+app.user.id),
+			contentType: "application/json",
+			dataType: "json",
+			data: JSON.stringify(data),
+			success: function(data){
+				console.debug(data);
+				menu.setUser(data);
+			}});
+	};
+	menu.updateGame = function(gamename) {
+		var data = {'gameName':gamename};
+		$.ajax({
+			type: 'PUT', 
+			url: getRelativePath('/api/game/'+app.gameId),
+			contentType: "application/json",
+			dataType: "json",
+			data: JSON.stringify(data),
+			success: function(data){
+				console.debug(data);
+				app.gameName = data.gameName
+			}});
 	};
 	
 	menu.getGames = function() {
@@ -116,7 +149,7 @@ var menu = {
 						 .attr('data-toggle','modal')
 						 .attr('data-target','#waitForPlayers')
 						 .attr('data-backdrop',"static")
-						.text("Game "+game.gameId+" - started by "+game.startedBy.username)
+						.text(game.gameName+" - started by "+game.startedBy.username)
 						.on('click', joinGameAction));
 		}
 		
@@ -132,6 +165,7 @@ var app = {
 		userboard: {},
 		gameboard: {},
 		gameId: null,
+		gameName: null,
 		canMoveData: null,
 		countdownTimer: null
 };
@@ -180,6 +214,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				app.gameName = app.gameboard.gameName;
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
 				$('#blockToggleButton').hide();
@@ -201,6 +236,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				app.gameName = app.gameboard.gameName;
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
 				$('#blockToggleButton').hide();
@@ -213,10 +249,15 @@ var app = {
 	app.updateInviteLink = function() {
 		$('#inviteLink .url')
 			.val($(location).attr('href').split('#')[0]+'#'+this.gameId);
+		$('.gamename').html(app.gameName);
+		if (app.gameboard.host) {
+			$('.editGamenameBtn').show();
+		}
+		$('.editGamename [name=gamenameInput]').val(app.gameName);
 		if ('serviceWorker' in navigator && navigator.share) {
 			$('#inviteLink').append(
 					$('<div class="input-group-append">').append(
-							$('<button class="btn btn-outline-primary" type="button" title="Share URL..."><i class="fa fa-share-alt"></i></button>')
+							$('<button class="btn btn-outline-primary" type="button" title="Share URL..."><i class="fa fa-share-alt"></i> Share</button>')
 							.on('click',function(){
 								navigator.share({
 									title: 'Double Solitare',
@@ -227,7 +268,7 @@ var app = {
 		} else {
 			$('#inviteLink').append(
 					$('<div class="input-group-append">').append(
-							$('<button class="btn btn-outline-primary" type="button" title="Copy to clipboard"><i class="fa fa-clipboard"></i></button>')
+							$('<button class="btn btn-outline-primary" type="button" title="Copy to clipboard"><i class="fa fa-clipboard"></i> Copy</button>')
 							.on('click',function(){
 								var copyText = $('#inviteLink .url').get(0);
 								copyText.select();
@@ -249,6 +290,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				app.gameName = app.gameboard.gameName;
 				app.updateInviteLink();
 				connect(app.gameId);
 				$('#scoreBar').hide();
@@ -272,6 +314,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				app.gameName = app.gameboard.gameName;
 				app.updateInviteLink();
 				connect(app.gameId);
 				$('#scoreBar').hide();
@@ -299,6 +342,7 @@ var app = {
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
+				app.gameName = app.gameboard.gameName;
 				app.updateInviteLink();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
@@ -353,6 +397,16 @@ var app = {
 			contentType: "application/json",
 			dataType: "json"});	
 	};
+	
+	app.endGame = function() {
+		$.ajax({
+			type: 'GET', 
+			url: getRelativePath('/api/game/'+app.gameId+'/end'
+					+'?userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json"});	
+	};
+	
 	
 	app.toggleSleep = function(gameId, sleep) {
 		$.ajax({
@@ -656,7 +710,7 @@ var app = {
 			.addClass('list-group-item')
 			.addClass('user')
 			.attr('data-user-id',user.id)
-			.html(user.username+ " <label>I'm Ready: <input class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
+			.html('<span class="username">'+user.username+"</span> <small class='status'></small><label>I'm Ready: <input class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
 		userDiv.find('.ready').on('change',app.readyStatusOnChange);
 		$('#waitForPlayers .users').append(userDiv);
 		
@@ -827,19 +881,47 @@ var app = {
 	};
 		
 	
-	app.mainMenu = function() {
+	$('#gameOver').on('hidden.bs.modal', function(){
+		window.location.replace("/");
+	});
+	
+	$('.cancelBtn').on('click', function(){
 		app.leaveGame();
 		window.location.replace("/");
-	};
+	});
 	
-	$('#gameOver').on('hidden.bs.modal', app.mainMenu);
-	$('.cancelBtn').on('click', app.mainMenu);
-	$('#quitBtn').on('click', app.mainMenu);
+	$('#quitBtn').on('click', function(){
+		app.leaveGame();
+		if (!app.gameBoard.multiPlayer) {
+			window.location.replace("/");
+		}
+	});
+	
+	$('#endGameBtn').on('click', app.endGame);
 	
 	$('#blockBtn').on('change',function(){
 		app.toggleBlock(app.gameId, $(this).prop("checked") == true);
 		$(this).blur();
 		$('#quitBtn').focus();
+	});
+	
+	$('.editUsernameBtn').on('click', function(){
+		$('.editUsername').show();
+		$('.staticUsername').hide();
+	});
+	$('.saveUsernameBtn').on('click', function(){
+		$('.editUsername').hide();
+		$('.staticUsername').show();
+		menu.updateUser($('.editUsername [name=usernameInput]').val());
+	});
+	$('.editGamenameBtn').on('click', function(){
+		$('.editGamename').show();
+		$('.editGamenameBtn').hide();
+	});
+	$('.saveGamenameBtn').on('click', function(){
+		$('.editGamename').hide();
+		$('.editGamenameBtn').show();
+		menu.updateGame($('.editGamename [name=gamenameInput]').val());
 	});
 	
 	

@@ -1,5 +1,6 @@
 package com.andrewfesta.doublesolitare.model;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.concurrent.locks.Lock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -30,6 +32,7 @@ public class UserBoard {
 	boolean gameWon = false;
 	Score score;
 	boolean userReady;
+	Instant lastMoveInstant;
 	
 	boolean shuffle = true; //shuffle by default.  Tests should use false to have a predictable set
 	
@@ -100,8 +103,9 @@ public class UserBoard {
 	}
 	
 	public void discard(int maxNumberOfCards) {
-		GAME_LOG.debug("GameId:{} User:{} discard",
-				game.gameId, user);
+		GAME_LOG.debug("GameId:({}){} User:({}){} discard",
+				game.gameId, game.gameName, 
+				user.id, user.username);
 		if (stockPile.isEmpty()) {
 			score.deckPassthrough++;
 			do {
@@ -119,6 +123,7 @@ public class UserBoard {
 			c.setCurrentPile(discardPile);
 		}
 		score.discard++;
+		lastMoveInstant = Instant.now();
 	}
 	
 	protected Integer getPileIdToFlip(Card card) {
@@ -140,18 +145,23 @@ public class UserBoard {
 			Card card = lookupCard(cardId);
 			Integer pileIdToFlip = getPileIdToFlip(card);
 			
-			GAME_LOG.debug("GameId:{} User:{} Move {} to foundation pile {}",
-					game.gameId, user, card.abbrev(), toFoundationId);
+			GAME_LOG.debug("GameId:({}){} User:({}){} Move {} to foundation pile {}",
+					game.gameId, game.gameName, 
+					user.id, user.username,
+					card.abbrev(), toFoundationId);
 			game.getFoundation().getPile().get(toFoundationId).push(card);
 			score.toFoundation++;
+			lastMoveInstant = Instant.now();
 			
 			if (pileIdToFlip!=null && 
 					!getTableau().getPile()[pileIdToFlip].isEmpty() &&
 					getTableau().getBuild()[pileIdToFlip].isEmpty()) {
 				getTableau().flipTopPileCard(pileIdToFlip);
 				score.tableauFlip++;
-				GAME_LOG.debug("GameId:{} User:{} Flip pile {} reveals {}",
-						game.gameId, user, pileIdToFlip, card.abbrev());
+				GAME_LOG.debug("GameId:({}){} User:({}){} Flip pile {} reveals {}",
+						game.gameId, game.gameName, 
+						user.id, user.username, 
+						pileIdToFlip, card.abbrev());
 			}
 			
 			boolean gameWon = true;
@@ -165,7 +175,9 @@ public class UserBoard {
 				if (gameWon && getStockPile().isEmpty() && getDiscardPile().isEmpty()) {
 					setGameWon(true);
 					game.setGameOver(true);
-					GAME_LOG.debug("GameId:{} User:{} has won!", game.gameId);
+					GAME_LOG.debug("GameId:({}){} User:({}){} has won!", 
+							game.gameId, game.gameName, 
+							user.id, user.username);
 				}
 			}
 		} finally {
@@ -187,27 +199,40 @@ public class UserBoard {
 		
 		if (card.getCurrentBuild()!=null && !card.equals(card.getCurrentBuild().peek())) {
 			//Move Build of cards from pile to pile
-			GAME_LOG.debug("GameId:{} User:{} Move build ({}-{}) to tableau pile {}",
-					game.gameId, user, card.abbrev(), card.getCurrentBuild().peek().abbrev(), toBuildId);
+			GAME_LOG.debug("GameId:({}){} User:({}){} Move build ({}-{}) to tableau pile {}",
+					game.gameId, game.gameName, 
+					user.id, user.username, 
+					card.abbrev(), card.getCurrentBuild().peek().abbrev(), toBuildId);
 			getTableau().getBuild()[toBuildId].push(card.getCurrentBuild(), card);
+			score.tableauToTableau++;
 		} else {
 			//Move card from pile or discard pile to tableau pile
-			GAME_LOG.debug("GameId:{} User:{} Move {} to tableau pile {}",
-					game.gameId, user, card.abbrev(), toBuildId);
+			GAME_LOG.debug("GameId:({}){} User:({}){} Move {} to tableau pile {}",
+					game.gameId, game.gameName, 
+					user.id, user.username,
+					card.abbrev(), toBuildId);
 			getTableau().getBuild()[toBuildId].push(card);
 			score.discardToTableau++;
 		}
+		lastMoveInstant = Instant.now();
 		
 		if (pileIdToFlip!=null && 
 				!getTableau().getPile()[pileIdToFlip].isEmpty() &&
 				getTableau().getBuild()[pileIdToFlip].isEmpty()) {
 			getTableau().flipTopPileCard(pileIdToFlip);
 			score.tableauFlip++;
-			GAME_LOG.debug("GameId:{} User:{} Flip pile {} reveals {}",
-					game.gameId, user, pileIdToFlip, card.abbrev());
+			GAME_LOG.debug("GameId:({}){} User:({}){} Flip pile {} reveals {}",
+					game.gameId, game.gameName, 
+					user.id, user.username, 
+					pileIdToFlip, card.abbrev());
 		}
 	}
 	
+	@JsonIgnore
+	public User getUser() {
+		return user;
+	}
+
 	public GameBoard getGame() {
 		return game;
 	}
@@ -268,6 +293,14 @@ public class UserBoard {
 		this.userReady = userReady;
 	}
 
+	public Instant getLastMoveInstant() {
+		return lastMoveInstant;
+	}
+
+	public void setLastMoveInstant(Instant lastMoveInstant) {
+		this.lastMoveInstant = lastMoveInstant;
+	}
+
 	@JsonInclude(Include.NON_NULL)
 	public class CanPush {
 		private Card card;
@@ -298,6 +331,7 @@ public class UserBoard {
 	public class Score {
 		int toFoundation = 0;
 		int discardToTableau = 0;
+		int tableauToTableau = 0;
 		int tableauFlip = 0;
 		int discard = 0;
 		int deckPassthrough = 0;
@@ -324,11 +358,12 @@ public class UserBoard {
 		public int getTotalScore() {
 			return (toFoundation*10)+
 					(discardToTableau*5)+
+//					(tableauToTableau*3)+
 					(tableauFlip*5)+
 					(deckPassthrough*-20);
 		}
 		public int getTotalMoves() {
-			return toFoundation+discardToTableau+discard;
+			return toFoundation+discardToTableau+tableauToTableau+discard;
 		}
 		
 		public void prettyPrint() {

@@ -46,6 +46,7 @@ function setConnected(connected, gameId) {
     	if (data.action=='PLAYER_JOIN') {
     		app.addPlayer(data.numOfUsers-1);
     		app.addPlayerStatus(data.user);
+    		app.gameboard.foundation=data.foundation;
     	}
     	if (data.action=='PLAYER_DROP') {
     		app.removePlayer();
@@ -57,7 +58,7 @@ function setConnected(connected, gameId) {
 							$('<thead>').append(
 								$('<tr>').append(
 									$('<th>').html('User')).append(
-									$('<th>').html('Status')).append(
+									$('<th>').html('Score')).append(
 									$('<th>').html('Moves'))
 							)
 						).append($('<tbody>')));
@@ -66,7 +67,7 @@ function setConnected(connected, gameId) {
 					$('#gameOver .modal-body tbody').append(
 						$('<tr>').append(
 							$('<td>').addClass('username').html(user.username)).append(
-							$('<td>').addClass('status').html("")).append(
+							$('<td>').addClass('score').html(app.gameboard.userScores[user.id].toFoundation)).append(
 							$('<td>').addClass('moves').html(app.gameboard.userScores[user.id].totalMoves))
 					);
 				}					
@@ -74,13 +75,14 @@ function setConnected(connected, gameId) {
     		}
     	}
     	if (data.action=='GAME_WON') {
+    		console.log(data.score);
 			$('#gameOverTitle').text(data.user.username+' won game');
 			$('#gameOver .modal-body').empty().append(
 					$('<table>').append(
 						$('<thead>').append(
 							$('<tr>').append(
 								$('<th>').html('User')).append(
-								$('<th>').html('Status')).append(
+								$('<th>').html('Score')).append(
 								$('<th>').html('Moves'))
 						)
 					).append($('<tbody>')));
@@ -89,8 +91,8 @@ function setConnected(connected, gameId) {
 				$('#gameOver .modal-body tbody').append(
 					$('<tr>').append(
 						$('<td>').addClass('username').html(user.username)).append(
-						$('<td>').addClass('status').html("")).append(
-						$('<td>').addClass('moves').html(app.gameboard.userScores[user.id].totalMoves))
+						$('<td>').addClass('score').html(data.score[user.id].toFoundation)).append(
+						$('<td>').addClass('moves').html(data.score[user.id].totalMoves))
 				);
 			}					
 			$('#gameOver').modal('show');
@@ -105,6 +107,16 @@ function setConnected(connected, gameId) {
     	if (data.action=='PLAY_IS_BLOCKED') {
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').addClass('blocked');
     		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').html("I'm Stuck!");
+    		var allStuck=true;
+    		$('#scoreBoard.users .user').each(function(){
+    			$('#endGameBtn').hide();
+    			if (!$(this).hasClass('blocked')) {
+    				allStuck=false;
+    			}
+    			if (allStuck) {
+    				$('#endGameBtn').show();
+    			}
+    		});
     	} else if (data.action=='PLAY_NOT_BLOCKED') {
     		if (data.user.id == app.user.id) {
     			$('#blockBtn')
@@ -113,13 +125,22 @@ function setConnected(connected, gameId) {
     		}
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').removeClass('blocked');
     		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').html("");
+    		$('#endGameBtn').hide();
     	}
     	if (data.action=='PLAYER_SLEEP') {
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').addClass('sleep');
     		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').text("Away...");
+    		$('#waitForPlayers .user[data-user-id='+data.user.id+'] .status').text('Away...');
     	} else if (data.action=='PLAYER_AWAKE') {
     		$('#scoreBoard.users .user[data-user-id='+data.user.id+']').removeClass('sleep');
     		$('#scoreBoard .user[data-user-id='+data.user.id+'] .status').text("");
+    		$('#waitForPlayers .user[data-user-id='+data.user.id+'] .status').text('');
+    	}
+    	if (data.action=='PLAYER_RENAME'){
+    		$('.user[data-user-id='+data.user.id+'] .username').html(data.user.username);
+    	}
+    	if (data.action=='GAME_RENAME') {
+    		$('.gamename').html(data.gameName);
     	}
     });
   }
