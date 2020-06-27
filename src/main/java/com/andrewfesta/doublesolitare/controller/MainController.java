@@ -226,6 +226,9 @@ public class MainController {
 		assertGameNotNull(gameId, game);
 		User user = userService.getUser();
 		game.leave(user);
+		if (game.getCreatedBy().equals(user) && game.getUsers().isEmpty()) {
+			games.remove(game.getGameId());
+		}
 		syncService.notifyPlayerDrop(game, user);
 	}
 	
