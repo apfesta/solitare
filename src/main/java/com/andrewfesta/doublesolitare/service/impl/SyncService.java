@@ -1,5 +1,6 @@
 package com.andrewfesta.doublesolitare.service.impl;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
 
@@ -115,6 +116,11 @@ public class SyncService {
 						user, game, null, null, null));
 	}
 	
+	public void notifyGameChat(GameBoard game, User user, String message) {
+		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+				new GameChat(user, message));
+	}
+	
 	enum GameUpdateAction {
 		PLAYER_JOIN,
 		PLAYER_DROP,
@@ -132,7 +138,8 @@ public class SyncService {
 		PLAY_NOT_BLOCKED,
 		GAME_WON,
 		GAME_RENAME,
-		PUBLIC_GAME_AVAILABLE
+		PUBLIC_GAME_AVAILABLE,
+		GAME_CHAT
 	}
 	
 	
@@ -151,6 +158,34 @@ public class SyncService {
 		public User getUser() {
 			return user;
 		}
+	}
+	
+	static class GameChat extends BasePayload {
+		String message;
+		ZonedDateTime timestamp;
+		
+		public GameChat(User user, String message) {
+			super(GameUpdateAction.GAME_CHAT, user);
+			this.message = message;
+			this.timestamp = ZonedDateTime.now();
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public void setMessage(String message) {
+			this.message = message;
+		}
+
+		public ZonedDateTime getTimestamp() {
+			return timestamp;
+		}
+
+		public void setTimestamp(ZonedDateTime timestamp) {
+			this.timestamp = timestamp;
+		}
+		
 	}
 	
 	static class AppUpdate extends BasePayload {

@@ -7,6 +7,7 @@ $('.editUsername').hide();
 $('.editGamename').hide();
 $('.editGamenameBtn').hide();
 $('#endGameBtn').hide();
+$('.chatbar').hide();
 
 var menu = {
 		games: []
@@ -240,6 +241,7 @@ var app = {
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
 				$('#blockToggleButton').hide();
+				$('.chatbar').hide();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -296,6 +298,7 @@ var app = {
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
 				$('#blockToggleButton').show();
+				$('.chatbar').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -320,6 +323,7 @@ var app = {
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
 				$('#blockToggleButton').show();
+				$('.chatbar').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -339,6 +343,7 @@ var app = {
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
 				$('#blockToggleButton').show();
+				$('.chatbar').show();
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
@@ -417,6 +422,17 @@ var app = {
 			contentType: "application/json",
 			dataType: "json"});		
 	}
+	
+	app.chat = function(message) {
+		var data = {'message':message};
+		$.ajax({
+			type: 'POST', 
+			url: getRelativePath('/api/game/'+app.gameId+'/chat'
+					+'?userId='+app.user.id),
+			contentType: "application/json",
+			dataType: "json",
+			data: JSON.stringify(data)});	
+	};
 	
 	
 	app.handleUnload = function() {
@@ -880,6 +896,17 @@ var app = {
 		app.canMoveData = null;
 	};
 		
+	$('.sendMessageBtn').on('click', function(){
+		var messageInput = $(this).closest('.chatbar').find('[name=messageInput]');
+		app.chat(messageInput.val());
+		messageInput.val("");
+	});
+	$('[name=messageInput]').on('keypress',function(ev){
+		if(ev.which == 13) {
+			app.chat($(this).val());
+			$(this).val("");
+	    }
+	});
 	
 	$('#gameOver').on('hidden.bs.modal', function(){
 		window.location.replace("/");
@@ -892,7 +919,7 @@ var app = {
 	
 	$('#quitBtn').on('click', function(){
 		app.leaveGame();
-		if (!app.gameBoard.multiPlayer) {
+		if (!app.gameboard.multiPlayer) {
 			window.location.replace("/");
 		}
 	});
