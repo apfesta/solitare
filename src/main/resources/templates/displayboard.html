@@ -42,7 +42,8 @@
 
 	<div id="menu">
 		<h1>Double Solitare</h1>
-		<small hidden>Version <span th:text="#{version}"></span>.</small>
+		<small>Version <span th:text="#{version}"></span>. 
+			Build date <span th:text="${#temporals.format(T(java.time.ZonedDateTime).parse(#messages.msg('build.date).trim()).toLocalDateTime(), 'E, d MMM yyyy HH:mm')}">N/A</span></small>
 		<p>Your are logged in as 
 			<span class="staticUsername">
 				<strong sec:authentication="name" class="username"></strong> 
