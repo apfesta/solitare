@@ -367,10 +367,35 @@ public class MainController {
 		syncService.notifyPlayerSleep(game, user, sleep);
 	}
 	
+	@RequestMapping(value="/api/game/{gameId}/chat", method = RequestMethod.POST)
+	public @ResponseBody void chat(@PathVariable Integer gameId,
+			@RequestBody Message message) {
+		LOG.trace("GET /api/game/{}/chat", gameId);
+		
+		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
+		User user = userService.getUser();
+		
+		syncService.notifyGameChat(game, user, message.message);
+	}
+	
 	private void assertGameNotNull(Integer gameId, GameBoard game) {
 		if (game==null) {
 			throw new GameNotFoundException("Game "+gameId+" not found");
 		}
+	}
+	
+	public static class Message {
+		String message;
+
+		public String getMessage() {
+			return message;
+		}
+
+		public void setMessage(String message) {
+			this.message = message;
+		}
+		
 	}
 	
 	public static class Game {

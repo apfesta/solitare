@@ -188,4 +188,42 @@ progress#startgame_countdown {
 #gameOver .score, #gameOver .moves {
 	text-align: center;
 }
-
+.chatmessageframe {
+	position: relative;
+	padding: 1vw;
+	overflow: hidden;
+	height: 30vh;
+}
+.modal-body .chatbar {
+	background-color: transparent;
+}
+.modal-body .chatmessageframe {
+	height: auto;
+	max-height: 20vh;
+	min-height: 10vh;
+}
+.modal-body .chatmessages {
+	color: #000;
+}
+.chatmessages {
+	position: absolute;
+	bottom: 0;
+	color: #FFF;
+	background: rgba(255,255,255,0.4); 
+	width: 100%;
+}
+.chatbar {
+	padding: 1vw;
+	color: #FFF;
+	background-color: rgba(0,0,0,0.4); 
+}
+.chatframe.fixed-bottom {
+	bottom: 47px;
+}
+.message .user {
+	font-weight: bold;
+	color: blue;
+}
+.message .user.me {
+	color: red;
+}

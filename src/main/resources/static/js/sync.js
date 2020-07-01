@@ -142,6 +142,26 @@ function setConnected(connected, gameId) {
     	if (data.action=='GAME_RENAME') {
     		$('.gamename').html(data.gameName);
     	}
+    	if (data.action=='GAME_CHAT') {
+    		if (data.user.id == app.user.id) {
+    			$('.chatmessages').append(
+        				$('<div>').addClass('message').append(
+        						$('<span>')
+        							.addClass('user')
+        							.addClass('me')
+        							.html(data.user.username+": ")
+        					).append(
+        						$('<span>').html(data.message)));
+    		} else {
+    			$('.chatmessages').append(
+        				$('<div>').addClass('message').append(
+        						$('<span>')
+        							.addClass('user')
+        							.html(data.user.username+": ")
+        					).append(
+        						$('<span>').html(data.message)));
+    		}
+    	}
     });
   }
 }

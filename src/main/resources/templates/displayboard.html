@@ -42,7 +42,7 @@
 
 	<div id="menu">
 		<h1>Double Solitare</h1>
-		<small hidden>Version <span th:text="#{version}"></span>.</small>
+		
 		<p>Your are logged in as 
 			<span class="staticUsername">
 				<strong sec:authentication="name" class="username"></strong> 
@@ -63,6 +63,12 @@
 			<div id="availableGamesToJoin">
 			</div>
 		</div>
+		
+		<footer class="fixed-bottom">
+		<small>&copy; 2020 Andrew Festa.<br/>
+			Version <span th:text="#{version}"></span>.
+			Build date <span th:text="${#temporals.format(T(java.time.ZonedDateTime).parse(#messages.msg('build.date').trim()).toLocalDateTime(), 'E, d MMM yyyy HH:mm')}">N/A</span></small>
+		</footer>
 	</div>
 
 	<div id="board">
@@ -96,6 +102,21 @@
 		</div>
 	
 		<div id="tableau"></div>
+		
+		<div class="chatframe fixed-bottom">
+			<div class="chatmessageframe">
+				<div class="chatmessages">
+				</div>
+			 </div>
+			<div class="chatbar">
+				<div class="input-group m-1 input-group-sm">
+	        		<input class="message form-control" name="messageInput" placeholder="chat with players..."/>
+	        		<div class="input-group-append">
+	        			<button class="btn btn-sm btn-primary sendMessageBtn"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
+	        		</div>
+	        	</div>
+			</div>
+		</div>
 		
 		<nav class="navbar fixed-bottom navbar-dark bg-dark justify-content-between">
 		  <div class="navbar-nav">
@@ -140,6 +161,20 @@
 	        <div class="list-group users">
 	        	<div class="list-group-item user me">Me</div>
 	        </div>
+	        <div class="chatframe">
+				<div class="chatmessageframe">
+					<div class="chatmessages">
+					</div>
+				 </div>
+				<div class="chatbar">
+					<div class="input-group m-1 input-group-sm">
+		        		<input class="message form-control" name="messageInput" placeholder="chat with players..."/>
+		        		<div class="input-group-append">
+		        			<button class="btn btn-sm btn-primary sendMessageBtn"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
+		        		</div>
+		        	</div>
+				</div>
+			</div>
 	      </div>
 	      <div class="modal-footer">
 	      	<div id="startgame_countdown_text">Waiting...</div>
