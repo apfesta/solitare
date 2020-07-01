@@ -42,8 +42,7 @@
 
 	<div id="menu">
 		<h1>Double Solitare</h1>
-		<small>Version <span th:text="#{version}"></span>. 
-			Build date <span th:text="${#temporals.format(T(java.time.ZonedDateTime).parse(#messages.msg('build.date).trim()).toLocalDateTime(), 'E, d MMM yyyy HH:mm')}">N/A</span></small>
+		
 		<p>Your are logged in as 
 			<span class="staticUsername">
 				<strong sec:authentication="name" class="username"></strong> 
@@ -64,6 +63,12 @@
 			<div id="availableGamesToJoin">
 			</div>
 		</div>
+		
+		<footer class="fixed-bottom">
+		<small>&copy; 2020 Andrew Festa.<br/>
+			Version <span th:text="#{version}"></span>.
+			Build date <span th:text="${#temporals.format(T(java.time.ZonedDateTime).parse(#messages.msg('build.date').trim()).toLocalDateTime(), 'E, d MMM yyyy HH:mm')}">N/A</span></small>
+		</footer>
 	</div>
 
 	<div id="board">
