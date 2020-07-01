@@ -192,7 +192,18 @@ progress#startgame_countdown {
 	position: relative;
 	padding: 1vw;
 	overflow: hidden;
-	height: 40vh;
+	height: 30vh;
+}
+.modal-body .chatbar {
+	background-color: transparent;
+}
+.modal-body .chatmessageframe {
+	height: auto;
+	max-height: 20vh;
+	min-height: 10vh;
+}
+.modal-body .chatmessages {
+	color: #000;
 }
 .chatmessages {
 	position: absolute;
