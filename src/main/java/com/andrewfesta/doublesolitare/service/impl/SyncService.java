@@ -2,6 +2,9 @@ package com.andrewfesta.doublesolitare.service.impl;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,58 +23,85 @@ public class SyncService {
 
 	private SimpMessageSendingOperations simpMessageSending;
 	
+	private Map<String, List<Object>> replayCache = new LinkedHashMap<>(); 
+	
 	@Autowired
 	public void setSimpMessageSending(SimpMessageSendingOperations simpMessageSending) {
 		this.simpMessageSending = simpMessageSending;
 	}
 	
+	private void convertAndSend(String destination, Object payload) {
+		simpMessageSending.convertAndSend(destination, payload);
+		if (!replayCache.containsKey(destination)) {
+			replayCache.put(destination, new LinkedList<>());
+		}
+		replayCache.get(destination).add(payload);
+	}
+	
+	private void replay(String destination) {
+		for (Object payload: replayCache.get(destination)) {
+			simpMessageSending.convertAndSend(destination, payload);
+		}
+	}
+	private void discardReplay(String destination) {
+		replayCache.remove(destination);
+	}
+	
+	public void discardReplay(GameBoard game) {
+		this.discardReplay("/topic/game/" + game.getGameId() + "/activity");
+	}
+	
+	public void replayGameActivity(GameBoard game) {
+		replay("/topic/game/" + game.getGameId() + "/activity");
+	}
+	
 	public void notifyPlayerJoin(GameBoard game, User user) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameUpdate(GameUpdateAction.PLAYER_JOIN, user, game));
 		
-		simpMessageSending.convertAndSend("/topic/games/activity", 
+		convertAndSend("/topic/games/activity", 
 				new AppUpdate(GameUpdateAction.GAME_RENAME, 
 						user, game.getGameId(), game.getGameName(), game.getUsers()));
 	}
 	
 	public void notifyPlayerStatus(GameBoard game, User user, boolean isReady) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new BasePayload(isReady?GameUpdateAction.PLAYER_READY:GameUpdateAction.PLAYER_NOT_READY, 
 						user));
 	}
 	
 	public void notifyCountdown(GameBoard game, User user, boolean isCountdown) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new BasePayload(isCountdown?GameUpdateAction.COUNTDOWN_STARTED:GameUpdateAction.COUNTDOWN_CANCELLED, 
 						user));
 	}
 	
 	public void notifyPlayerDrop(GameBoard game, User user) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new BasePayload(GameUpdateAction.PLAYER_DROP, user));
 		
-		simpMessageSending.convertAndSend("/topic/games/activity", 
+		convertAndSend("/topic/games/activity", 
 				new AppUpdate(GameUpdateAction.GAME_RENAME, 
 						user, game.getGameId(), game.getGameName(), game.getUsers()));
 	}
 	
 	public void notifyPlayerRename(Collection<GameBoard> games, User user) {
 		for (GameBoard game: games) {
-			simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+			convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 					new BasePayload(GameUpdateAction.PLAYER_RENAME, 
 							user));
 		}
 		
-		simpMessageSending.convertAndSend("/topic/games/activity", 
+		convertAndSend("/topic/games/activity", 
 				new BasePayload(GameUpdateAction.PLAYER_RENAME, user));
 	}
 	
 	public void notifyGameRename(GameBoard game, User user) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameNameUpdate(GameUpdateAction.GAME_RENAME, 
 						user, game));
 		
-		simpMessageSending.convertAndSend("/topic/games/activity", 
+		convertAndSend("/topic/games/activity", 
 				new AppUpdate(GameUpdateAction.GAME_RENAME, 
 						user, game.getGameId(), game.getGameName(), game.getUsers()));
 	}
@@ -79,7 +109,7 @@ public class SyncService {
 	public void notifyMoveToFoundation(GameBoard game, User user,
 			Integer cardId,
 			Integer toFoundationId) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameUpdate(GameUpdateAction.MOVE_TO_FOUNDATION, user, game, 
 						cardId, toFoundationId, null));
 	}
@@ -87,37 +117,37 @@ public class SyncService {
 	public void notifyMoveToTableau(GameBoard game, User user,
 			Integer cardId,
 			Integer toBuildId) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameUpdate(GameUpdateAction.MOVE_TO_TABLEAU, user, game, 
 						cardId, null, toBuildId));
 	}
 	
 	public void notifyDiscard(GameBoard game, User user) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameUpdate(GameUpdateAction.DISCARD, user, game, 
 						null, null, null));
 	}
 	
 	public void notifyBlocked(GameBoard game, User user, boolean blocked) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameUpdate(blocked?GameUpdateAction.PLAY_IS_BLOCKED:GameUpdateAction.PLAY_NOT_BLOCKED, 
 						user, game, null, null, null));
 	}
 	
 	public void notifyPlayerSleep(GameBoard game, User user, boolean sleep) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameUpdate(sleep?GameUpdateAction.PLAYER_SLEEP:GameUpdateAction.PLAYER_AWAKE,
 						user, game, null, null, null));
 	}
 	
 	public void notifyGameWon(GameBoard game, User user) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameUpdate(GameUpdateAction.GAME_WON, 
 						user, game, null, null, null));
 	}
 	
 	public void notifyGameChat(GameBoard game, User user, String message) {
-		simpMessageSending.convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
+		convertAndSend("/topic/game/" + game.getGameId() + "/activity", 
 				new GameChat(user, message));
 	}
 	
