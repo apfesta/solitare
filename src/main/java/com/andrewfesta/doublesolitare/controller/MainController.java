@@ -2,6 +2,7 @@ package com.andrewfesta.doublesolitare.controller;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -370,7 +371,7 @@ public class MainController {
 	@RequestMapping(value="/api/game/{gameId}/chat", method = RequestMethod.POST)
 	public @ResponseBody void chat(@PathVariable Integer gameId,
 			@RequestBody Message message) {
-		LOG.trace("GET /api/game/{}/chat", gameId);
+		LOG.trace("POST /api/game/{}/chat", gameId);
 		
 		GameBoard game = games.get(gameId);
 		assertGameNotNull(gameId, game);
@@ -379,12 +380,18 @@ public class MainController {
 		syncService.notifyGameChat(game, user, message.message);
 	}
 	
+	@RequestMapping(value="/api/log", method = RequestMethod.POST)
+	public @ResponseBody void clientEventLog(@RequestBody ClientEventLog event) {
+		LOG.trace("POST /api/log");
+		LOG.debug(event.toString());
+	}
+	
 	private void assertGameNotNull(Integer gameId, GameBoard game) {
 		if (game==null) {
 			throw new GameNotFoundException("Game "+gameId+" not found");
 		}
 	}
-	
+		
 	public static class Message {
 		String message;
 
@@ -450,6 +457,59 @@ public class MainController {
 		public User getStartedBy() {
 			return startedBy;
 		}
+	}
+	
+	public static class ClientEventLog {
+		String version;
+		String event;
+		Integer userId;
+		Integer gameId;
+		Map<String,String> state;
+		
+		public String getVersion() {
+			return version;
+		}
+		public void setVersion(String version) {
+			this.version = version;
+		}
+		public String getEvent() {
+			return event;
+		}
+		public void setEvent(String event) {
+			this.event = event;
+		}
+		public Integer getUserId() {
+			return userId;
+		}
+		public void setUserId(Integer userId) {
+			this.userId = userId;
+		}
+		public Integer getGameId() {
+			return gameId;
+		}
+		public void setGameId(Integer gameId) {
+			this.gameId = gameId;
+		}
+		public Map<String, String> getState() {
+			return state;
+		}
+		public void setState(Map<String, String> state) {
+			this.state = state;
+		}
+		public Map<String,Object> toMap() {
+			Map<String,Object> map = new LinkedHashMap<>();
+			if (version!=null) map.put("version", version);
+			if (event!=null) map.put("event", event);
+			if (userId!=null) map.put("userId", userId);
+			if (gameId!=null) map.put("gameId", gameId);
+			if (state!=null && !state.isEmpty()) map.put("state", state);
+			return map;
+		}
+		@Override
+		public String toString() {
+			return toMap().toString();
+		}
+		
 	}
 			
 }
