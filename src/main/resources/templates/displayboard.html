@@ -225,6 +225,7 @@
   		/*
   		 * This allows us to dynmically set the servlet context path
   		 */
+  		var version = /*[[#{version}]]*/ '0';
   		var ctx = /*[[@{|/|}]]*/ "/";
 		var stompUrl = /*[[@{|/stomp|}]]*/ '/stomp';
   		console.log('Context path: '+ctx);

@@ -203,6 +203,17 @@ var app = {
 	// AJAX functions
 	//---------------
 	
+	app.log = function(eventName,state={}) {
+		var data = {'version':version,'event':eventName,'userId':app.user.id,'state':state};
+		if (app.gameId!=null) data['gameId'] = app.gameId;
+		$.ajax({
+			type: 'POST', 
+			url: getRelativePath('/api/log'),
+			contentType: "application/json",
+			dataType: "json",
+			data: JSON.stringify(data)});	
+	}
+	
 	app.newTest = function() {
 		$.ajax({
 			type: 'POST', 
@@ -437,13 +448,25 @@ var app = {
 	
 	app.handleUnload = function() {
 		$(window).on('unload', function(){
+			app.log('unload');
 	    	app.leaveGame();
 	    });
 	};
+	app.handleBeforeUnload = function() {
+		$(window).on('beforeunload', function(){
+			app.log('beforeunload');
+			return confirm("Do you really want to close?"); 
+		});
+	}
 	
 	app.handleVisibilityChange = function() {
 		
 		document.addEventListener("visibilitychange", function() {
+			app.log('visibilitychange',
+				{
+					'document.hidden':document.hidden,
+					'document.visibilityState':document.visibilityState
+				});
 			if (document.hidden) {
 				app.toggleSleep(app.gameId, true);
 			} else {
@@ -909,15 +932,18 @@ var app = {
 	});
 	
 	$('#gameOver').on('hidden.bs.modal', function(){
+		app.log('#gameOver.hidden.bs.modal');
 		window.location.replace("/");
 	});
 	
 	$('.cancelBtn').on('click', function(){
+		app.log('.cancelBtn.click');
 		app.leaveGame();
 		window.location.replace("/");
 	});
 	
 	$('#quitBtn').on('click', function(){
+		app.log('#quitBtn.click');
 		app.leaveGame();
 		if (!app.gameboard.multiPlayer) {
 			window.location.replace("/");
