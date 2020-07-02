@@ -23,6 +23,7 @@ function disconnect() {
 
 function setConnected(connected, gameId) {
   if (connected) {
+	app.handleBeforeUnload();
 	app.handleUnload();
 	app.handleVisibilityChange();
     stompClient.subscribe('/topic/game/'+gameId+'/activity', function(result){ 
