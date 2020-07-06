@@ -320,12 +320,15 @@ public class GameBoard {
 	}
 	
 	public boolean isReady() {
-		for (UserBoard userBoard: userBoards.values()) {
-			if (!userBoard.isUserReady()) {
-				return false;
+		if (userBoards.size()>1) {
+			for (UserBoard userBoard: userBoards.values()) {
+				if (!userBoard.isUserReady()) {
+					return false;
+				}
 			}
+			return true;
 		}
-		return true;
+		return false;
 	}
 	
 	public Instant getLastMoveTimestamp() {
@@ -369,6 +372,12 @@ public class GameBoard {
 	
 	public UserBoard getUserBoard(User user) {
 		return userBoards.get(user);
+	}
+	
+	public Map<Integer, Boolean> getUserReady() {
+		return userBoards.entrySet().stream()
+			.collect(Collectors.toMap(
+					(e)->e.getKey().getId(), (e)->e.getValue().isUserReady()));
 	}
 	
 	public Map<Integer, UserBoard.Score> getUserScores() {

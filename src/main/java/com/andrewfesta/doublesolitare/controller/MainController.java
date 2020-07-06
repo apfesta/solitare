@@ -232,6 +232,10 @@ public class MainController {
 		if (game.getCreatedBy().equals(user) && game.getUsers().isEmpty()) {
 			games.remove(game.getGameId());
 		}
+		if (game.isInProgress()) {
+			game.setInProgress(false);
+			game.setGameOver(true);
+		}
 		syncService.notifyPlayerDrop(game, user);
 	}
 	
