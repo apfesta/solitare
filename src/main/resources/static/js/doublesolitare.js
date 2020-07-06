@@ -455,7 +455,10 @@ var app = {
 	app.handleBeforeUnload = function() {
 		$(window).on('beforeunload', function(){
 			app.log('beforeunload');
-			return confirm("Do you really want to close?"); 
+			console.log(app.gameboard.gameOver);
+			if (!app.gameboard.gameOver) {
+				return confirm("Do you really want to leave the game?"); 
+			}
 		});
 	}
 	
@@ -692,7 +695,7 @@ var app = {
 		for (i in app.gameboard.users) {
 			app.addPlayer(i);
 			if (app.gameboard.users[i].id!=app.user.id) {
-				app.addPlayerStatus(app.gameboard.users[i]);
+				app.addPlayerStatus(app.gameboard.users[i], app.gameboard.userReady[app.gameboard.users[i].id]);
 			}
 			
 		}
@@ -729,6 +732,7 @@ var app = {
 			  if(timeleft <= 0){
 			    clearInterval(app.countdownTimer);
 			    $('#waitForPlayers').modal('hide');
+			    app.gameboard.inProgress = true;
 			  }
 			  $("#startgame_countdown").val(5 - timeleft);
 			  $('#startgame_countdown_text')
@@ -740,16 +744,16 @@ var app = {
 	
 	
 	app.readyStatusOnChange = function() {
-//		console.log($(this).is(':checked'));
 		app.readyStatus(app.gameId, $(this).is(':checked'));
 	}
 	
-	app.addPlayerStatus = function(user) {
+	app.addPlayerStatus = function(user, isReady) {
 		var userDiv = $('<div>')
 			.addClass('list-group-item')
 			.addClass('user')
 			.attr('data-user-id',user.id)
-			.html('<span class="username">'+user.username+"</span> <small class='status'></small><label>I'm Ready: <input class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
+			.html('<span class="username">'+user.username+"</span> <small class='status'></small><label>I'm Ready: " +
+					"<input "+(isReady?"checked='checked' ":'')+"class='ready checkbox-2x' data-user-id='"+user.id+"' type='checkbox' disabled='disabled'/></label>")
 		userDiv.find('.ready').on('change',app.readyStatusOnChange);
 		$('#waitForPlayers .users').append(userDiv);
 		

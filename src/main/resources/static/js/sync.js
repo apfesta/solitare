@@ -46,13 +46,15 @@ function setConnected(connected, gameId) {
     	}
     	if (data.action=='PLAYER_JOIN') {
     		app.addPlayer(data.numOfUsers-1);
-    		app.addPlayerStatus(data.user);
+    		app.addPlayerStatus(data.user, false);
     		app.gameboard.foundation=data.foundation;
     	}
     	if (data.action=='PLAYER_DROP') {
     		app.removePlayer();
     		$('.users .user[data-user-id='+data.user.id+']').remove();
+    		console.log(app.gameboard.inProgress);
     		if (app.gameboard.inProgress) {
+    			app.gameboard.gameOver = true;
 				$('#gameOverTitle').text(data.user.username+' left game');
 				$('#gameOver .modal-body').empty().append(
 						$('<table>').append(

@@ -202,19 +202,25 @@ public class GameBoard {
 		if (userBoards.size() >= 1 && !this.multiPlayer) {
 			throw new RuntimeException("Cannot join single player game.");
 		}
-		UserBoard userBoard = new UserBoard(this, user);
-		userBoard.setShuffle(debugProperties.isShuffle());
-		userBoard.setup();
-		userBoards.put(user, userBoard);
-				
-		foundation.addPlayer();
-		
-		foundation.prettyPrint();
-		userBoard.getTableau().prettyPrint();
-		
-		GAME_LOG.info("GameId:({}){} User:({}){} joined game", 
-				gameId, gameName, 
-				user.id, user.username);
+		if (!userBoards.containsKey(user)) {
+			UserBoard userBoard = new UserBoard(this, user);
+			userBoard.setShuffle(debugProperties.isShuffle());
+			userBoard.setup();
+			userBoards.put(user, userBoard);
+					
+			foundation.addPlayer();
+			
+			foundation.prettyPrint();
+			userBoard.getTableau().prettyPrint();
+			
+			GAME_LOG.info("GameId:({}){} User:({}){} joined game", 
+					gameId, gameName, 
+					user.id, user.username);
+		} else {
+			GAME_LOG.info("GameId:({}){} User:({}){} re-joined game", 
+					gameId, gameName, 
+					user.id, user.username);
+		}
 	}
 		
 	public void leave(User user) {
@@ -314,12 +320,15 @@ public class GameBoard {
 	}
 	
 	public boolean isReady() {
-		for (UserBoard userBoard: userBoards.values()) {
-			if (!userBoard.isUserReady()) {
-				return false;
+		if (userBoards.size()>1) {
+			for (UserBoard userBoard: userBoards.values()) {
+				if (!userBoard.isUserReady()) {
+					return false;
+				}
 			}
+			return true;
 		}
-		return true;
+		return false;
 	}
 	
 	public Instant getLastMoveTimestamp() {
@@ -363,6 +372,12 @@ public class GameBoard {
 	
 	public UserBoard getUserBoard(User user) {
 		return userBoards.get(user);
+	}
+	
+	public Map<Integer, Boolean> getUserReady() {
+		return userBoards.entrySet().stream()
+			.collect(Collectors.toMap(
+					(e)->e.getKey().getId(), (e)->e.getValue().isUserReady()));
 	}
 	
 	public Map<Integer, UserBoard.Score> getUserScores() {
