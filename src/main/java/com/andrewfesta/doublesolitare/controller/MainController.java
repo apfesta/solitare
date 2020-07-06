@@ -196,16 +196,24 @@ public class MainController {
 		LOG.trace("POST /api/game/{}/join", gameId);
 		GameBoard game = games.get(gameId);
 		assertGameNotNull(gameId, game);
-		if (!game.isInProgress()) {
-			User user = userService.getUser();
-			if (!game.getUsers().contains(user)) {
-				game.join(user);
-				syncService.notifyPlayerJoin(game, user);
-			}
-			
-			return game.getUserBoard(user);
+		
+		if (game.isInProgress()) {
+			throw new GameInProgressException("Game "+gameId+" is already in progress");
 		}
-		throw new GameInProgressException("Game "+gameId+" is already in progress");
+		if (game.isGameOver() || game.isExpired()) {
+			throw new GameNotFoundException("Game "+gameId+" is over");
+		}
+		if (!game.isMultiPlayer()) {
+			throw new GameInProgressException("Game "+gameId+" is not a multi-player game");
+		}
+		
+		User user = userService.getUser();
+		if (!game.getUsers().contains(user)) {
+			game.join(user);
+			syncService.notifyPlayerJoin(game, user);
+		}
+		
+		return game.getUserBoard(user);		
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/ready", method = RequestMethod.GET)
