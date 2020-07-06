@@ -455,7 +455,7 @@ var app = {
 	app.handleBeforeUnload = function() {
 		$(window).on('beforeunload', function(){
 			app.log('beforeunload');
-			return confirm("Do you really want to close?"); 
+			return confirm("Do you really want to leave the game?"); 
 		});
 	}
 	

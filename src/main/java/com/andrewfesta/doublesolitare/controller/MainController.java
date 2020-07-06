@@ -198,8 +198,10 @@ public class MainController {
 		assertGameNotNull(gameId, game);
 		if (!game.isInProgress()) {
 			User user = userService.getUser();
-			game.join(user);
-			syncService.notifyPlayerJoin(game, user);
+			if (!game.getUsers().contains(user)) {
+				game.join(user);
+				syncService.notifyPlayerJoin(game, user);
+			}
 			
 			return game.getUserBoard(user);
 		}
