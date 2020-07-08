@@ -7,7 +7,7 @@ $('.editUsername').hide();
 $('.editGamename').hide();
 $('.editGamenameBtn').hide();
 $('#endGameBtn').hide();
-$('.chatbar').hide();
+$('.chatframe').hide();
 
 var menu = {
 		games: []
@@ -252,7 +252,7 @@ var app = {
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
 				$('#blockToggleButton').hide();
-				$('.chatbar').hide();
+				$('.chatframe').hide();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -309,7 +309,7 @@ var app = {
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
 				$('#blockToggleButton').show();
-				$('.chatbar').show();
+				$('.chatframe').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -334,7 +334,7 @@ var app = {
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
 				$('#blockToggleButton').show();
-				$('.chatbar').show();
+				$('.chatframe').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -354,7 +354,7 @@ var app = {
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
 				$('#blockToggleButton').show();
-				$('.chatbar').show();
+				$('.chatframe').show();
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
