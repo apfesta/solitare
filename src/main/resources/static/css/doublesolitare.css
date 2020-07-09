@@ -1,7 +1,12 @@
+/* Display Orientation */
+
 @media (orientation: landscape) {
 	#board {
 		padding-left: 5vh;
 		padding-right: 5vh;
+	}
+	#topSection {
+		margin-top: 0;
 	}
 	#topLeftSection #scoreBoard {
 		padding-right: 1vh;
@@ -11,7 +16,7 @@
 		min-height: 27vh;
 	}
 	#tableau {
-		margin-top: 2vh;
+		margin-top: 1vh;
 	}
 	.pokercard {
 		width: 19vh;
@@ -31,6 +36,10 @@
 	#discard-pile .pokercard {
 		width: 19vh;
 	}
+	#foundation .col {
+		padding-left:0;
+		padding-right:0;
+	}
 	#foundation .pile, #tableau .pile, #stockPile .pile {
 		width: 19vh;
 	}
@@ -42,42 +51,76 @@
 	#board {
     	padding: 0;
 	}
-	#stockAndDiscardPiles {
-		min-height: 17vw;
+	#topSection {
+		margin-top: 1vw;
 	}
 	#topLeftSection #scoreBoard {
 		padding-right: 1vw;
 		padding-top: 0.5vw;
 	}
+	#stockAndDiscardPiles {
+		min-height: 20vw;
+	}
 	#tableau {
 		margin-top: 2vw;
 	}
 	.pokercard {
-		width: 12vw;
+		width: 14vw;
 	}
 	.fan-down {
 		margin-top: -16vw;
 	}
 	.build .fan-down {
-		margin-top: -13vw;
+		margin-top: -15vw;
 	}
 	.fan-right {
-		margin-right: -10vw;
+		margin-right: -11vw;
 	}
 	#discard-pile {
-		min-width: 12vw;
+		min-width: 14vw;
 	}
 	#discard-pile .pokercard {
-		width: 12vw;
+		width: 14vw;
+	}
+	#foundation .col {
+		padding-left:1vw; 
+		padding-right:1vw;
 	}
 	#foundation .pile, #tableau .pile, #stockPile .pile {
-		width: 12vw;
+		width: 13vw;
 	}
 	.pile {
-		min-height: 17vw;
+		min-height: 19vw;
 	}
 }
 
+body {
+	background-color: #008800;
+}
+
+
+/* MENU */
+.appTitle {
+	margin-top:2vh;
+}
+.appTitle:before {
+	content: "";
+	position: relative;
+	top: 6px;
+	background: url("/img/icon-72x72.png") no-repeat center;
+	background-size: contain;
+	width: 32px;
+    height: 32px;
+    float: left;
+}
+/*#menu .list-group-item {
+	color: #FFF;
+	background-color: rgba(0,0,0,0.4); 
+	border: 1px solid rgba(0,0,0,0.2);
+}*/
+
+
+/* GAME BOARD */
 #board {
 	background-color: #008800;
 	position:fixed;
@@ -89,16 +132,23 @@
 }
 
 
+/* Scorebar - Single player only */
 #scoreBar {
 	padding: 0.5vw;
 	color: #FFF;
 	background-color: rgba(0,0,0,0.4); 
 }
 
+
+/* Top Section */
+
+#topSection {
+	width:100%;
+}
+
 #topLeftSection .row {
 	margin:0;
 }
-
 
 #scoreBoard table {
 	border-spacing: 0 1vw;
@@ -127,11 +177,6 @@
 	text-align: center;
 }
 
-#topSection {
-	margin-top: 1vw;
-	width:100%;
-}
-
 #stockAndDiscardPiles {
 	width: 100%;
 	margin: 0;
@@ -146,45 +191,45 @@
 	bottom: 0;
 }
 
-
 #foundation .row {
 	min-height: 10vw;
+	padding: 1vw;
 }
 
 
+/* Tableau */
 
 #tableau.row, #topSection.row {
 	margin-left: 0;
 	margin-right: 0;
 }
-#tableau .col, #topSection .col, #foundation .col {
-	padding-left:0.25vh;
-	padding-right:0.25vh;
+#tableau .col, #topSection .col {
+	padding-left:0;
+	padding-right:0;
 }
 #topLeftSection .col {
 	padding-left:0;
 	padding-right:0;
 }
 
+
+/* Piles */
+
 #foundation .pile, #tableau .pile, #stockPile .pile {
 	background-color: #44AA44;
 	border-radius: .5rem;
-}
-#foundation .row {
-	padding: 1vw;
 }
 
 #foundation .pile.canDrop, #tableau .pile.canDrop {
 	background-color: #00CC00;
 }
 
-/*.target {
+#discard-pile .pokercard {
 	float: left;
-	border-radius: .25rem;
-	border: 1px solid yellow;
-	min-width: 50px;
-	min-height: 50px;
-}*/
+}
+
+
+/* Cards */
 
 .pokercard {
 	position: relative;
@@ -204,14 +249,13 @@
 	color: blue;
 }
 
-#discard-pile .pokercard {
-	float: left;
-}
-
 .bottom {
 	top: 0;
 	bottom: 0;
 }
+
+
+/* Wait for Players Dialog */
 
 .users .user label {
 	float:right;
@@ -224,12 +268,19 @@ progress#startgame_countdown {
 	width:100%;
 }
 
+
+/* Game Over Dialog */
+
 #gameOver table {
 	width: 100%;
 }
 #gameOver .score, #gameOver .moves {
 	text-align: center;
 }
+
+
+/* Chat */
+
 .chatmessageframe {
 	position: relative;
 	padding: 1vw;

@@ -150,8 +150,9 @@ var menu = {
 						 .attr('data-toggle','modal')
 						 .attr('data-target','#waitForPlayers')
 						 .attr('data-backdrop',"static")
-						.text(game.gameName+" - started by "+game.startedBy.username)
-						.on('click', joinGameAction));
+						 .on('click', joinGameAction).append(
+								$('<h5>').addClass('mb-1').text(game.gameName)).append(
+								$('<p>').addClass('mb-1').text("Started by "+game.startedBy.username)));
 		}
 		
 	}
