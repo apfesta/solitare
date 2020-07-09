@@ -226,7 +226,7 @@ public class MainController {
 		game.getUserBoard(user).setUserReady(ready);
 		syncService.notifyPlayerStatus(game, user, ready);
 		if (game.isReady()) {
-			game.setInProgress(true);
+			game.start();
 		}
 	}
 	
@@ -239,10 +239,6 @@ public class MainController {
 		game.leave(user);
 		if (game.getCreatedBy().equals(user) && game.getUsers().isEmpty()) {
 			games.remove(game.getGameId());
-		}
-		if (game.isInProgress()) {
-			game.setInProgress(false);
-			game.setGameOver(true);
 		}
 		syncService.notifyPlayerDrop(game, user);
 	}

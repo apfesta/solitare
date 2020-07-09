@@ -1,5 +1,6 @@
 package com.andrewfesta.doublesolitare.model;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -175,9 +176,12 @@ public class UserBoard {
 				if (gameWon && getStockPile().isEmpty() && getDiscardPile().isEmpty()) {
 					setGameWon(true);
 					game.setGameOver(true);
-					GAME_LOG.debug("GameId:({}){} User:({}){} has won!", 
+					game.setEndTime(Instant.now());
+					game.setInProgress(false);
+					GAME_LOG.debug("GameId:({}){} User:({}){} has won! Duration:{}", 
 							game.gameId, game.gameName, 
-							user.id, user.username);
+							user.id, user.username,
+							Duration.between(game.startTime, game.endTime));
 				}
 			}
 		} finally {

@@ -26,6 +26,8 @@ public class GameBoard {
 	final Integer gameId;
 	final User createdBy;
 	final ZonedDateTime createdOn;
+	Instant startTime;
+	Instant endTime;
 	String gameName;
 	Foundation foundation;
 	final boolean multiPlayer;
@@ -118,6 +120,9 @@ public class GameBoard {
 		this.gameId = gameId;
 		this.gameName = "Game "+gameId;
 		this.multiPlayer = multiPlayer;
+		if (!multiPlayer) {
+			this.startTime = Instant.now();
+		}
 	}
 	
 	public GameBoard(User createdBy, Integer gameId, boolean multiPlayer, 
@@ -225,12 +230,20 @@ public class GameBoard {
 		
 	public void leave(User user) {
 		if (inProgress) {
+			endTime = Instant.now();
 			inProgress = false;
 			gameOver = true;
 		} else if (!inProgress && !gameOver) {
 			//Game hasn't started yet.  Remove them.
 			userBoards.remove(user);
 		}
+	}
+	
+	public void start() {
+		GAME_LOG.debug("GameId:({}){} has started", 
+				gameId, gameName);
+		startTime = Instant.now();
+		inProgress = true;
 	}
 	
 	/**
@@ -241,6 +254,8 @@ public class GameBoard {
 		GAME_LOG.debug("GameId:({}){} User:({}){} has chosen to end the game!", 
 				gameId, gameName, 
 				user.id, user.username);
+		
+		endTime = Instant.now();
 		
 		UserBoard winner = userBoards.values().stream()
 			//Winner is highest Total Score
@@ -257,9 +272,9 @@ public class GameBoard {
 							userBoards.values().iterator().next()));
 		inProgress = false;
 		gameOver = true;
-		GAME_LOG.debug("GameId:({}){} User:({}){} has won!", 
+		GAME_LOG.debug("GameId:({}){} User:({}){} has won! Duration:{}", 
 				gameId, gameName, 
-				winner.user.id, winner.user.username);
+				winner.user.id, winner.user.username, Duration.between(startTime, endTime));
 		return winner;
 	}
 	
@@ -352,6 +367,22 @@ public class GameBoard {
 	@JsonIgnore
 	public ZonedDateTime getCreatedOn() {
 		return createdOn;
+	}
+
+	public Instant getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Instant startTime) {
+		this.startTime = startTime;
+	}
+
+	public Instant getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Instant endTime) {
+		this.endTime = endTime;
 	}
 
 	public Integer getGameId() {
