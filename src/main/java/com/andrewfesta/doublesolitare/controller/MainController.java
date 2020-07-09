@@ -226,7 +226,7 @@ public class MainController {
 		game.getUserBoard(user).setUserReady(ready);
 		syncService.notifyPlayerStatus(game, user, ready);
 		if (game.isReady()) {
-			game.setInProgress(true);
+			game.start();
 		}
 	}
 	

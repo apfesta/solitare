@@ -7,7 +7,7 @@ $('.editUsername').hide();
 $('.editGamename').hide();
 $('.editGamenameBtn').hide();
 $('#endGameBtn').hide();
-$('.chatbar').hide();
+$('.chatframe').hide();
 
 var menu = {
 		games: []
@@ -150,8 +150,9 @@ var menu = {
 						 .attr('data-toggle','modal')
 						 .attr('data-target','#waitForPlayers')
 						 .attr('data-backdrop',"static")
-						.text(game.gameName+" - started by "+game.startedBy.username)
-						.on('click', joinGameAction));
+						 .on('click', joinGameAction).append(
+								$('<h5>').addClass('mb-1').text(game.gameName)).append(
+								$('<p>').addClass('mb-1').text("Started by "+game.startedBy.username)));
 		}
 		
 	}
@@ -252,7 +253,7 @@ var app = {
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
 				$('#blockToggleButton').hide();
-				$('.chatbar').hide();
+				$('.chatframe').hide();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -309,7 +310,7 @@ var app = {
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
 				$('#blockToggleButton').show();
-				$('.chatbar').show();
+				$('.chatframe').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -334,7 +335,7 @@ var app = {
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
 				$('#blockToggleButton').show();
-				$('.chatbar').show();
+				$('.chatframe').show();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
 				app.setupTableau();
@@ -354,7 +355,7 @@ var app = {
 				$('#scoreBar').hide();
 				$('#scoreBoard').show();
 				$('#blockToggleButton').show();
-				$('.chatbar').show();
+				$('.chatframe').show();
 				app.userboard = data;
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;

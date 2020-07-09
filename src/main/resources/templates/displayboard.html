@@ -41,12 +41,12 @@
 <body onload="disconnect()">
 
 	<div id="menu">
-		<h1>Double Solitare</h1>
+		<h1 class="appTitle">Double Solitare</h1>
 		
 		<p>Your are logged in as 
 			<span class="staticUsername">
 				<strong sec:authentication="name" class="username"></strong> 
-				<button class="btn btn-sm btn-outline-primary editUsernameBtn"><i class="fa fa-pencil"></i> Edit</button>
+				<button class="btn btn-sm btn-primary editUsernameBtn"><i class="fa fa-pencil"></i> Edit</button>
 			</span>
 			<div class="editUsername input-group mb-3 input-group-sm">
         		<input class="url form-control" name="usernameInput"/>
@@ -58,8 +58,13 @@
 		<div class="list-group">
 			<a hidden href='#' id="newSinglePlayerTestAction" class="list-group-item list-group-item-action">New Single Player TEST</a>
 			<a hidden href='#' id="newMultiPlayerTestAction" class="list-group-item list-group-item-action">New Multi-Player TEST</a>
-			<a href='#' id="newSinglePlayerGameAction" class="list-group-item list-group-item-action">New Single Player Game</a>
-			<a href='#' id="newMultiPlayerGameAction" class="list-group-item list-group-item-action">New Multi-Player Game</a>
+			<a href='#' id="newSinglePlayerGameAction" class="list-group-item list-group-item-action"><i class="fa fa-user" aria-hidden="true"></i> New Single Player Game</a>
+			<a href='#' id="newMultiPlayerGameAction" class="list-group-item list-group-item-action"><i class="fa fa-users" aria-hidden="true"></i> New Multi-Player Game</a>
+			
+		</div>
+		<hr/>
+		<h2>Public games to join:</h2>
+		<div class="list-group">
 			<div id="availableGamesToJoin">
 			</div>
 		</div>
