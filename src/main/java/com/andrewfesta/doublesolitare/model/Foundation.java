@@ -56,7 +56,7 @@ public class Foundation {
 		if (max==0) {
 			//Empty
 			buffer.append("|");
-			for (int i=0; i<4; i++) {
+			for (int i=0; i<pile.size(); i++) {
 				buffer.append("     ")
 					.append("|");
 			}
@@ -65,7 +65,7 @@ public class Foundation {
 			//Not empty
 			for (int j=0; j<max; j++) {
 				buffer.append("|");
-				for (int i=0; i<4; i++) {
+				for (int i=0; i<pile.size(); i++) {
 					if (pile.get(i).size()>j) {
 						Card c = pile.get(i).peekFromBottom(j);
 						buffer.append(" ").append(c.abbrev()).append(" ");

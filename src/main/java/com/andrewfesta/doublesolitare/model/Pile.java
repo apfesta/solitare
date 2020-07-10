@@ -54,9 +54,13 @@ public class Pile {
 	}
 
 	public void print(int maxNumberOfCards) {
-		StringBuffer buffer = new StringBuffer(toString());
+		List<Card> readOnly = asList();
+		StringBuffer buffer = new StringBuffer(prefix()).append(": (").append(readOnly.size()).append(")");
+		for (int i = 0; i<maxNumberOfCards && i<readOnly.size(); i++) {
+			buffer.append(readOnly.get(i).abbrev()).append(" | ");
+		}
 		buffer.append("\n");
-		System.out.println(toString());
+		System.out.println(buffer.toString());
 	}
 	
 	public void setToStringPrefix(String toStringPrefix) {

@@ -96,7 +96,7 @@ public class Build extends VisiblePile {
 				throw new RuntimeException("Card "+c+" cannot move.");
 			}
 		} else {
-			throw new RuntimeException("Cannot place card "+c+"on top of "+cards.peek()+" for this type of build");
+			throw new RuntimeException("Cannot place card "+c+" on top of "+cards.peek()+" for this type of build");
 		}
 	}
 	
@@ -126,6 +126,8 @@ public class Build extends VisiblePile {
 				} else {
 					throw new RuntimeException("Card "+c+" cannot move.");
 				}
+			} else {
+				throw new RuntimeException("Cannot place card "+c+" on top of "+cards.peek()+" for this type of build");
 			}
 		}
 	}
