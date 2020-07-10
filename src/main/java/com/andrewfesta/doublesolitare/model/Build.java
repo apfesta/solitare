@@ -4,8 +4,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Build extends VisiblePile {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class Build extends VisiblePile {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(Build.class);
+	
 	enum Sequence {
 		ALTERNATE_COLOR,
 		RANK
@@ -16,6 +21,7 @@ public class Build extends VisiblePile {
 	public Build(Sequence sequence) {
 		super();
 		this.sequence = sequence;
+		this.setToStringPrefix("Build");
 	}
 
 	public Sequence getSequence() {
@@ -67,9 +73,13 @@ public class Build extends VisiblePile {
 		if (canPush(c)) {
 			if (canMove(c)) {
 				if (c.getCurrentBuild()!=null && !c.equals(c.getCurrentBuild().peek())) {
+					LOG.error("Card:{} is not on top of build:{}",
+							c.abbrev(),c.getCurrentBuild());
 					throw new RuntimeException("Card "+c+" is not on top of its build.  Use push(Build) instead.");
 				}
 				if (c.getCurrentPile()!=null && !c.equals(c.getCurrentPile().peek())) {
+					LOG.error("Card:{} is not on top of pile:{}",
+							c.abbrev(),c.getCurrentPile());
 					throw new RuntimeException("Card "+c+" is not on top of its pile.");
 				}
 				
@@ -81,10 +91,12 @@ public class Build extends VisiblePile {
 				c.setCurrentBuild(this);
 				c.setCurrentPile(null);
 			} else {
+				LOG.error("Card:{} Currentpile:{}",
+						c.abbrev(),c.getCurrentPile());
 				throw new RuntimeException("Card "+c+" cannot move.");
 			}
 		} else {
-			throw new RuntimeException("Cannot place card "+c+"on top of "+cards.peek()+" for this type of build");
+			throw new RuntimeException("Cannot place card "+c+" on top of "+cards.peek()+" for this type of build");
 		}
 	}
 	
@@ -114,6 +126,8 @@ public class Build extends VisiblePile {
 				} else {
 					throw new RuntimeException("Card "+c+" cannot move.");
 				}
+			} else {
+				throw new RuntimeException("Cannot place card "+c+" on top of "+cards.peek()+" for this type of build");
 			}
 		}
 	}

@@ -10,6 +10,7 @@ public class Deck extends Pile {
 	
 	private Deck() {
 		super();
+		this.setToStringPrefix("Deck");
 	}
 
 	public static Deck getInstance() {
