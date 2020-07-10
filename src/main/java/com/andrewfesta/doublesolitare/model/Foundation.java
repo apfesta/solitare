@@ -48,7 +48,7 @@ public class Foundation {
 		StringBuffer buffer= new StringBuffer("F: ");
 		
 		List<Integer> heights = new ArrayList<>(7);
-		for (int i=0; i<4; i++) {
+		for (int i=0; i<pile.size(); i++) {
 			heights.add(pile.get(i).size());
 		}
 		int max = Collections.max(heights);
