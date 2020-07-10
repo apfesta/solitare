@@ -35,6 +35,8 @@ import com.andrewfesta.doublesolitare.service.impl.UserService;
 public class MainController {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MainController.class);
+	private static final Logger GAME_LOG = LoggerFactory.getLogger("GameLog");
+
 	
 	Map<Integer, GameBoard> games = new HashMap<>();
 	AtomicInteger gameIdSequence = new AtomicInteger(0);
@@ -390,6 +392,11 @@ public class MainController {
 		GameBoard game = games.get(gameId);
 		assertGameNotNull(gameId, game);
 		User user = userService.getUser();
+		
+		GAME_LOG.info("GameId:({}){} User:({}){} Chat:\"{}\"", 
+				gameId, game.getGameName(), 
+				user.getId(), user.getUsername(), 
+				message.message);
 		
 		syncService.notifyGameChat(game, user, message.message);
 	}

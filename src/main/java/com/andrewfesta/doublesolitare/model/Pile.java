@@ -7,6 +7,7 @@ import java.util.List;
 public class Pile {
 	
 	protected ArrayDeque<Card> cards;
+	String toStringPrefix = "Pile";
 	
 	Pile() {
 		super();
@@ -54,11 +55,30 @@ public class Pile {
 
 	public void print(int maxNumberOfCards) {
 		List<Card> readOnly = asList();
-		StringBuffer buffer = new StringBuffer("D: (").append(readOnly.size()).append(")");
+		StringBuffer buffer = new StringBuffer(prefix()).append(": (").append(readOnly.size()).append(")");
 		for (int i = 0; i<maxNumberOfCards && i<readOnly.size(); i++) {
 			buffer.append(readOnly.get(i).abbrev()).append(" | ");
 		}
 		buffer.append("\n");
 		System.out.println(buffer.toString());
 	}
+	
+	public void setToStringPrefix(String toStringPrefix) {
+		this.toStringPrefix = toStringPrefix;
+	}
+	
+	public String prefix() {
+		return toStringPrefix;
+	}
+	
+	@Override
+	public String toString() {
+		List<Card> readOnly = asList();
+		StringBuffer buffer = new StringBuffer(prefix()).append(": (").append(readOnly.size()).append(")");
+		for (int i = 0; i<cards.size() && i<readOnly.size(); i++) {
+			buffer.append(readOnly.get(i).abbrev()).append(" | ");
+		}
+		return buffer.toString();
+	}
+	
 }
