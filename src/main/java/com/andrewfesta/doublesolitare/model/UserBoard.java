@@ -29,7 +29,7 @@ public class UserBoard {
 	final GameBoard game;
 	Tableau tableau;
 	Pile stockPile;
-	VisiblePile discardPile = new VisiblePile();
+	VisiblePile discardPile;
 	boolean gameWon = false;
 	Score score;
 	boolean userReady;
@@ -43,6 +43,8 @@ public class UserBoard {
 		super();
 		this.game = game;
 		this.user = user;
+		this.discardPile = new VisiblePile();
+		this.discardPile.setToStringPrefix("D");
 	}
 	
 	/**
@@ -66,6 +68,9 @@ public class UserBoard {
 		if (shuffle) {
 			d.shuffle();
 		}
+		GAME_LOG.debug("GameId:({}){} User:({}){} deck:{}",
+				game.gameId, game.gameName, 
+				user.id, user.username, d);
 		for (Card c: d.cards) {
 			cards.put(c.getUnicodeInt(), c);
 		}
@@ -157,12 +162,12 @@ public class UserBoard {
 			if (pileIdToFlip!=null && 
 					!getTableau().getPile()[pileIdToFlip].isEmpty() &&
 					getTableau().getBuild()[pileIdToFlip].isEmpty()) {
-				getTableau().flipTopPileCard(pileIdToFlip);
+				Card revealed = getTableau().flipTopPileCard(pileIdToFlip);
 				score.tableauFlip++;
 				GAME_LOG.debug("GameId:({}){} User:({}){} Flip pile {} reveals {}",
 						game.gameId, game.gameName, 
 						user.id, user.username, 
-						pileIdToFlip, card.abbrev());
+						pileIdToFlip, revealed.abbrev());
 			}
 			
 			boolean gameWon = true;
@@ -223,12 +228,12 @@ public class UserBoard {
 		if (pileIdToFlip!=null && 
 				!getTableau().getPile()[pileIdToFlip].isEmpty() &&
 				getTableau().getBuild()[pileIdToFlip].isEmpty()) {
-			getTableau().flipTopPileCard(pileIdToFlip);
+			Card revealed = getTableau().flipTopPileCard(pileIdToFlip);
 			score.tableauFlip++;
 			GAME_LOG.debug("GameId:({}){} User:({}){} Flip pile {} reveals {}",
 					game.gameId, game.gameName, 
 					user.id, user.username, 
-					pileIdToFlip, card.abbrev());
+					pileIdToFlip, revealed.abbrev());
 		}
 	}
 	
