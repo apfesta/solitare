@@ -1,12 +1,17 @@
 package com.andrewfesta.doublesolitare.model;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +22,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 
 public class GameBoard {
@@ -41,6 +53,8 @@ public class GameBoard {
 	Set<Integer> blocked = new HashSet<>();
 	
 	DoubleSolitareDebugProperties debugProperties = new DoubleSolitareDebugProperties();
+	
+	List<Move> moves = new ArrayList<>();
 	
 	public static final Card[] TEST_DECK = new Card[] {
 			//STOCK PILE (in reverse order)
@@ -233,6 +247,11 @@ public class GameBoard {
 			endTime = Instant.now();
 			inProgress = false;
 			gameOver = true;
+			try {
+				export().writeAsFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} else if (!inProgress && !gameOver) {
 			//Game hasn't started yet.  Remove them.
 			userBoards.remove(user);
@@ -272,6 +291,11 @@ public class GameBoard {
 							userBoards.values().iterator().next()));
 		inProgress = false;
 		gameOver = true;
+		try {
+			export().writeAsFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		GAME_LOG.debug("GameId:({}){} User:({}){} has won! Duration:{}", 
 				gameId, gameName, 
 				winner.user.id, winner.user.username, Duration.between(startTime, endTime));
@@ -287,10 +311,12 @@ public class GameBoard {
 	}
 	
 	public void discard(User user) {
+		moves.add(Move.discard(user.id));
 		userBoards.get(user).discard(maxNumberOfCards);
 	}
 		
 	public void moveToFoundation(User user, Integer cardId, Integer toFoundationId) {
+		moves.add(Move.moveToFoundation(user.id, cardId, toFoundationId));
 		userBoards.get(user).moveToFoundation(cardId, toFoundationId);
 	}
 	
@@ -301,6 +327,7 @@ public class GameBoard {
 	 * @param toBuildId
 	 */
 	public void moveToTableau(User user, Integer cardId, Integer toBuildId) {
+		moves.add(Move.moveToTableau(user.id, cardId, toBuildId));
 		userBoards.get(user).moveToTableau(cardId, toBuildId);
 	}
 	
@@ -453,4 +480,123 @@ public class GameBoard {
 		this.debugProperties = debugProperties;
 	}
 	
+	public GameExport export() {
+		return new GameExport();
+	}
+	
+	public class GameExport {
+		
+		public Integer getGameId() {
+			return gameId;
+		}
+		public String getGameName() {
+			return gameName;
+		}
+		public ZonedDateTime getCreatedOn() {
+			return createdOn;
+		}
+		public Instant getStartTime() {
+			return startTime;
+		}
+		public Set<User> getUsers() {
+			return userBoards.keySet();
+		}
+		public Map<Integer, UserBoard.Export> getUserBoards() {
+			Map<Integer, UserBoard.Export> userBoardsExports = new HashMap<>();
+			for (Entry<User, UserBoard> userBoard: userBoards.entrySet()) {
+				userBoardsExports.put(userBoard.getKey().id, userBoard.getValue().export);
+			}
+			return userBoardsExports;
+		}
+		public List<Move> getMoves() {
+			return moves;
+		}
+		
+		private ObjectWriter getObjectWriter() {
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.registerModule(new JavaTimeModule());
+		    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		    return mapper.writerWithDefaultPrettyPrinter();
+		}
+		
+		public String writeValueAsString() {
+			try {
+				return getObjectWriter().writeValueAsString(this);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		public void writeAsFile() throws IOException {
+			try {
+				getObjectWriter().writeValue(new File("game"+gameId+".json"), this);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+	}
+	
+	enum MoveType {
+		TO_FOUNDATION,
+		TO_TABLEAU,
+		DISCARD
+	}
+	
+	@JsonInclude(Include.NON_NULL)
+	public static class Move {
+		MoveType moveType;
+		Integer userId;
+		Integer cardId;
+		Integer toFoundationId;
+		Integer toBuildId;
+		
+		public Move(MoveType moveType, Integer userId, Integer cardId, Integer toFoundationId, Integer toBuildId) {
+			super();
+			this.moveType = moveType;
+			this.userId = userId;
+			this.cardId = cardId;
+			this.toFoundationId = toFoundationId;
+			this.toBuildId = toBuildId;
+		}
+		static Move discard(Integer userId) {
+			return new Move(MoveType.DISCARD, userId, null, null, null);
+		}
+		static Move moveToFoundation(Integer userId, Integer cardId, Integer toFoundationId) {
+			return new Move(MoveType.TO_FOUNDATION, userId, cardId, toFoundationId, null);
+		}
+		static Move moveToTableau(Integer userId, Integer cardId, Integer toBuildId) {
+			return new Move(MoveType.TO_TABLEAU, userId, cardId, null, toBuildId);
+		}
+		public MoveType getMoveType() {
+			return moveType;
+		}
+		public void setMoveType(MoveType moveType) {
+			this.moveType = moveType;
+		}
+		public Integer getUserId() {
+			return userId;
+		}
+		public void setUserId(Integer userId) {
+			this.userId = userId;
+		}
+		public Integer getCardId() {
+			return cardId;
+		}
+		public void setCardId(Integer cardId) {
+			this.cardId = cardId;
+		}
+		public Integer getToFoundationId() {
+			return toFoundationId;
+		}
+		public void setToFoundationId(Integer toFoundationId) {
+			this.toFoundationId = toFoundationId;
+		}
+		public Integer getToBuildId() {
+			return toBuildId;
+		}
+		public void setToBuildId(Integer toBuildId) {
+			this.toBuildId = toBuildId;
+		}
+	}
 }

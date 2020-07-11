@@ -2,6 +2,7 @@ package com.andrewfesta.doublesolitare.model;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Deck extends Pile {
@@ -55,6 +56,24 @@ public class Deck extends Pile {
 	
 	public void shuffle() {
 		cards = shuffle(cards, rand.nextInt(4)+1);
+	}
+	
+	public Export exportState() {
+		return new Export(new ArrayList<>(cards));
+	}
+	
+	public class Export {
+		final List<Card> cards;
+
+		public Export(List<Card> cards) {
+			super();
+			this.cards = cards;
+		}
+
+		public List<Card> getCards() {
+			return cards;
+		}
+		
 	}
 	
 }

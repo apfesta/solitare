@@ -78,6 +78,13 @@
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 		
+		<!-- Jackson Annotations for JSON serialization -->
+		<dependency>
+		    <groupId>com.fasterxml.jackson.datatype</groupId>
+		    <artifactId>jackson-datatype-jsr310</artifactId>
+		    <scope>provided</scope>
+		</dependency>
+		
 		<!-- WebJars -->
 		<dependency>
    			<groupId>org.webjars</groupId>

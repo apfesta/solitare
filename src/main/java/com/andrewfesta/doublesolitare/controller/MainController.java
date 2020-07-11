@@ -1,5 +1,6 @@
 package com.andrewfesta.doublesolitare.controller;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -351,6 +352,16 @@ public class MainController {
 		game.getUserBoard(user).getScore().prettyPrint();
 		
 		return game.getUserBoard(user);
+	}
+	
+	@RequestMapping(value="/api/game/{gameId}/export", method = RequestMethod.GET)
+	public @ResponseBody void export(@PathVariable Integer gameId) throws IOException {
+		LOG.trace("GET /api/game/{}/export", gameId);
+		
+		GameBoard game = games.get(gameId);
+		assertGameNotNull(gameId, game);
+		
+		game.export().writeAsFile();
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/toggle", method = RequestMethod.GET,
