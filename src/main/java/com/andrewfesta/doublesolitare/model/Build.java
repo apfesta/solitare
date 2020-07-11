@@ -7,6 +7,8 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.andrewfesta.doublesolitare.exception.PushException;
+
 public class Build extends VisiblePile {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(Build.class);
@@ -75,12 +77,12 @@ public class Build extends VisiblePile {
 				if (c.getCurrentBuild()!=null && !c.equals(c.getCurrentBuild().peek())) {
 					LOG.error("Card:{} is not on top of build:{}",
 							c.abbrev(),c.getCurrentBuild());
-					throw new RuntimeException("Card "+c+" is not on top of its build.  Use push(Build) instead.");
+					throw new PushException("Card "+c+" is not on top of its build.  Use push(Build) instead.");
 				}
 				if (c.getCurrentPile()!=null && !c.equals(c.getCurrentPile().peek())) {
 					LOG.error("Card:{} is not on top of pile:{}",
 							c.abbrev(),c.getCurrentPile());
-					throw new RuntimeException("Card "+c+" is not on top of its pile.");
+					throw new PushException("Card "+c+" is not on top of its pile.");
 				}
 				
 				if (c.getCurrentBuild()!=null) c.getCurrentBuild().pop();
@@ -93,10 +95,10 @@ public class Build extends VisiblePile {
 			} else {
 				LOG.error("Card:{} Currentbuild:{} Currentpile:{}",
 						c.abbrev(),c.getCurrentBuild(), c.getCurrentPile());
-				throw new RuntimeException("Card "+c+" cannot move.");
+				throw new PushException("Card "+c+" cannot move.");
 			}
 		} else {
-			throw new RuntimeException("Cannot place card "+c+" on top of "+cards.peek()+" for this type of build");
+			throw new PushException("Cannot place card "+c+" on top of "+cards.peek()+" for this type of build");
 		}
 	}
 	
@@ -124,10 +126,10 @@ public class Build extends VisiblePile {
 					
 					c.setCurrentBuild(this);
 				} else {
-					throw new RuntimeException("Card "+c+" cannot move.");
+					throw new PushException("Card "+c+" cannot move.");
 				}
 			} else {
-				throw new RuntimeException("Cannot place card "+c+" on top of "+cards.peek()+" for this type of build");
+				throw new PushException("Cannot place card "+c+" on top of "+cards.peek()+" for this type of build");
 			}
 		}
 	}

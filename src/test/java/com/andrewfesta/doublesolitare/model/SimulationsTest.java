@@ -4,6 +4,8 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import com.andrewfesta.doublesolitare.exception.PushException;
+
 public class SimulationsTest {
 	
 	GameBoard game;
@@ -270,7 +272,7 @@ public class SimulationsTest {
 		try {
 			game.moveToFoundation(user3, card(5, Suit.DIAMONDS), 5);
 			fail("Exception expected");
-		} catch (Exception e) {}
+		} catch (PushException e) {}
 		game.moveToFoundation(user4, card(6, Suit.SPADES), 6);
 		game.moveToFoundation(user3, card(5, Suit.CLUBS), 4);
 		game.moveToFoundation(user3, card(6, Suit.DIAMONDS), 5);
@@ -295,7 +297,7 @@ public class SimulationsTest {
 		try {
 			game.moveToTableau(user4, card(6, Suit.DIAMONDS), 2);
 			fail("Exception expected");
-		} catch (Exception e) {}
+		} catch (PushException e) {}
 				
 		//PRINT
 		game.getFoundation().prettyPrint();
