@@ -39,6 +39,8 @@ public class UserBoard {
 	
 	Map<Integer, Card> cards = new HashMap<>(); //card by ID
 	
+	Export export;
+	
 	public UserBoard(GameBoard game, User user) {
 		super();
 		this.game = game;
@@ -54,6 +56,11 @@ public class UserBoard {
 	 */
 	public void setup(Card[] stackedDeck) {
 		Deck d = Deck.getStackedDeck(stackedDeck);
+		GAME_LOG.debug("GameId:({}){} User:({}){} deck:{}",
+				game.gameId, game.gameName, 
+				user.id, user.username, d);
+		export = new Export();
+		export.startingDeck = d.exportState();
 		for (Card c: d.cards) {
 			cards.put(c.getUnicodeInt(), c);
 		}
@@ -71,6 +78,8 @@ public class UserBoard {
 		GAME_LOG.debug("GameId:({}){} User:({}){} deck:{}",
 				game.gameId, game.gameName, 
 				user.id, user.username, d);
+		export = new Export();
+		export.startingDeck = d.exportState();
 		for (Card c: d.cards) {
 			cards.put(c.getUnicodeInt(), c);
 		}
@@ -383,6 +392,18 @@ public class UserBoard {
 			buffer.append("Moves: "+getTotalMoves())
 				.append(" Score: "+getTotalScore());
 			System.out.println(buffer.toString());
+		}
+	}
+	
+	public class Export {
+		Deck.Export startingDeck;
+
+		public Deck.Export getStartingDeck() {
+			return startingDeck;
+		}
+
+		public void setStartingDeck(Deck.Export startingDeck) {
+			this.startingDeck = startingDeck;
 		}
 	}
 
