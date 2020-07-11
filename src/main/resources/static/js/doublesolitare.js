@@ -215,6 +215,14 @@ var app = {
 			data: JSON.stringify(data)});	
 	}
 	
+	app.exportData = function(gameId) {
+		$.ajax({
+			type: 'POST', 
+			url: getRelativePath('/api/game/'+gameId+'/export'),
+			dataType: "json",
+			data: {'boardHtml':$('#board').html()}});	
+	}
+	
 	app.newTest = function() {
 		$.ajax({
 			type: 'POST', 
@@ -976,6 +984,10 @@ var app = {
 		if (!app.gameboard.multiPlayer) {
 			window.location.replace("/");
 		}
+	});
+	
+	$('#bugBtn').on('click', function(){
+		app.exportData(app.gameId);
 	});
 	
 	$('#endGameBtn').on('click', app.endGame);

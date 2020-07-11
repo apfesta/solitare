@@ -247,11 +247,6 @@ public class GameBoard {
 			endTime = Instant.now();
 			inProgress = false;
 			gameOver = true;
-			try {
-				export().writeAsFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		} else if (!inProgress && !gameOver) {
 			//Game hasn't started yet.  Remove them.
 			userBoards.remove(user);
@@ -291,11 +286,6 @@ public class GameBoard {
 							userBoards.values().iterator().next()));
 		inProgress = false;
 		gameOver = true;
-		try {
-			export().writeAsFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		GAME_LOG.debug("GameId:({}){} User:({}){} has won! Duration:{}", 
 				gameId, gameName, 
 				winner.user.id, winner.user.username, Duration.between(startTime, endTime));
@@ -486,6 +476,9 @@ public class GameBoard {
 	
 	public class GameExport {
 		
+		String boardHtml;
+		Integer generatedByUserId;
+		
 		public Integer getGameId() {
 			return gameId;
 		}
@@ -500,6 +493,26 @@ public class GameBoard {
 		}
 		public Set<User> getUsers() {
 			return userBoards.keySet();
+		}
+		public GameExport boardHtml(String boardHtml) {
+			setBoardHtml(boardHtml);
+			return this;
+		}
+		public GameExport generatedByUserId(Integer generatedByUserId) {
+			setGeneratedByUserId(generatedByUserId);
+			return this;
+		}
+		public Integer getGeneratedByUserId() {
+			return generatedByUserId;
+		}
+		public void setGeneratedByUserId(Integer generatedByUserId) {
+			this.generatedByUserId = generatedByUserId;
+		}
+		public String getBoardHtml() {
+			return boardHtml;
+		}
+		public void setBoardHtml(String boardHtml) {
+			this.boardHtml = boardHtml;
 		}
 		public Map<Integer, UserBoard.Export> getUserBoards() {
 			Map<Integer, UserBoard.Export> userBoardsExports = new HashMap<>();
@@ -529,7 +542,7 @@ public class GameBoard {
 		
 		public void writeAsFile() throws IOException {
 			try {
-				getObjectWriter().writeValue(new File("game"+gameId+".json"), this);
+				getObjectWriter().writeValue(new File("game"+gameId+"_user"+generatedByUserId+".json"), this);
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}

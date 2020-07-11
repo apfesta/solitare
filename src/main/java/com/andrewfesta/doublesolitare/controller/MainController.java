@@ -354,14 +354,19 @@ public class MainController {
 		return game.getUserBoard(user);
 	}
 	
-	@RequestMapping(value="/api/game/{gameId}/export", method = RequestMethod.GET)
-	public @ResponseBody void export(@PathVariable Integer gameId) throws IOException {
-		LOG.trace("GET /api/game/{}/export", gameId);
+	@RequestMapping(value="/api/game/{gameId}/export", method = RequestMethod.POST)
+	public @ResponseBody void export(@PathVariable Integer gameId,
+			@RequestParam String boardHtml) throws IOException {
+		LOG.trace("POST /api/game/{}/export", gameId);
 		
 		GameBoard game = games.get(gameId);
 		assertGameNotNull(gameId, game);
+		User user = userService.getUser();
 		
-		game.export().writeAsFile();
+		game.export()
+			.boardHtml(boardHtml)
+			.generatedByUserId(user.getId())
+			.writeAsFile();
 	}
 	
 	@RequestMapping(value="/api/game/{gameId}/toggle", method = RequestMethod.GET,
