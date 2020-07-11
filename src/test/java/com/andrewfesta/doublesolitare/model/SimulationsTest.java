@@ -47,52 +47,59 @@ public class SimulationsTest {
 		game.foundation = new Foundation();
 		game.foundation.addPlayer();
 		game.foundation.addPlayer();
-		UserBoard userBoard3 = new UserBoard(game, user3);
-		game.userBoards.put(user3, userBoard3);
 		UserBoard userBoard4 = new UserBoard(game, user4);
 		game.userBoards.put(user4, userBoard4);
 		
 		/*
 		 * SETUP
 		 */
-		userBoard3.tableau = new Tableau();
-		userBoard3.stockPile = new Pile();
-		userBoard3.score = userBoard3.new Score();
-		pushToBuild(user3, 0, newCard(10, Suit.DIAMONDS));
-		pushToBuild(user3, 1, newCard(Card.KING, Suit.DIAMONDS));
-		addToPile(user3, 1, newCard(Card.QUEEN, Suit.HEARTS));
-		pushToBuild(user3, 2, newCard(10, Suit.HEARTS));
-		pushToBuild(user3, 3, newCard(Card.QUEEN, Suit.DIAMONDS));
-		addToPile(user3, 3, newCard(5, Suit.CLUBS));
-		addToPile(user3, 3, newCard(6, Suit.DIAMONDS));
-		addToPile(user3, 3, newCard(Card.ACE, Suit.SPADES));
-		pushToBuild(user3, 4, newCard(4, Suit.CLUBS));
-		pushToBuild(user3, 5, newCard(10, Suit.CLUBS));
-		pushToBuild(user3, 6, newCard(Card.KING, Suit.SPADES));
-		addToStock(user3, newCard(2, Suit.SPADES));
-		addToStock(user3, newCard(9, Suit.CLUBS));
-		addToStock(user3, newCard(Card.ACE, Suit.DIAMONDS));
-		addToStock(user3, newCard(9, Suit.DIAMONDS));
-		addToStock(user3, newCard(8, Suit.SPADES));
-		addToStock(user3, newCard(4, Suit.DIAMONDS));
-		addToStock(user3, newCard(7, Suit.DIAMONDS));
-		addToStock(user3, newCard(7, Suit.CLUBS));
-		addToStock(user3, newCard(9, Suit.SPADES));
-		addToStock(user3, newCard(7, Suit.HEARTS));
-		addToStock(user3, newCard(Card.ACE, Suit.HEARTS));
-		addToStock(user3, newCard(5, Suit.DIAMONDS));
-		addToStock(user3, newCard(4, Suit.SPADES));
-		addToStock(user3, newCard(5, Suit.SPADES));
-		addToStock(user3, newCard(5, Suit.HEARTS));
-		addToStock(user3, newCard(8, Suit.DIAMONDS));
-		addToStock(user3, newCard(Card.JACK, Suit.HEARTS));
-		addToStock(user3, newCard(9, Suit.HEARTS));
-		addToStock(user3, newCard(Card.JACK, Suit.DIAMONDS));
-		addToStock(user3, newCard(Card.KING, Suit.CLUBS));
-		addToStock(user3, newCard(4, Suit.HEARTS));
-		addToStock(user3, newCard(10, Suit.SPADES));
-		addToStock(user3, newCard(2, Suit.DIAMONDS));
-		addToStock(user3, newCard(Card.ACE, Suit.CLUBS));
+		UserBoard userBoard3 = new UserBoardBuilder(game, user3)
+			.tableau()
+				.stack(0)
+					.topCard(10, Suit.DIAMONDS).build()
+				.stack(1)
+					.topCard(Card.KING, Suit.DIAMONDS)
+					.pile()
+						.add(Card.QUEEN, Suit.HEARTS).build().build()
+				.stack(2)
+					.topCard(10, Suit.HEARTS).build()
+				.stack(3)
+					.topCard(Card.QUEEN, Suit.DIAMONDS)
+					.pile()
+						.add(5, Suit.CLUBS)
+						.add(6, Suit.DIAMONDS)
+						.add(Card.ACE, Suit.SPADES).build().build()
+				.stack(4)
+					.topCard(4, Suit.CLUBS).build()
+				.stack(5)
+					.topCard(10, Suit.CLUBS).build()
+				.stack(6)
+					.topCard(Card.KING, Suit.SPADES).build().build()
+			.stockPile()
+				.add(2, Suit.SPADES)
+				.add(9, Suit.CLUBS)
+				.add(Card.ACE, Suit.DIAMONDS)
+				.add(9, Suit.DIAMONDS)
+				.add(8, Suit.SPADES)
+				.add(4, Suit.DIAMONDS)
+				.add(7, Suit.DIAMONDS)
+				.add(7, Suit.CLUBS)
+				.add(9, Suit.SPADES)
+				.add(7, Suit.HEARTS)
+				.add(Card.ACE, Suit.HEARTS)
+				.add(5, Suit.DIAMONDS)
+				.add(4, Suit.SPADES)
+				.add(5, Suit.SPADES)
+				.add(5, Suit.HEARTS)
+				.add(8, Suit.DIAMONDS)
+				.add(Card.JACK, Suit.HEARTS)
+				.add(9, Suit.HEARTS)
+				.add(Card.JACK, Suit.DIAMONDS)
+				.add(Card.KING, Suit.CLUBS)
+				.add(4, Suit.HEARTS)
+				.add(10, Suit.SPADES)
+				.add(2, Suit.DIAMONDS)
+				.add(Card.ACE, Suit.CLUBS).build().build();
 		
 		userBoard4.tableau = new Tableau();
 		userBoard4.stockPile = new Pile();
@@ -300,4 +307,121 @@ public class SimulationsTest {
 		userBoard4.getScore().prettyPrint();
 	}
 
+	
+	class UserBoardBuilder {
+		UserBoard userBoard;
+		UserBoardBuilder(GameBoard game, User user) {
+			userBoard = new UserBoard(game, user);
+			userBoard.score = userBoard.new Score();
+			game.userBoards.put(user, userBoard);
+			
+		}
+		TableauBuilder tableau() {
+			return new TableauBuilder(this);
+		}
+		StockPileBuilder stockPile() {
+			return new StockPileBuilder(this);
+		}
+		UserBoard build() {
+			return userBoard;
+		}
+	}
+	class TableauBuilder {
+		Tableau tableau;
+		UserBoardBuilder userBoardBuilder;
+		TableauBuilder(UserBoardBuilder userBoardBuilder){
+			this.userBoardBuilder = userBoardBuilder;
+			this.tableau = new Tableau();
+		}
+		StackBuilder stack(int stackId) {
+			return new StackBuilder(this, stackId);
+		}
+		UserBoardBuilder build() {
+			userBoardBuilder.userBoard.tableau = tableau;
+			return userBoardBuilder;
+		}
+	}
+	
+	class StackBuilder {
+		int stackId;
+		TableauBuilder tableauBuilder;
+		StackBuilder(TableauBuilder tableauBuilder, int stackId) {
+			this.tableauBuilder = tableauBuilder;
+			this.stackId = stackId;
+		}
+		StackBuilder topCard(int value, Suit suit) {
+			new BuildBuilder(this, 
+					tableauBuilder.tableau.build[stackId]).push(value, suit);
+			return this;
+		}
+		PileBuilder pile() {
+			return new PileBuilder(this, 
+					tableauBuilder.tableau.pile[stackId]);
+		}
+		TableauBuilder build() {
+			return tableauBuilder;
+		}
+	}
+	
+	class BuildBuilder {
+		Build build;
+		StackBuilder stackBuilder;
+		BuildBuilder(StackBuilder stackBuilder, Build build) {
+			this.stackBuilder = stackBuilder;
+			this.build = build;
+		}
+		void push(int value, Suit suit) {
+			Card c = newCard(value, suit);
+			if (stackBuilder.tableauBuilder.userBoardBuilder.userBoard.cards.containsKey(c.getUnicodeInt())) {
+				throw new RuntimeException("Card already exists in deck");
+			}
+			stackBuilder.tableauBuilder.userBoardBuilder.userBoard.cards.put(c.getUnicodeInt(), c);
+			build.cards.push(c);
+			c.setCurrentBuild(build);
+		}
+	}
+	
+	class PileBuilder {
+		Pile pile;
+		StackBuilder stackBuilder;
+		PileBuilder(StackBuilder stackBuilder, Pile pile) {
+			this.stackBuilder = stackBuilder;
+			this.pile = pile;
+		}
+		PileBuilder add(int value, Suit suit) {
+			Card c = newCard(value, suit);
+			if (stackBuilder.tableauBuilder.userBoardBuilder.userBoard.cards.containsKey(c.getUnicodeInt())) {
+				throw new RuntimeException("Card already exists in deck");
+			}
+			stackBuilder.tableauBuilder.userBoardBuilder.userBoard.cards.put(c.getUnicodeInt(), c);
+			pile.cards.add(c);
+			return this;
+		}
+		StackBuilder build() {
+			return stackBuilder;
+		}
+	}
+	
+	class StockPileBuilder {
+		Pile stockPile;
+		UserBoardBuilder userBoardBuilder;
+		StockPileBuilder(UserBoardBuilder userBoardBuilder) {
+			this.userBoardBuilder = userBoardBuilder;
+			this.stockPile = new Pile();
+		}
+		StockPileBuilder add(int value, Suit suit) {
+			Card c = newCard(value, suit);
+			if (userBoardBuilder.userBoard.cards.containsKey(c.getUnicodeInt())) {
+				throw new RuntimeException("Card already exists in deck");
+			}
+			userBoardBuilder.userBoard.cards.put(c.getUnicodeInt(), c);
+			stockPile.cards.add(c);
+			c.setCurrentPile(stockPile);
+			return this;
+		}
+		UserBoardBuilder build() {
+			userBoardBuilder.userBoard.stockPile = stockPile;
+			return userBoardBuilder;
+		}
+	}
 }

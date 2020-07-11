@@ -91,8 +91,8 @@ public class Build extends VisiblePile {
 				c.setCurrentBuild(this);
 				c.setCurrentPile(null);
 			} else {
-				LOG.error("Card:{} Currentpile:{}",
-						c.abbrev(),c.getCurrentPile());
+				LOG.error("Card:{} Currentbuild:{} Currentpile:{}",
+						c.abbrev(),c.getCurrentBuild(), c.getCurrentPile());
 				throw new RuntimeException("Card "+c+" cannot move.");
 			}
 		} else {
