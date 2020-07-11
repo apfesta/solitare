@@ -215,6 +215,14 @@ var app = {
 			data: JSON.stringify(data)});	
 	}
 	
+	app.exportData = function(gameId) {
+		$.ajax({
+			type: 'POST', 
+			url: getRelativePath('/api/game/'+gameId+'/export'),
+			dataType: "json",
+			data: {'boardHtml':$('#board').html()}});	
+	}
+	
 	app.newTest = function() {
 		$.ajax({
 			type: 'POST', 
@@ -481,16 +489,12 @@ var app = {
 		
 	
 	app.canMove = function(cardId) {
-		$.ajax({
+		return $.ajax({
 			type: 'GET', 
 			url: getRelativePath('/api/game/'+app.gameId+"/canmove/"+cardId
 					+'?userId='+app.user.id),
 			contentType: "application/json",
-			dataType: "json",
-			success: function(data){
-				console.debug(data);
-				app.canMoveData = data;
-			}});
+			dataType: "json"});
 	};
 	
 	app.syncFoundation = function(cardId, card, foundationId) {
@@ -514,134 +518,139 @@ var app = {
 	}
 	
 	app.moveToFoundation = function(cardId, foundationId) {
-		
-		$.ajax({
+		return $.ajax({
 			type: 'GET', 
 			url: getRelativePath('/api/game/'+app.gameId+"/move/"+cardId+"/toFoundation/"+foundationId
 					+'?userId='+app.user.id),
 			contentType: "application/json",
-			dataType: "json",
-			success: function(data){
-				console.debug(data);
-				var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
-				var pileDiv = cardDiv.parents('.pile');
-				var pileId = pileDiv.attr('data-pile-id');
-				var nextBuildDiv = cardDiv.next('.build');
-				
-				if ($("#foundationPile"+foundationId+" .pokercard").length > 0) {
-					$("#foundationPile"+foundationId+" .pokercard").replaceWith(cardDiv);
-				} else {
-					$("#foundationPile"+foundationId).append(cardDiv);
-				}
-				nextBuildDiv.remove();
-				cardDiv.removeClass('fan-down')
-				cardDiv.removeClass('fan-right');
-				if (app.gameboard.multiPlayer && app.gameboard.foundation.pile[foundationId].numberOfCards==12) {
-					cardDiv.addClass('back');
-					cardDiv.find("img").attr('src',getRelativePath('/img/back1.png'));
-				}
-				app.userboard = data;
-				app.gameboard = app.userboard.game;
-				if (pileId!=null) {
-					if (app.userboard.tableau.pile[pileId].numberOfCards>=0 && 
-							app.userboard.tableau.build[pileId].numberOfCards==1) {
-						app.flip(pileId);
-					}
-				} else {
-					$('#discardPile .build').append($('#discardPile .pokercard:last'));
-				}
-				$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
-				$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
-				if (app.gameboard.multiPlayer && app.gameboard.gameOver) {
-					console.log('game over');
-					$('#gameOverTitle').text('You Win!');
-					$('#gameOver .modal-body').html('Score: '+app.userboard.score.totalScore)
-					
-					$('#gameOver').modal('show');
-				}
-			}});
+			dataType: "json"});
 	};
 	
+	app.moveToFoundationSuccess = function(cardId, foundationId, data) {
+		console.debug(data);
+		var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
+		var pileDiv = cardDiv.parents('.pile');
+		var pileId = pileDiv.attr('data-pile-id');
+		var nextBuildDiv = cardDiv.next('.build');
+		
+		if ($("#foundationPile"+foundationId+" .pokercard").length > 0) {
+			$("#foundationPile"+foundationId+" .pokercard").replaceWith(cardDiv);
+		} else {
+			$("#foundationPile"+foundationId).append(cardDiv);
+		}
+		nextBuildDiv.remove();
+		cardDiv.removeClass('fan-down')
+		cardDiv.removeClass('fan-right');
+		if (app.gameboard.multiPlayer && app.gameboard.foundation.pile[foundationId].numberOfCards==12) {
+			cardDiv.addClass('back');
+			cardDiv.find("img").attr('src',getRelativePath('/img/back1.png'));
+		}
+		app.userboard = data;
+		app.gameboard = app.userboard.game;
+		if (pileId!=null) {
+			if (app.userboard.tableau.pile[pileId].numberOfCards>=0 && 
+					app.userboard.tableau.build[pileId].numberOfCards==1) {
+				app.flip(pileId);
+			}
+		} else {
+			$('#discardPile .build').append($('#discardPile .pokercard:last'));
+		}
+		$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
+		$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
+		if (app.gameboard.multiPlayer && app.gameboard.gameOver) {
+			console.log('game over');
+			$('#gameOverTitle').text('You Win!');
+			$('#gameOver .modal-body').html('Score: '+app.userboard.score.totalScore)
+			
+			$('#gameOver').modal('show');
+		}
+	}
+	
+	
 	app.moveToTableau = function(cardId, buildId) {
-		$.ajax({
+		return $.ajax({
 			type: 'GET', 
 			url: getRelativePath('/api/game/'+app.gameId+"/move/"+cardId+"/toTableau/"+buildId
 					+'?userId='+app.user.id),
 			contentType: "application/json",
-			dataType: "json",
-			success: function(data){
-				console.debug(data);
-				var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
-				var fromPileDiv = cardDiv.parents('.pile');
-				var fromPileId = fromPileDiv.attr('data-pile-id');
-				var nextBuildDiv = cardDiv.next('.build');
-				$("#pile"+buildId+" .build:last").append(cardDiv).append(nextBuildDiv);
-				cardDiv.removeClass('fan-right');
-				if (app.userboard.tableau.build[buildId].numberOfCards+app.userboard.tableau.pile[buildId].numberOfCards==0) 
-					cardDiv.removeClass('fan-down');
-				else
-					cardDiv.addClass('fan-down')
-				app.userboard = data;
-				app.gameboard = app.userboard.game;
-				if (fromPileId!=null) {
-					if (app.userboard.tableau.pile[fromPileId].numberOfCards>=0 && 
-							app.userboard.tableau.build[fromPileId].numberOfCards==1) {
-						app.flip(fromPileId);
-					}
-				} else {
-					//sub-build for consistency with other piles
-					var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
-					$('#discardPile .build').append($('#discardPile .pokercard:last')).append(subBuildDiv);
-				}
-				$('#score').html('Score: '+app.userboard.score.totalScore);
-				$('#moves').html('Moves: '+app.userboard.score.totalMoves);
-			}});
+			dataType: "json"});
 	};
 	
+	app.moveToTableauSuccess = function(cardId, buildId, data) {
+		console.debug(data);
+		var cardDiv = $("#tableau [data-card-id='"+cardId+"'], #discardPile [data-card-id='"+cardId+"']");
+		var fromPileDiv = cardDiv.parents('.pile');
+		var fromPileId = fromPileDiv.attr('data-pile-id');
+		var nextBuildDiv = cardDiv.next('.build');
+		$("#pile"+buildId+" .build:last").append(cardDiv).append(nextBuildDiv);
+		cardDiv.removeClass('fan-right');
+		if (app.userboard.tableau.build[buildId].numberOfCards+app.userboard.tableau.pile[buildId].numberOfCards==0) 
+			cardDiv.removeClass('fan-down');
+		else
+			cardDiv.addClass('fan-down')
+		app.userboard = data;
+		app.gameboard = app.userboard.game;
+		if (fromPileId!=null) {
+			if (app.userboard.tableau.pile[fromPileId].numberOfCards>=0 && 
+					app.userboard.tableau.build[fromPileId].numberOfCards==1) {
+				app.flip(fromPileId);
+			}
+		} else {
+			//sub-build for consistency with other piles
+			var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+			$('#discardPile .build').append($('#discardPile .pokercard:last')).append(subBuildDiv);
+		}
+		$('#score').html('Score: '+app.userboard.score.totalScore);
+		$('#moves').html('Moves: '+app.userboard.score.totalMoves);
+	}
+	
 	app.discard = function() {
-		$.ajax({
+		return $.ajax({
 			type: 'GET', 
 			url: getRelativePath('/api/game/'+app.gameId+"/discard"
 					+'?userId='+app.user.id),
 			contentType: "application/json",
-			dataType: "json",
-			success: function(data){
-				console.debug(data);
-				app.userboard = data;
-				app.gameboard = app.userboard.game;
-				$('#discard-pile').empty();
-				var maxcards = app.userboard.discardPile.cards.length>=3 ? 3 : app.userboard.discardPile.cards.length
-				for (var c=0; c<maxcards; c++) {
-					var card = app.userboard.discardPile.cards[maxcards-1-c];
-					var cardDiv = $('<div>')
-						.addClass('pokercard').addClass('front')
-						.attr('data-card-id',card.unicodeInt)
-						.append($('<img>')
-							.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
-							.attr('title',card.unicodeHtmlEntity));
-					if (card.color=='RED') cardDiv.addClass('red');
-					cardDiv.addClass('fan-right');
-					if (c==2) {
-						var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
-						buildDiv.append(cardDiv);
-						$('#discard-pile').append(buildDiv);
-						
-						//sub-build for consistency with other piles
-						var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
-						buildDiv.append(subBuildDiv);
-					} else {
-						$('#discard-pile').append(cardDiv);
-					}
-				}
-				if (app.userboard.stockPile.empty) {
-					$('#stock-pile .pokercard').hide();
-				} else {
-					$('#stock-pile .pokercard').show();
-				}
-				$('#score').html('Score: '+app.userboard.score.totalScore);
-				$('#moves').html('Moves: '+app.userboard.score.totalMoves);
-			}});
+			dataType: "json"});
 	};
+	
+	app.discardSuccess = function(data) {
+		console.debug(data);
+		app.userboard = data;
+		app.gameboard = app.userboard.game;
+		$('#discard-pile').empty();
+		var maxcards = app.userboard.discardPile.cards.length>=3 ? 3 : app.userboard.discardPile.cards.length
+		for (var c=0; c<maxcards; c++) {
+			var card = app.userboard.discardPile.cards[maxcards-1-c];
+			var cardDiv = $('<div>')
+				.addClass('pokercard').addClass('front')
+				.attr('data-card-id',card.unicodeInt)
+				.append($('<img>')
+					.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
+					.attr('title',card.unicodeHtmlEntity));
+			if (card.color=='RED') cardDiv.addClass('red');
+			cardDiv.addClass('fan-right');
+			if (c==2) {
+				var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+				buildDiv.append(cardDiv);
+				$('#discard-pile').append(buildDiv);
+				
+				//sub-build for consistency with other piles
+				var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+				buildDiv.append(subBuildDiv);
+			} else {
+				$('#discard-pile').append(cardDiv);
+			}
+		}
+		if (app.userboard.stockPile.empty) {
+			$('#stock-pile .pokercard').hide();
+		} else {
+			$('#stock-pile .pokercard').show();
+		}
+		$('#score').html('Score: '+app.userboard.score.totalScore);
+		$('#moves').html('Moves: '+app.userboard.score.totalMoves);
+	}
+	
+	
 	
 	//---------------
 	// Display functions
@@ -827,7 +836,12 @@ var app = {
 	app.setupStockAndDiscardPiles = function() {
 		//create pileDiv
 		var pileDiv = $('<div>').attr('id','stock-pile').addClass('pile')
-			.on('click', app.discard);
+			.on('click', function(){
+				app.discard()
+					.done(function(data){
+						app.discardSuccess(data);
+					});
+			});
 		$('#stockPile').append(pileDiv);
 		var targetDiv = $('<div>').addClass('target');
 		pileDiv.append(targetDiv);
@@ -904,7 +918,11 @@ var app = {
 		
 		var cardDiv = $(ev.currentTarget.getElementsByClassName('pokercard')[0]);
 				
-		app.canMove(cardDiv.attr('data-card-id'));
+		app.canMove(cardDiv.attr('data-card-id'))
+			.done(function(data){
+				console.debug(data);
+				app.canMoveData = data;
+			});
 		
 		ev.originalEvent.dataTransfer.setData("text", cardDiv.attr('data-card-id'));
 	};
@@ -913,15 +931,28 @@ var app = {
 		ev.preventDefault();
 		var pileId = $(ev.currentTarget).attr('data-pile-id');
 		var cardId = ev.originalEvent.dataTransfer.getData('text');
+		
+		finishDrop = function() {
+			var curTarget = $(ev.currentTarget);
+			curTarget.removeClass('canDrop');
+			app.canMoveData = null;
+		}
 		if ($(ev.currentTarget).parents('#foundation').length>0) {
-			app.moveToFoundation(cardId, pileId);
+			app.moveToFoundation(cardId, pileId)
+				.done(function(data){
+					app.moveToFoundationSuccess(cardId, pileId, data)
+				})
+				.done(finishDrop)
+				.fail(finishDrop)
 		}
 		if ($(ev.currentTarget).parents('#tableau').length>0) {
-			app.moveToTableau(cardId, pileId);
+			app.moveToTableau(cardId, pileId)
+				.done(function(data){
+					app.moveToTableauSuccess(cardId, pileId, data);
+				})
+				.done(finishDrop)
+				.fail(finishDrop);
 		}
-		var curTarget = $(ev.currentTarget);
-		curTarget.removeClass('canDrop');
-		app.canMoveData = null;
 	};
 		
 	$('.sendMessageBtn').on('click', function(){
@@ -953,6 +984,10 @@ var app = {
 		if (!app.gameboard.multiPlayer) {
 			window.location.replace("/");
 		}
+	});
+	
+	$('#bugBtn').on('click', function(){
+		app.exportData(app.gameId);
 	});
 	
 	$('#endGameBtn').on('click', app.endGame);
