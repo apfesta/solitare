@@ -307,6 +307,277 @@ public class SimulationsTest {
 		userBoard4.getScore().prettyPrint();
 	}
 
+	@Test
+	public void simulation2() {
+		User user3 = new User(3);
+		User user4 = new User(4);
+		game = new GameBoard(user3, 8, true);
+		game.foundation = new Foundation();
+		game.foundation.addPlayer();
+		game.foundation.addPlayer();
+		
+		UserBoard userBoard3 = new UserBoardBuilder(game, user3)
+			.tableau()
+				.stack(0)
+					.topCard(10, Suit.SPADES).build()
+				.stack(1)
+					.topCard(3, Suit.SPADES)
+					.pile()
+						.add(4, Suit.CLUBS).build()
+					.build()
+				.stack(2)
+					.topCard(Card.ACE, Suit.SPADES)
+					.pile()
+						.add(Card.QUEEN, Suit.SPADES)
+						.add(8, Suit.CLUBS)
+						.build()
+					.build()
+				.stack(3)
+					.topCard(10, Suit.CLUBS)
+					.pile()
+						.add(Card.JACK, Suit.CLUBS)
+						.add(3, Suit.DIAMONDS)
+						.add(6, Suit.CLUBS)
+						.build()
+					.build()
+				.stack(4)
+					.topCard(Card.KING, Suit.DIAMONDS)
+					.pile()
+						.add(5, Suit.CLUBS)
+						.add(Card.KING, Suit.CLUBS)
+						.add(Card.ACE, Suit.HEARTS)
+						.add(6, Suit.HEARTS)
+						.build()
+					.build()
+				.stack(5)
+					.topCard(7, Suit.SPADES)
+					.build()
+				.stack(6)
+					.topCard(7, Suit.CLUBS)
+					.build()
+				.build()
+			.stockPile()
+				.add(Card.ACE, Suit.CLUBS)
+				.add(9, Suit.DIAMONDS)
+				.add(7, Suit.DIAMONDS)
+				.add(6, Suit.SPADES)
+				.add(Card.KING, Suit.HEARTS)
+				.add(9, Suit.SPADES)
+				.add(9, Suit.CLUBS)
+				.add(3, Suit.CLUBS)
+				.add(Card.QUEEN, Suit.DIAMONDS)
+				.add(Card.ACE, Suit.DIAMONDS)
+				.add(10, Suit.HEARTS)
+				.add(10, Suit.DIAMONDS)
+				.add(Card.JACK, Suit.SPADES)
+				.add(2, Suit.HEARTS)
+				.add(6, Suit.DIAMONDS)
+				.add(4, Suit.DIAMONDS)
+				.add(8, Suit.SPADES)
+				.add(5, Suit.HEARTS)
+				.add(Card.JACK, Suit.HEARTS)
+				.add(4, Suit.HEARTS)
+				.add(5, Suit.DIAMONDS)
+				.add(Card.QUEEN, Suit.CLUBS)
+				.add(3, Suit.HEARTS)
+				.add(7, Suit.HEARTS)
+					.build().build();
+		
+		UserBoard userBoard4 = new UserBoardBuilder(game, user4)
+			.tableau()
+				.stack(0)
+					.topCard(4, Suit.HEARTS)
+					.build()
+				.stack(1)
+					.topCard(Card.ACE, Suit.SPADES)
+					.pile()
+						.add(Card.JACK, Suit.CLUBS).build()
+					.build()
+				.stack(2)
+					.topCard(Card.KING, Suit.SPADES)
+					.pile()
+						.add(5, Suit.DIAMONDS).build()
+					.build()
+				.stack(3)
+					.topCard(8, Suit.HEARTS)
+					.pile()
+						.add(9, Suit.HEARTS).build()
+					.build()
+				.stack(4)
+					.topCard(9, Suit.SPADES)
+					.build()
+				.stack(5)
+					.topCard(4, Suit.SPADES)
+					.pile()
+						.add(3, Suit.HEARTS)
+						.add(2, Suit.SPADES)
+						.add(2, Suit.HEARTS)
+						.add(Card.QUEEN, Suit.CLUBS)
+						.add(Card.JACK, Suit.HEARTS)
+						.build()
+					.build()
+				.stack(6)
+					.topCard(6, Suit.CLUBS)
+					.pile()
+						.add(2, Suit.CLUBS)
+						.add(Card.KING, Suit.DIAMONDS)
+						.build()
+					.build()
+				.build()
+			.stockPile()
+				.add(6, Suit.DIAMONDS)
+				.add(7, Suit.HEARTS)
+				.add(Card.KING, Suit.CLUBS)
+				.add(Card.QUEEN, Suit.SPADES)
+				.add(5, Suit.HEARTS)
+				.add(Card.ACE, Suit.CLUBS)
+				.add(10, Suit.CLUBS)
+				.add(Card.QUEEN, Suit.HEARTS)
+				.add(Card.KING, Suit.HEARTS)
+				.add(Card.JACK, Suit.SPADES)
+				.add(4, Suit.DIAMONDS)
+				.add(4, Suit.CLUBS)
+				.add(3, Suit.CLUBS)
+				.add(9, Suit.CLUBS)
+				.add(7, Suit.CLUBS)
+				.add(5, Suit.CLUBS)
+				.add(6, Suit.HEARTS)
+				.add(6, Suit.SPADES)
+				.add(Card.ACE, Suit.DIAMONDS)
+				.add(8, Suit.CLUBS)
+				.add(Card.JACK, Suit.DIAMONDS)
+				.add(10, Suit.DIAMONDS)
+				.add(8, Suit.SPADES)
+				.add(Card.ACE, Suit.HEARTS)
+				.build().build();
+		
+		game.moveToFoundation(user3, card(Card.ACE, Suit.SPADES), 4);
+		game.discard(user3);
+		game.moveToFoundation(user4, card(Card.ACE, Suit.SPADES), 5);
+		game.moveToTableau(user3, card(Card.QUEEN, Suit.SPADES), 4);
+		game.moveToTableau(user3, card(7, Suit.DIAMONDS), 2);
+		game.moveToTableau(user4, card(8, Suit.HEARTS), 4);
+		game.moveToTableau(user3, card(9, Suit.DIAMONDS), 3);
+		game.discard(user4);
+		game.moveToFoundation(user3, card(Card.ACE, Suit.CLUBS), 6);
+		game.discard(user3);
+		game.discard(user4);
+		game.moveToFoundation(user4, card(Card.ACE, Suit.CLUBS), 7);
+		game.discard(user3);
+		game.moveToTableau(user4, card(5, Suit.HEARTS),6);
+		game.discard(user3);
+		game.moveToTableau(user4, card(4, Suit.SPADES),6);
+		game.discard(user3);
+		game.moveToTableau(user4, card(3, Suit.HEARTS),6);
+		game.moveToTableau(user3, card(6, Suit.DIAMONDS), 5);
+		game.discard(user3);
+		game.moveToFoundation(user4, card(2, Suit.SPADES), 4);
+		game.moveToFoundation(user3, card(3, Suit.SPADES), 4);
+		game.discard(user4);
+		game.discard(user4);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user4);
+		game.discard(user3);
+		game.moveToTableau(user4, card(7, Suit.CLUBS),4);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user4);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user4);
+		game.discard(user4);
+		game.discard(user3);
+		game.moveToFoundation(user4, card(Card.ACE, Suit.HEARTS), 0);
+		game.moveToFoundation(user4, card(2, Suit.HEARTS), 0);
+		game.discard(user3);
+		game.moveToFoundation(user4, card(3, Suit.HEARTS), 0);
+		game.discard(user3);
+		game.moveToFoundation(user4, card(4, Suit.HEARTS), 0);
+		game.discard(user3);
+		game.moveToTableau(user4, card(Card.KING, Suit.SPADES),0);
+		game.discard(user3);
+		game.discard(user3);
+		game.moveToTableau(user3, card(Card.JACK, Suit.HEARTS),4);
+		game.moveToTableau(user3, card(10, Suit.CLUBS),4);
+		game.moveToTableau(user3, card(8, Suit.CLUBS),4);
+		game.moveToTableau(user3, card(Card.KING, Suit.DIAMONDS),2);
+		game.moveToTableau(user3, card(5, Suit.CLUBS), 5);
+		game.moveToFoundation(user3, card(5, Suit.HEARTS), 0);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.moveToTableau(user3, card(Card.QUEEN, Suit.DIAMONDS),4);
+		game.moveToTableau(user3, card(Card.JACK, Suit.CLUBS),4);
+		game.discard(user3);
+		game.moveToTableau(user3, card(10, Suit.DIAMONDS),4);
+		game.discard(user3);
+		game.moveToTableau(user3, card(4, Suit.DIAMONDS),5);
+		game.moveToTableau(user3, card(3, Suit.DIAMONDS),1);
+		game.moveToTableau(user3, card(6, Suit.CLUBS),2);
+		game.moveToTableau(user3, card(Card.KING, Suit.CLUBS),3);
+		game.moveToFoundation(user3, card(Card.ACE, Suit.HEARTS), 1);
+		game.moveToFoundation(user3, card(2, Suit.HEARTS), 1);
+		game.moveToFoundation(user3, card(6, Suit.HEARTS), 0);
+		game.discard(user3);
+		game.discard(user4);
+		game.discard(user4);
+		game.moveToTableau(user4, card(Card.QUEEN, Suit.HEARTS),0);
+		game.moveToTableau(user4, card(Card.JACK, Suit.CLUBS),0);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.moveToFoundation(user3, card(Card.ACE, Suit.DIAMONDS), 2);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.moveToTableau(user3, card(9, Suit.SPADES),3);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user4);
+		game.discard(user3);
+		game.moveToFoundation(user3, card(3, Suit.HEARTS), 1);
+		game.discard(user4);
+		game.discard(user4);
+		game.discard(user4);
+		game.discard(user3);
+		game.moveToTableau(user4, card(Card.JACK, Suit.DIAMONDS),5);
+		game.moveToTableau(user4, card(8, Suit.CLUBS),3);
+		game.moveToFoundation(user4, card(Card.ACE, Suit.DIAMONDS), 3);
+		game.discard(user4);
+		game.discard(user4);
+		game.discard(user3);
+		game.moveToTableau(user4, card(Card.KING, Suit.CLUBS),1);
+		game.discard(user3);
+		game.discard(user3);
+		game.moveToTableau(user4, card(7, Suit.HEARTS),3);
+		game.moveToTableau(user4, card(6, Suit.CLUBS),3);
+		game.discard(user3);
+		game.moveToFoundation(user4, card(2, Suit.CLUBS), 6);
+		game.discard(user3);
+		game.discard(user3);
+		game.discard(user3);
+		game.moveToTableau(user4, card(Card.QUEEN, Suit.CLUBS),6);
+		
+		game.moveToFoundation(user4, card(4, Suit.SPADES), 4);
+		
+		//PRINT
+		game.getFoundation().prettyPrint();
+		userBoard3.getTableau().prettyPrint();
+		userBoard3.getDiscardPile().print(3);
+		userBoard3.getScore().prettyPrint();
+		userBoard4.getTableau().prettyPrint();
+		userBoard4.getDiscardPile().print(3);
+		userBoard4.getScore().prettyPrint();
+	}
 	
 	class UserBoardBuilder {
 		UserBoard userBoard;
