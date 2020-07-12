@@ -304,6 +304,10 @@ public class GameBoard {
 		moves.add(Move.discard(user.id));
 		userBoards.get(user).discard(maxNumberOfCards);
 	}
+	
+	public void prettyPrintStockAndDiscardPiles(User user) {
+		userBoards.get(user).prettyPrintStockAndDiscardPiles(maxNumberOfCards);
+	}
 		
 	public void moveToFoundation(User user, Integer cardId, Integer toFoundationId) {
 		moves.add(Move.moveToFoundation(user.id, cardId, toFoundationId));
@@ -442,7 +446,7 @@ public class GameBoard {
 		return userBoards.get(user).stockPile;
 	}
 
-	public Pile getDiscardPile(User user) {
+	public VisiblePile getDiscardPile(User user) {
 		return userBoards.get(user).discardPile;
 	}
 

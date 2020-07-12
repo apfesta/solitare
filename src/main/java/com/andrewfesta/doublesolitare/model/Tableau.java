@@ -35,6 +35,7 @@ public class Tableau {
 		
 		//return leftover cards
 		Pile p = new Pile(d);
+		p.setToStringPrefix("S");
 		for (Card c: d.cards) {
 			c.setCurrentPile(p);
 		}

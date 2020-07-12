@@ -629,7 +629,7 @@ var app = {
 					.attr('title',card.unicodeHtmlEntity));
 			if (card.color=='RED') cardDiv.addClass('red');
 			cardDiv.addClass('fan-right');
-			if (c==2) {
+			if (c==(maxcards-1)) {
 				var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
 				buildDiv.append(cardDiv);
 				$('#discard-pile').append(buildDiv);

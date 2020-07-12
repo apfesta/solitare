@@ -44,7 +44,7 @@ public class SamplePlayTest {
 			for (Suit s: Suit.values()) {
 				if (i==0) {
 					game.discard(user);
-					game.getDiscardPile(user).print(3);
+					game.prettyPrintStockAndDiscardPiles(user);
 				}
 				game.moveToFoundation(user, cardId(v,s), foundationIds.get(s));
 				game.getUserBoard(user).getScore().prettyPrint();
@@ -207,7 +207,7 @@ public class SamplePlayTest {
 				
 		//MOVE #5 - Discard
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #6 - Move FIVE of CLUBS to 6 of HEARTS
 		toBuildId = 3;
@@ -221,15 +221,15 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #7 - Discard 3 times til we get to the ACE
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #8 - Move ACE of DIAMONDS
 		toFoundationId = 2;
@@ -242,11 +242,11 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #9 - Discard
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #10 - Move FOUR DIAMONDS
 		toBuildId = 3;
@@ -259,11 +259,11 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #11 - Discard
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #12 - Move SEVEN DIAMONDS
 		toBuildId = 1;
@@ -276,15 +276,15 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #13 - Discard
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #14 - Move SIX CLUBS
 		toBuildId = 1;
@@ -297,13 +297,13 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//DIscard
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #14 - Move QUEEN CLUBS
 		toBuildId = 0;
@@ -316,7 +316,7 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE 15 - Move JACK of HEARTS
 		fromBuildId = 5;
@@ -352,15 +352,15 @@ public class SamplePlayTest {
 		
 		//DIscard
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #17 - Move SEVEN CLUBS
 		toBuildId = 4;
@@ -373,11 +373,11 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//DIscard
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #18 - Move TEN CLUBS
 		toBuildId = 0;
@@ -390,10 +390,10 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 				
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #8 - Move TWO of DIAMONDS
 		toFoundationId = 2;
@@ -408,7 +408,7 @@ public class SamplePlayTest {
 		tableau.prettyPrint();
 		
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #19 - Move SIX of DIAMONDS
 		toBuildId = 4;
@@ -421,7 +421,7 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #20 - Move FIVE of DIAMONDS
 		toBuildId = 1;
@@ -434,7 +434,7 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 			
 		
 		//MOVE #21 - Move THREE of DIAMONDS
@@ -448,7 +448,7 @@ public class SamplePlayTest {
 		
 		foundation.prettyPrint();
 		tableau.prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//MOVE #22 - Move FOUR of DIAMONDS
 		fromBuildId = 3;
@@ -543,9 +543,9 @@ public class SamplePlayTest {
 		
 				
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.discard(user);
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		
 		//Game over because we've run out of moves
 	}
