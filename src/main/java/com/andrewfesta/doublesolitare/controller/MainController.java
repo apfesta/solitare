@@ -300,7 +300,7 @@ public class MainController {
 		
 		game.getFoundation().prettyPrint();
 		game.getTableau(user).prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.getUserBoard(user).getScore().prettyPrint();
 		
 		return game.getUserBoard(user);
@@ -334,7 +334,7 @@ public class MainController {
 						
 		game.getFoundation().prettyPrint();
 		game.getTableau(user).prettyPrint();
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.getUserBoard(user).getScore().prettyPrint();
 		
 		return game.getUserBoard(user);
@@ -352,7 +352,7 @@ public class MainController {
 		game.discard(user);
 		syncService.notifyDiscard(game, user);
 		
-		game.getDiscardPile(user).print(3);
+		game.prettyPrintStockAndDiscardPiles(user);
 		game.getUserBoard(user).getScore().prettyPrint();
 		
 		return game.getUserBoard(user);

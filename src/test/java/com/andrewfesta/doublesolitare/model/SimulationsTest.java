@@ -302,10 +302,10 @@ public class SimulationsTest {
 		//PRINT
 		game.getFoundation().prettyPrint();
 		userBoard3.getTableau().prettyPrint();
-		userBoard3.getDiscardPile().print(3);
+		userBoard3.prettyPrintStockAndDiscardPiles(3);
 		userBoard3.getScore().prettyPrint();
 		userBoard4.getTableau().prettyPrint();
-		userBoard4.getDiscardPile().print(3);
+		userBoard4.prettyPrintStockAndDiscardPiles(3);
 		userBoard4.getScore().prettyPrint();
 	}
 

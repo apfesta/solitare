@@ -35,6 +35,7 @@ public class Tableau {
 		
 		//return leftover cards
 		Pile p = new Pile(d);
+		p.setToStringPrefix("S");
 		for (Card c: d.cards) {
 			c.setCurrentPile(p);
 		}
@@ -75,8 +76,7 @@ public class Tableau {
 		this.build = build;
 	}
 
-
-	public void prettyPrint() {
+	public String getPrettyPrint() {
 		StringBuffer buffer= new StringBuffer();
 		
 		List<Integer> heights = new ArrayList<>(7);
@@ -90,8 +90,6 @@ public class Tableau {
 			for (int i=0; i<7; i++) {
 				if (pile[i].size()>j) {
 					buffer.append(" --- ");
-//					Card c = pile[i].peekFromBottom(j);
-//					buffer.append(" ").append(c.abbrev()).append(" ");
 				} else {
 					if (build[i].size()+pile[i].size()>j) {
 						Card c = build[i].peekFromBottom(j-pile[i].size());
@@ -104,7 +102,11 @@ public class Tableau {
 			}
 			buffer.append("\n");
 		}
-		System.out.println(buffer.toString());
+		return buffer.toString();
+	}
+	
+	public void prettyPrint() {
+		System.out.println(getPrettyPrint());
 	}
 
 }

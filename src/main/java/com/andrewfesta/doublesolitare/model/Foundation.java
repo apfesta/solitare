@@ -44,7 +44,7 @@ public class Foundation {
 		this.locks = locks;
 	}
 
-	public void prettyPrint() {
+	public String getPrettyPrint() {
 		StringBuffer buffer= new StringBuffer("F: ");
 		
 		List<Integer> heights = new ArrayList<>(7);
@@ -80,8 +80,11 @@ public class Foundation {
 				}
 			}
 		}
-		
-		System.out.println(buffer.toString());
+		return buffer.toString();
+	}
+	
+	public void prettyPrint() {
+		System.out.println(getPrettyPrint());
 	}
 	
 }

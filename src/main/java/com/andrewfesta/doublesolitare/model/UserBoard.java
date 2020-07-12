@@ -144,6 +144,11 @@ public class UserBoard {
 		lastMoveInstant = Instant.now();
 	}
 	
+	public void prettyPrintStockAndDiscardPiles(int maxNumberOfCards) {
+		getStockPile().print();
+		getDiscardPile().print(maxNumberOfCards);
+	}
+	
 	protected Integer getPileIdToFlip(Card card) {
 		Integer pileIdToFlip = null;
 		for (int i=0; i<getTableau().getPile().length; i++) {
@@ -404,6 +409,19 @@ public class UserBoard {
 
 		public void setStartingDeck(Deck.Export startingDeck) {
 			this.startingDeck = startingDeck;
+		}
+
+		public String[] getCurrentFoundation() {
+			return game.getFoundation().getPrettyPrint().split("\n");
+		}
+		public String[] getCurrentTableau() {
+			return tableau.getPrettyPrint().split("\n");
+		}
+		public String getCurrentStockPile() {
+			return stockPile.toString();
+		}
+		public String getCurrentDiscardPile() {
+			return discardPile.toString();
 		}
 	}
 

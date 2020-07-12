@@ -53,13 +53,10 @@ public class Pile {
 		return cards.contains(o);
 	}
 
-	public void print(int maxNumberOfCards) {
+	public void print() {
 		List<Card> readOnly = asList();
 		StringBuffer buffer = new StringBuffer(prefix()).append(": (").append(readOnly.size()).append(")");
-		for (int i = 0; i<maxNumberOfCards && i<readOnly.size(); i++) {
-			buffer.append(readOnly.get(i).abbrev()).append(" | ");
-		}
-		buffer.append("\n");
+		buffer.append(" ");
 		System.out.println(buffer.toString());
 	}
 	
