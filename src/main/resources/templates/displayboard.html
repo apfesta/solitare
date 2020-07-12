@@ -81,33 +81,36 @@
 			<div class="score col">Score: 0</div>
 			<div class="moves col">Moves: 0</div>
 		</div>
-		<div id="topSection" class="row">
-			<div id="topLeftSection" class="col">
-				<div class="row">
-					<div id="scoreBoard" class="col users">
-						<table>
-						<thead>
-							<tr><th></th><th>Status</th><th>Moves</th></tr>
-						</thead>
-						<tbody>
-							<tr class="user me"></tr>
-						</tbody>
-						</table>
+		<div id="gameBoard">
+		
+			<div id="topSection" class="row">
+				<div id="topLeftSection" class="col">
+					<div class="row">
+						<div id="scoreBoard" class="col users">
+							<table>
+							<thead>
+								<tr><th></th><th>Status</th><th>Moves</th></tr>
+							</thead>
+							<tbody>
+								<tr class="user me"></tr>
+							</tbody>
+							</table>
+						</div>
+					</div>
+					<div id="stockAndDiscardPiles" class="row">
+						<div id="stockPile" class="col"></div>
+						<div id="discardPile" class="col-8"></div>
 					</div>
 				</div>
-				<div id="stockAndDiscardPiles" class="row">
-					<div id="stockPile" class="col"></div>
-					<div id="discardPile" class="col-8"></div>
+				
+				<div id="foundationPiles" class="col-7">
+					<div id="foundation"></div>
 				</div>
 			</div>
-			
-			<div id="foundationPiles" class="col-7">
-				<div id="foundation"></div>
-			</div>
-		</div>
-	
-		<div id="tableau"></div>
 		
+			<div id="tableau"></div>
+		
+		</div>
 		<div class="chatframe fixed-bottom">
 			<div class="chatmessageframe">
 				<div class="chatmessages">

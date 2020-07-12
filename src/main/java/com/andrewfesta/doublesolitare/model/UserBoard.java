@@ -410,6 +410,19 @@ public class UserBoard {
 		public void setStartingDeck(Deck.Export startingDeck) {
 			this.startingDeck = startingDeck;
 		}
+
+		public String[] getCurrentFoundation() {
+			return game.getFoundation().getPrettyPrint().split("\n");
+		}
+		public String[] getCurrentTableau() {
+			return tableau.getPrettyPrint().split("\n");
+		}
+		public String getCurrentStockPile() {
+			return stockPile.toString();
+		}
+		public String getCurrentDiscardPile() {
+			return discardPile.toString();
+		}
 	}
 
 }

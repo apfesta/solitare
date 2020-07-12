@@ -220,7 +220,7 @@ var app = {
 			type: 'POST', 
 			url: getRelativePath('/api/game/'+gameId+'/export'),
 			dataType: "json",
-			data: {'boardHtml':$('#board').html()}});	
+			data: {'boardHtml':$('#gameBoard').html()}});	
 	}
 	
 	app.newTest = function() {
