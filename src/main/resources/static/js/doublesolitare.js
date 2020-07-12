@@ -220,7 +220,7 @@ var app = {
 			type: 'POST', 
 			url: getRelativePath('/api/game/'+gameId+'/export'),
 			dataType: "json",
-			data: {'boardHtml':$('#board').html()}});	
+			data: {'boardHtml':$('#gameBoard').html()}});	
 	}
 	
 	app.newTest = function() {
@@ -629,7 +629,7 @@ var app = {
 					.attr('title',card.unicodeHtmlEntity));
 			if (card.color=='RED') cardDiv.addClass('red');
 			cardDiv.addClass('fan-right');
-			if (c==2) {
+			if (c==(maxcards-1)) {
 				var buildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
 				buildDiv.append(cardDiv);
 				$('#discard-pile').append(buildDiv);
@@ -795,10 +795,7 @@ var app = {
 				.on('dragenter', app.dragenter)
 				.on('dragleave', app.dragleave);
 			colDiv.append(pileDiv);
-			
-			var targetDiv = $('<div>').addClass('target');
-			pileDiv.append(targetDiv);
-			
+						
 			for (var c=0; c<pile.numberOfCards; c++) {
 				var cardDiv = $('<div>')
 					.addClass('pokercard').addClass('back')
