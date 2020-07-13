@@ -24,6 +24,7 @@ import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugPr
 import com.andrewfesta.doublesolitare.exception.GameInProgressException;
 import com.andrewfesta.doublesolitare.exception.GameNotFoundException;
 import com.andrewfesta.doublesolitare.model.Card;
+import com.andrewfesta.doublesolitare.model.Foundation;
 import com.andrewfesta.doublesolitare.model.GameBoard;
 import com.andrewfesta.doublesolitare.model.Suit;
 import com.andrewfesta.doublesolitare.model.User;
@@ -86,6 +87,11 @@ public class MainController {
 	public @ResponseBody UserBoard newTestGame(
 			@RequestParam("multiplayer") boolean multiplayer) {
 		LOG.trace("POST /api/game?multiplayer={}",multiplayer);
+		
+		return testGame2();
+	}
+	
+	UserBoard testGame1(boolean multiplayer) {
 		User user = userService.getUser();
 		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
 		if (debugProperties!=null) {
@@ -123,6 +129,38 @@ public class MainController {
 		}
 		
 		return game.getUserBoard(user);
+	}
+	
+	UserBoard testGame2() {
+		User user = userService.getUser();
+		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), false);
+		games.put(game.getGameId(), game);
+		game.setFoundation(new Foundation());
+		game.getFoundation().addPlayer();
+		
+		UserBoard userBoard = UserBoard
+				.builder(game, user)
+				.tableau()
+					.stack(0)
+						.topCard(4, Suit.CLUBS)
+						.addToTableau()
+					.stack(1)
+						.topCard(5, Suit.SPADES)
+						.addToTableau()
+					.stack(2)
+						.topCard(6, Suit.CLUBS)
+						.addToTableau()
+					.addToBoard()
+				.stockPile()
+					.add(6, Suit.DIAMONDS)
+					.add(5, Suit.DIAMONDS)
+					.add(4, Suit.DIAMONDS)
+					.add(3, Suit.DIAMONDS)
+					.add(2, Suit.DIAMONDS)
+					.add(Card.ACE, Suit.DIAMONDS)
+					.addToParent()
+				.build();
+		return userBoard;
 	}
 	
 	@RequestMapping(value="/api/user", method = RequestMethod.POST)
