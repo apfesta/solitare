@@ -556,7 +556,9 @@ var app = {
 			if ($('#discardPile .pokercard').length==0) {
 				app.showNextDiscardCards(1);
 			} else {
-				$('#discardPile .build').append($('#discardPile .pokercard:last'));
+				//sub-build for consistency with other piles
+				var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+				$('#discardPile .build').append($('#discardPile .pokercard:last')).append(subBuildDiv);;
 			}
 		}
 		$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
