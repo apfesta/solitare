@@ -553,7 +553,13 @@ var app = {
 				app.flip(pileId);
 			}
 		} else {
-			$('#discardPile .build').append($('#discardPile .pokercard:last'));
+			if ($('#discardPile .pokercard').length==0) {
+				app.showNextDiscardCards(1);
+			} else {
+				//sub-build for consistency with other piles
+				var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+				$('#discardPile .build').append($('#discardPile .pokercard:last')).append(subBuildDiv);;
+			}
 		}
 		$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
 		$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
@@ -596,9 +602,14 @@ var app = {
 				app.flip(fromPileId);
 			}
 		} else {
-			//sub-build for consistency with other piles
-			var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
-			$('#discardPile .build').append($('#discardPile .pokercard:last')).append(subBuildDiv);
+			if ($('#discardPile .pokercard').length==0) {
+				app.showNextDiscardCards(1);
+			} else {
+				//sub-build for consistency with other piles
+				var subBuildDiv = $('<div>').addClass('build').attr('draggable',true).on('dragstart', app.drag);
+				$('#discardPile .build').append($('#discardPile .pokercard:last')).append(subBuildDiv);
+			}
+			
 		}
 		$('#score').html('Score: '+app.userboard.score.totalScore);
 		$('#moves').html('Moves: '+app.userboard.score.totalMoves);
@@ -612,13 +623,32 @@ var app = {
 			contentType: "application/json",
 			dataType: "json"});
 	};
-	
-	app.discardSuccess = function(data) {
+		
+	app.discardSuccess = function(data, numOfCards) {
 		console.debug(data);
 		app.userboard = data;
 		app.gameboard = app.userboard.game;
+		
+		app.showNextDiscardCards(3);
+		
+		if (app.userboard.stockPile.empty) {
+			$('#stock-pile .pokercard').hide();
+		} else {
+			$('#stock-pile .pokercard').show();
+		}
+		$('#score').html('Score: '+app.userboard.score.totalScore);
+		$('#moves').html('Moves: '+app.userboard.score.totalMoves);
+	}
+	
+	
+	
+	//---------------
+	// Display functions
+	//---------------
+	
+	app.showNextDiscardCards = function(numOfCards) {
 		$('#discard-pile').empty();
-		var maxcards = app.userboard.discardPile.cards.length>=3 ? 3 : app.userboard.discardPile.cards.length
+		var maxcards = app.userboard.discardPile.cards.length>=numOfCards ? numOfCards : app.userboard.discardPile.cards.length
 		for (var c=0; c<maxcards; c++) {
 			var card = app.userboard.discardPile.cards[maxcards-1-c];
 			var cardDiv = $('<div>')
@@ -641,21 +671,7 @@ var app = {
 				$('#discard-pile').append(cardDiv);
 			}
 		}
-		if (app.userboard.stockPile.empty) {
-			$('#stock-pile .pokercard').hide();
-		} else {
-			$('#stock-pile .pokercard').show();
-		}
-		$('#score').html('Score: '+app.userboard.score.totalScore);
-		$('#moves').html('Moves: '+app.userboard.score.totalMoves);
 	}
-	
-	
-	
-	//---------------
-	// Display functions
-	//---------------
-	
 	
 	app.flip = function(pileId) {
 		var cardDiv = $('#tableau #pile'+pileId+' .pokercard:last');
@@ -836,7 +852,7 @@ var app = {
 			.on('click', function(){
 				app.discard()
 					.done(function(data){
-						app.discardSuccess(data);
+						app.discardSuccess(data,3);
 					});
 			});
 		$('#stockPile').append(pileDiv);
