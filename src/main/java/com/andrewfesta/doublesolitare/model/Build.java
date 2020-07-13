@@ -2,7 +2,9 @@ package com.andrewfesta.doublesolitare.model;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,6 +133,43 @@ public class Build extends VisiblePile {
 			} else {
 				throw new PushException("Cannot place card "+c+" on top of "+cards.peek()+" for this type of build");
 			}
+		}
+	}
+	
+	public static Builder builder(Build build) {
+		return new Builder(build);
+	}
+	
+	public static class Builder {
+		Build build;
+		Map<Integer, Card> cards = new HashMap<>();
+		Tableau.StackBuilder stackBuilder;
+		
+		Builder(Build build) {
+			this.build = build;
+		}
+		public Builder cards(Map<Integer, Card> cards) {
+			this.cards = cards;
+			return this;
+		}
+		Builder push(int value, Suit suit) {
+			Card c = new Card(value, suit);
+			if (cards.containsKey(c.getUnicodeInt())) {
+				throw new RuntimeException("Card already exists in deck");
+			}
+			cards.put(c.getUnicodeInt(), c);
+			build.cards.push(c);
+			c.setCurrentBuild(build);
+			return this;
+		}
+		
+		public Builder stackBuilder(Tableau.StackBuilder stackBuilder) {
+			this.stackBuilder = stackBuilder;
+			return this;
+		}
+		
+		public Tableau.StackBuilder addToStack() {
+			return this.stackBuilder;
 		}
 	}
 	

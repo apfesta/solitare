@@ -2,7 +2,10 @@ package com.andrewfesta.doublesolitare.model;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class Pile {
 	
@@ -76,6 +79,60 @@ public class Pile {
 			buffer.append(readOnly.get(i).abbrev()).append(" | ");
 		}
 		return buffer.toString();
+	}
+	
+	public static <P> Builder<P> builder(P pileParent, boolean cardReferencesPile, Pile pile) {
+		return new Builder<P>(pileParent, cardReferencesPile, pile);
+	}
+	public static <P> Builder<P> builder(P pileParent, boolean cardReferencesPile) {
+		return new Builder<P>(pileParent, cardReferencesPile);
+	}
+	
+	public static class Builder<P> {
+		final P pileParent;
+		final Pile pile;
+		Map<Integer, Card> cards = new HashMap<>();
+		boolean cardReferencesPile = false;
+		Consumer<Pile> pileConsumer;
+		
+		public Builder(P pileParent, boolean cardReferencesPile, Pile pile) {
+			super();
+			this.pileParent = pileParent;
+			this.cardReferencesPile = cardReferencesPile;
+			this.pile = pile;
+		}
+		public Builder(P pileParent, boolean setCurrentPile) {
+			this(pileParent, setCurrentPile, new Pile());
+		}
+		public Builder<P> cards(Map<Integer, Card> cards) {
+			this.cards = cards;
+			return this;
+		}
+		public Builder<P> consumer(Consumer<Pile> consumer) {
+			this.pileConsumer = consumer;
+			return this;
+		}
+
+		public Builder<P> add(int value, Suit suit) {
+			Card c = new Card(value, suit);
+			pile.cards.add(c);
+			if (cardReferencesPile) {
+				c.setCurrentPile(pile);
+			}
+			if (cards.containsKey(c.getUnicodeInt())) {
+				throw new RuntimeException("Card already exists in deck");
+			}
+			cards.put(c.getUnicodeInt(), c);
+			return this;
+		}
+				
+		public P addToParent() {
+			if (pileConsumer!=null) {
+				pileConsumer.accept(pile);
+			}
+			return pileParent;
+		}
+		
 	}
 	
 }

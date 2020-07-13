@@ -3,6 +3,7 @@ package com.andrewfesta.doublesolitare.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class Tableau {
 	
@@ -107,6 +108,70 @@ public class Tableau {
 	
 	public void prettyPrint() {
 		System.out.println(getPrettyPrint());
+	}
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		Tableau tableau;
+		UserBoard.Builder userBoardBuilder;
+		public Builder(){
+			this.tableau = new Tableau();
+		}
+		Builder userBoardBuilder(UserBoard.Builder userBoardBuilder) {
+			this.userBoardBuilder = userBoardBuilder;
+			return this;
+		}
+		public StackBuilder stack(int stackId) {
+			return new StackBuilder(this, stackId)
+					.cards(userBoardBuilder.userBoard.cards);
+		}
+		public Tableau build() {
+			return tableau;
+		}
+		public UserBoard.Builder addToBoard() {
+			userBoardBuilder.tableau(this.build());
+			return userBoardBuilder;
+		}
+	}
+	
+	public static class StackBuilder {
+		int stackId;
+		Pile pile;
+		Build build;
+		Builder tableauBuilder;
+		Map<Integer, Card> cards;
+		
+		StackBuilder(Builder tableauBuilder, int stackId) {
+			this.tableauBuilder = tableauBuilder;
+			this.pile = tableauBuilder.tableau.pile[stackId];
+			this.build = tableauBuilder.tableau.build[stackId];
+			this.stackId = stackId;
+		}
+		public StackBuilder tableauBuilder(Builder tableauBuilder) {
+			return this;
+		}
+		public StackBuilder cards(Map<Integer, Card> cards) {
+			this.cards = cards;
+			return this;
+		}
+		public StackBuilder topCard(int value, Suit suit) {
+			Build.builder(build)
+				.cards(cards)
+				.stackBuilder(this)
+				.push(value, suit);
+			return this;
+		}
+		public Pile.Builder<StackBuilder> pile() {
+			return Pile.builder(this, false, pile)
+					.cards(cards);
+		}
+		public Builder addToTableau() {
+			return tableauBuilder;
+		}
+
 	}
 
 }
