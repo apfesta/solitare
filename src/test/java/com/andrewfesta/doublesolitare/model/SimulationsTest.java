@@ -55,28 +55,29 @@ public class SimulationsTest {
 		/*
 		 * SETUP
 		 */
-		UserBoard userBoard3 = new UserBoardBuilder(game, user3)
+		UserBoard userBoard3 = UserBoard.builder(game, user3)
 			.tableau()
 				.stack(0)
-					.topCard(10, Suit.DIAMONDS).build()
+					.topCard(10, Suit.DIAMONDS).addToTableau()
 				.stack(1)
 					.topCard(Card.KING, Suit.DIAMONDS)
 					.pile()
-						.add(Card.QUEEN, Suit.HEARTS).build().build()
+						.add(Card.QUEEN, Suit.HEARTS).addToParent().addToTableau()
 				.stack(2)
-					.topCard(10, Suit.HEARTS).build()
+					.topCard(10, Suit.HEARTS).addToTableau()
 				.stack(3)
 					.topCard(Card.QUEEN, Suit.DIAMONDS)
 					.pile()
 						.add(5, Suit.CLUBS)
 						.add(6, Suit.DIAMONDS)
-						.add(Card.ACE, Suit.SPADES).build().build()
+						.add(Card.ACE, Suit.SPADES).addToParent().addToTableau()
 				.stack(4)
-					.topCard(4, Suit.CLUBS).build()
+					.topCard(4, Suit.CLUBS).addToTableau()
 				.stack(5)
-					.topCard(10, Suit.CLUBS).build()
+					.topCard(10, Suit.CLUBS).addToTableau()
 				.stack(6)
-					.topCard(Card.KING, Suit.SPADES).build().build()
+					.topCard(Card.KING, Suit.SPADES).addToTableau()
+				.addToBoard()
 			.stockPile()
 				.add(2, Suit.SPADES)
 				.add(9, Suit.CLUBS)
@@ -101,7 +102,7 @@ public class SimulationsTest {
 				.add(4, Suit.HEARTS)
 				.add(10, Suit.SPADES)
 				.add(2, Suit.DIAMONDS)
-				.add(Card.ACE, Suit.CLUBS).build().build();
+				.add(Card.ACE, Suit.CLUBS).addToParent().build();
 		
 		userBoard4.tableau = new Tableau();
 		userBoard4.stockPile = new Pile();
@@ -318,30 +319,30 @@ public class SimulationsTest {
 		game.foundation.addPlayer();
 		game.foundation.addPlayer();
 		
-		UserBoard userBoard3 = new UserBoardBuilder(game, user3)
+		UserBoard userBoard3 = UserBoard.builder(game, user3)
 			.tableau()
 				.stack(0)
-					.topCard(10, Suit.SPADES).build()
+					.topCard(10, Suit.SPADES).addToTableau()
 				.stack(1)
 					.topCard(3, Suit.SPADES)
 					.pile()
-						.add(4, Suit.CLUBS).build()
-					.build()
+						.add(4, Suit.CLUBS).addToParent()
+					.addToTableau()
 				.stack(2)
 					.topCard(Card.ACE, Suit.SPADES)
 					.pile()
 						.add(Card.QUEEN, Suit.SPADES)
 						.add(8, Suit.CLUBS)
-						.build()
-					.build()
+						.addToParent()
+					.addToTableau()
 				.stack(3)
 					.topCard(10, Suit.CLUBS)
 					.pile()
 						.add(Card.JACK, Suit.CLUBS)
 						.add(3, Suit.DIAMONDS)
 						.add(6, Suit.CLUBS)
-						.build()
-					.build()
+						.addToParent()
+					.addToTableau()
 				.stack(4)
 					.topCard(Card.KING, Suit.DIAMONDS)
 					.pile()
@@ -349,15 +350,15 @@ public class SimulationsTest {
 						.add(Card.KING, Suit.CLUBS)
 						.add(Card.ACE, Suit.HEARTS)
 						.add(6, Suit.HEARTS)
-						.build()
-					.build()
+						.addToParent()
+					.addToTableau()
 				.stack(5)
 					.topCard(7, Suit.SPADES)
-					.build()
+					.addToTableau()
 				.stack(6)
 					.topCard(7, Suit.CLUBS)
-					.build()
-				.build()
+					.addToTableau()
+				.addToBoard()
 			.stockPile()
 				.add(Card.ACE, Suit.CLUBS)
 				.add(9, Suit.DIAMONDS)
@@ -383,31 +384,32 @@ public class SimulationsTest {
 				.add(Card.QUEEN, Suit.CLUBS)
 				.add(3, Suit.HEARTS)
 				.add(7, Suit.HEARTS)
-					.build().build();
+				.addToParent()
+			.build();
 		
-		UserBoard userBoard4 = new UserBoardBuilder(game, user4)
+		UserBoard userBoard4 = UserBoard.builder(game, user4)
 			.tableau()
 				.stack(0)
 					.topCard(4, Suit.HEARTS)
-					.build()
+					.addToTableau()
 				.stack(1)
 					.topCard(Card.ACE, Suit.SPADES)
 					.pile()
-						.add(Card.JACK, Suit.CLUBS).build()
-					.build()
+						.add(Card.JACK, Suit.CLUBS).addToParent()
+					.addToTableau()
 				.stack(2)
 					.topCard(Card.KING, Suit.SPADES)
 					.pile()
-						.add(5, Suit.DIAMONDS).build()
-					.build()
+						.add(5, Suit.DIAMONDS).addToParent()
+					.addToTableau()
 				.stack(3)
 					.topCard(8, Suit.HEARTS)
 					.pile()
-						.add(9, Suit.HEARTS).build()
-					.build()
+						.add(9, Suit.HEARTS).addToParent()
+					.addToTableau()
 				.stack(4)
 					.topCard(9, Suit.SPADES)
-					.build()
+					.addToTableau()
 				.stack(5)
 					.topCard(4, Suit.SPADES)
 					.pile()
@@ -416,16 +418,16 @@ public class SimulationsTest {
 						.add(2, Suit.HEARTS)
 						.add(Card.QUEEN, Suit.CLUBS)
 						.add(Card.JACK, Suit.HEARTS)
-						.build()
-					.build()
+						.addToParent()
+					.addToTableau()
 				.stack(6)
 					.topCard(6, Suit.CLUBS)
 					.pile()
 						.add(2, Suit.CLUBS)
 						.add(Card.KING, Suit.DIAMONDS)
-						.build()
-					.build()
-				.build()
+						.addToParent()
+					.addToTableau()
+				.addToBoard()
 			.stockPile()
 				.add(6, Suit.DIAMONDS)
 				.add(7, Suit.HEARTS)
@@ -451,7 +453,8 @@ public class SimulationsTest {
 				.add(10, Suit.DIAMONDS)
 				.add(8, Suit.SPADES)
 				.add(Card.ACE, Suit.HEARTS)
-				.build().build();
+				.addToParent()
+			.build();
 		
 		game.moveToFoundation(user3, card(Card.ACE, Suit.SPADES), 4);
 		game.discard(user3);
@@ -581,120 +584,4 @@ public class SimulationsTest {
 		userBoard4.getScore().prettyPrint();
 	}
 	
-	class UserBoardBuilder {
-		UserBoard userBoard;
-		UserBoardBuilder(GameBoard game, User user) {
-			userBoard = new UserBoard(game, user);
-			userBoard.score = userBoard.new Score();
-			game.userBoards.put(user, userBoard);
-			
-		}
-		TableauBuilder tableau() {
-			return new TableauBuilder(this);
-		}
-		StockPileBuilder stockPile() {
-			return new StockPileBuilder(this);
-		}
-		UserBoard build() {
-			return userBoard;
-		}
-	}
-	class TableauBuilder {
-		Tableau tableau;
-		UserBoardBuilder userBoardBuilder;
-		TableauBuilder(UserBoardBuilder userBoardBuilder){
-			this.userBoardBuilder = userBoardBuilder;
-			this.tableau = new Tableau();
-		}
-		StackBuilder stack(int stackId) {
-			return new StackBuilder(this, stackId);
-		}
-		UserBoardBuilder build() {
-			userBoardBuilder.userBoard.tableau = tableau;
-			return userBoardBuilder;
-		}
-	}
-	
-	class StackBuilder {
-		int stackId;
-		TableauBuilder tableauBuilder;
-		StackBuilder(TableauBuilder tableauBuilder, int stackId) {
-			this.tableauBuilder = tableauBuilder;
-			this.stackId = stackId;
-		}
-		StackBuilder topCard(int value, Suit suit) {
-			new BuildBuilder(this, 
-					tableauBuilder.tableau.build[stackId]).push(value, suit);
-			return this;
-		}
-		PileBuilder pile() {
-			return new PileBuilder(this, 
-					tableauBuilder.tableau.pile[stackId]);
-		}
-		TableauBuilder build() {
-			return tableauBuilder;
-		}
-	}
-	
-	class BuildBuilder {
-		Build build;
-		StackBuilder stackBuilder;
-		BuildBuilder(StackBuilder stackBuilder, Build build) {
-			this.stackBuilder = stackBuilder;
-			this.build = build;
-		}
-		void push(int value, Suit suit) {
-			Card c = newCard(value, suit);
-			if (stackBuilder.tableauBuilder.userBoardBuilder.userBoard.cards.containsKey(c.getUnicodeInt())) {
-				throw new RuntimeException("Card already exists in deck");
-			}
-			stackBuilder.tableauBuilder.userBoardBuilder.userBoard.cards.put(c.getUnicodeInt(), c);
-			build.cards.push(c);
-			c.setCurrentBuild(build);
-		}
-	}
-	
-	class PileBuilder {
-		Pile pile;
-		StackBuilder stackBuilder;
-		PileBuilder(StackBuilder stackBuilder, Pile pile) {
-			this.stackBuilder = stackBuilder;
-			this.pile = pile;
-		}
-		PileBuilder add(int value, Suit suit) {
-			Card c = newCard(value, suit);
-			if (stackBuilder.tableauBuilder.userBoardBuilder.userBoard.cards.containsKey(c.getUnicodeInt())) {
-				throw new RuntimeException("Card already exists in deck");
-			}
-			stackBuilder.tableauBuilder.userBoardBuilder.userBoard.cards.put(c.getUnicodeInt(), c);
-			pile.cards.add(c);
-			return this;
-		}
-		StackBuilder build() {
-			return stackBuilder;
-		}
-	}
-	
-	class StockPileBuilder {
-		Pile stockPile;
-		UserBoardBuilder userBoardBuilder;
-		StockPileBuilder(UserBoardBuilder userBoardBuilder) {
-			this.userBoardBuilder = userBoardBuilder;
-			this.stockPile = new Pile();
-		}
-		StockPileBuilder add(int value, Suit suit) {
-			Card c = newCard(value, suit);
-			if (userBoardBuilder.userBoard.cards.containsKey(c.getUnicodeInt())) {
-				throw new RuntimeException("Card already exists in deck");
-			}
-			userBoardBuilder.userBoard.cards.put(c.getUnicodeInt(), c);
-			stockPile.cards.add(c);
-			c.setCurrentPile(stockPile);
-			return this;
-		}
-		UserBoardBuilder build() {
-			userBoardBuilder.userBoard.stockPile = stockPile;
-			return userBoardBuilder;
-		}
-	}
 }

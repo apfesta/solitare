@@ -326,6 +326,38 @@ public class UserBoard {
 	public void setLastMoveInstant(Instant lastMoveInstant) {
 		this.lastMoveInstant = lastMoveInstant;
 	}
+	
+	public static Builder builder(GameBoard game, User user) {
+		return new Builder(game, user);
+	}
+	
+	public static class Builder {
+		UserBoard userBoard;
+		
+		Builder(GameBoard game, User user) {
+			userBoard = new UserBoard(game, user);
+			userBoard.score = userBoard.new Score();
+			game.userBoards.put(user, userBoard);
+		}
+		
+		public Builder tableau(Tableau tableau) {
+			userBoard.tableau = tableau;
+			return this;
+		}
+		public Tableau.Builder tableau() {
+			return Tableau.builder().userBoardBuilder(this);
+		}
+		public Pile.Builder<Builder> stockPile() {
+			return Pile.builder(this, true, new Pile())
+					.cards(userBoard.cards)
+					.consumer((pile)->userBoard.stockPile=pile);
+		}
+		
+		public UserBoard build() {
+			return userBoard;
+		}
+		
+	}
 
 	@JsonInclude(Include.NON_NULL)
 	public class CanPush {
