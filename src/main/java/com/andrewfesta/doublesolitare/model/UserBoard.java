@@ -118,7 +118,7 @@ public class UserBoard {
 	}
 	
 	public void discard(int maxNumberOfCards) {
-		if (stockPile.isEmpty()) {
+		if (stockPile.isEmpty() && !discardPile.isEmpty()) {
 			GAME_LOG.debug("GameId:({}){} User:({}){} putting discard pile back into stock pile",
 					game.gameId, game.gameName, 
 					user.id, user.username);
@@ -128,6 +128,12 @@ public class UserBoard {
 				stockPile.push(c);
 				c.setCurrentPile(stockPile);
 			} while (!discardPile.isEmpty());
+		} 
+		if (stockPile.isEmpty()) {
+			GAME_LOG.debug("GameId:({}){} User:({}){} no cards left to discard",
+					game.gameId, game.gameName, 
+					user.id, user.username);
+			return;
 		}
 		GAME_LOG.debug("GameId:({}){} User:({}){} discard",
 				game.gameId, game.gameName, 

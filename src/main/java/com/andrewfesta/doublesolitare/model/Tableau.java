@@ -124,14 +124,14 @@ public class Tableau {
 			this.userBoardBuilder = userBoardBuilder;
 			return this;
 		}
-		StackBuilder stack(int stackId) {
+		public StackBuilder stack(int stackId) {
 			return new StackBuilder(this, stackId)
 					.cards(userBoardBuilder.userBoard.cards);
 		}
-		Tableau build() {
+		public Tableau build() {
 			return tableau;
 		}
-		UserBoard.Builder addToBoard() {
+		public UserBoard.Builder addToBoard() {
 			userBoardBuilder.tableau(this.build());
 			return userBoardBuilder;
 		}
