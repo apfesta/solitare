@@ -404,6 +404,7 @@ public class MainController {
 		game.export()
 			.boardHtml(boardHtml)
 			.generatedByUserId(user.getId())
+			.build()
 			.writeAsFile();
 	}
 	

@@ -2,7 +2,9 @@ package com.andrewfesta.doublesolitare.model;
 
 import com.andrewfesta.doublesolitare.model.Suit.Color;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Card {
 	
 	public static final int ACE = 1;
@@ -10,8 +12,8 @@ public class Card {
 	public static final int QUEEN = 12;
 	public static final int KING = 13;
 
-	final private Suit suit;
-	final private int value;
+	private Suit suit;
+	private int value;
 	
 	private char unicodeChar;
 	private String unicodeHex;
@@ -33,6 +35,9 @@ public class Card {
 		init();
 	}
 	
+	Card() {
+		super();
+	}
 	public static int unicodeInt(int value, Suit suit) {
 		int code = 0;
 		switch (suit) {

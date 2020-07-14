@@ -24,6 +24,7 @@ import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugPr
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -474,66 +475,114 @@ public class GameBoard {
 		this.debugProperties = debugProperties;
 	}
 	
-	public GameExport export() {
-		return new GameExport();
+	public GameExportBuilder export() {
+		return new GameExportBuilder(this);
 	}
 	
-	public class GameExport {
+	public static class GameExport {
 		
+		Integer gameId;
+		ZonedDateTime createdOn;
+		Instant startTime;
+		Set<User> users;
+		String gameName;
 		String boardHtml;
 		Integer generatedByUserId;
+		Map<Integer, UserBoard.Export> userBoards;
+		List<Move> moves = new ArrayList<>();
 		
+		public GameExport() {
+		}
+
+		public GameExport(GameBoard game) {
+			this.gameId = game.gameId;
+			this.gameName = game.gameName;
+			this.createdOn = game.createdOn;
+			this.users = game.userBoards.keySet();
+			this.moves = game.moves;
+			userBoards = new HashMap<>();
+			for (Entry<User, UserBoard> userBoard: game.userBoards.entrySet()) {
+				userBoards.put(userBoard.getKey().id, userBoard.getValue().export.build());
+			}
+		}
+				
 		public Integer getGameId() {
 			return gameId;
 		}
-		public String getGameName() {
-			return gameName;
+
+		public void setGameId(Integer gameId) {
+			this.gameId = gameId;
 		}
-		public ZonedDateTime getCreatedOn() {
-			return createdOn;
-		}
+
 		public Instant getStartTime() {
 			return startTime;
 		}
+
+		public void setStartTime(Instant startTime) {
+			this.startTime = startTime;
+		}
+
 		public Set<User> getUsers() {
-			return userBoards.keySet();
+			return users;
 		}
-		public GameExport boardHtml(String boardHtml) {
-			setBoardHtml(boardHtml);
-			return this;
+
+		public void setUsers(Set<User> users) {
+			this.users = users;
 		}
-		public GameExport generatedByUserId(Integer generatedByUserId) {
-			setGeneratedByUserId(generatedByUserId);
-			return this;
+
+		public String getGameName() {
+			return gameName;
 		}
-		public Integer getGeneratedByUserId() {
-			return generatedByUserId;
+
+		public void setGameName(String gameName) {
+			this.gameName = gameName;
 		}
-		public void setGeneratedByUserId(Integer generatedByUserId) {
-			this.generatedByUserId = generatedByUserId;
-		}
+
 		public String getBoardHtml() {
 			return boardHtml;
 		}
+
 		public void setBoardHtml(String boardHtml) {
 			this.boardHtml = boardHtml;
 		}
-		public Map<Integer, UserBoard.Export> getUserBoards() {
-			Map<Integer, UserBoard.Export> userBoardsExports = new HashMap<>();
-			for (Entry<User, UserBoard> userBoard: userBoards.entrySet()) {
-				userBoardsExports.put(userBoard.getKey().id, userBoard.getValue().export);
-			}
-			return userBoardsExports;
+
+		public Integer getGeneratedByUserId() {
+			return generatedByUserId;
 		}
+
+		public void setGeneratedByUserId(Integer generatedByUserId) {
+			this.generatedByUserId = generatedByUserId;
+		}
+
+		public Map<Integer, UserBoard.Export> getUserBoards() {
+			return userBoards;
+		}
+
+		public void setUserBoards(Map<Integer, UserBoard.Export> userBoards) {
+			this.userBoards = userBoards;
+		}
+
 		public List<Move> getMoves() {
 			return moves;
 		}
-		
-		private ObjectWriter getObjectWriter() {
+
+		public void setMoves(List<Move> moves) {
+			this.moves = moves;
+		}
+
+		public ZonedDateTime getCreatedOn() {
+			return createdOn;
+		}
+
+		private static ObjectMapper getObjectMapper() {
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.registerModule(new JavaTimeModule());
 		    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		    return mapper.writerWithDefaultPrettyPrinter();
+		    return mapper;
+		}
+		
+		private ObjectWriter getObjectWriter() {
+		    return getObjectMapper().writerWithDefaultPrettyPrinter();
 		}
 		
 		public String writeValueAsString() {
@@ -552,6 +601,34 @@ public class GameBoard {
 			}
 		}
 		
+		public static GameExport readFromFile(String filename) throws IOException {
+			try {
+				return getObjectMapper().readValue(new File(filename), GameExport.class);
+			} catch (JsonParseException e) {
+				throw new RuntimeException(e);
+			} 
+		}
+		
+	}
+	
+	public static class GameExportBuilder {
+		GameExport gameExport;
+		
+		GameExportBuilder(GameBoard game) {
+			super();
+			this.gameExport = new GameExport(game);
+		}
+		public GameExportBuilder boardHtml(String boardHtml) {
+			gameExport.setBoardHtml(boardHtml);
+			return this;
+		}
+		public GameExportBuilder generatedByUserId(Integer generatedByUserId) {
+			gameExport.setGeneratedByUserId(generatedByUserId);
+			return this;
+		}
+		public GameExport build() {
+			return gameExport;
+		}
 	}
 	
 	enum MoveType {
@@ -568,6 +645,9 @@ public class GameBoard {
 		Integer toFoundationId;
 		Integer toBuildId;
 		
+		Move() {
+			super();
+		}
 		public Move(MoveType moveType, Integer userId, Integer cardId, Integer toFoundationId, Integer toBuildId) {
 			super();
 			this.moveType = moveType;

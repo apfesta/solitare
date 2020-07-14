@@ -104,6 +104,10 @@ public class Pile {
 		public Builder(P pileParent, boolean setCurrentPile) {
 			this(pileParent, setCurrentPile, new Pile());
 		}
+		public Builder<P> toStringPrefix(String toStringPrefix) {
+			pile.setToStringPrefix(toStringPrefix);
+			return this;
+		}
 		public Builder<P> cards(Map<Integer, Card> cards) {
 			this.cards = cards;
 			return this;

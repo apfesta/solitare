@@ -39,7 +39,7 @@ public class UserBoard {
 	
 	Map<Integer, Card> cards = new HashMap<>(); //card by ID
 	
-	Export export;
+	ExportBuilder export;
 	
 	public UserBoard(GameBoard game, User user) {
 		super();
@@ -59,8 +59,9 @@ public class UserBoard {
 		GAME_LOG.debug("GameId:({}){} User:({}){} deck:{}",
 				game.gameId, game.gameName, 
 				user.id, user.username, d);
-		export = new Export();
-		export.startingDeck = d.exportState();
+		export = new ExportBuilder(this)
+				.startingDeck(d.exportState());
+
 		for (Card c: d.cards) {
 			cards.put(c.getUnicodeInt(), c);
 		}
@@ -78,8 +79,8 @@ public class UserBoard {
 		GAME_LOG.debug("GameId:({}){} User:({}){} deck:{}",
 				game.gameId, game.gameName, 
 				user.id, user.username, d);
-		export = new Export();
-		export.startingDeck = d.exportState();
+		export = new ExportBuilder(this)
+				.startingDeck(d.exportState());
 		for (Card c: d.cards) {
 			cards.put(c.getUnicodeInt(), c);
 		}
@@ -343,6 +344,7 @@ public class UserBoard {
 		Builder(GameBoard game, User user) {
 			userBoard = new UserBoard(game, user);
 			userBoard.score = userBoard.new Score();
+			userBoard.export = new ExportBuilder(userBoard);
 			game.userBoards.put(user, userBoard);
 		}
 		
@@ -355,6 +357,7 @@ public class UserBoard {
 		}
 		public Pile.Builder<Builder> stockPile() {
 			return Pile.builder(this, true, new Pile())
+					.toStringPrefix("S")
 					.cards(userBoard.cards)
 					.consumer((pile)->userBoard.stockPile=pile);
 		}
@@ -438,8 +441,19 @@ public class UserBoard {
 		}
 	}
 	
-	public class Export {
+	public static class Export {
 		Deck.Export startingDeck;
+		UserBoard userBoard;
+		String[] currentFoundation;
+		String[] currentTableau;
+		String currentStockPile;
+		String currentDiscardPile;
+
+		public Export() {
+		}
+		public Export(UserBoard userBoard) {
+			this.userBoard = userBoard;
+		}
 
 		public Deck.Export getStartingDeck() {
 			return startingDeck;
@@ -448,18 +462,48 @@ public class UserBoard {
 		public void setStartingDeck(Deck.Export startingDeck) {
 			this.startingDeck = startingDeck;
 		}
-
 		public String[] getCurrentFoundation() {
-			return game.getFoundation().getPrettyPrint().split("\n");
+			return currentFoundation;
+		}
+		public void setCurrentFoundation(String[] currentFoundation) {
+			this.currentFoundation = currentFoundation;
 		}
 		public String[] getCurrentTableau() {
-			return tableau.getPrettyPrint().split("\n");
+			return currentTableau;
+		}
+		public void setCurrentTableau(String[] currentTableau) {
+			this.currentTableau = currentTableau;
 		}
 		public String getCurrentStockPile() {
-			return stockPile.toString();
+			return currentStockPile;
+		}
+		public void setCurrentStockPile(String currentStockPile) {
+			this.currentStockPile = currentStockPile;
 		}
 		public String getCurrentDiscardPile() {
-			return discardPile.toString();
+			return currentDiscardPile;
+		}
+		public void setCurrentDiscardPile(String currentDiscardPile) {
+			this.currentDiscardPile = currentDiscardPile;
+		}
+	}
+	
+	public static class ExportBuilder {
+		Export export;
+		
+		ExportBuilder(UserBoard userBoard) {
+			export = new Export(userBoard);
+		}
+		ExportBuilder startingDeck(Deck.Export startingDeck) {
+			export.setStartingDeck(startingDeck);
+			return this;
+		}
+		Export build() {
+			export.currentFoundation = export.userBoard.game.getFoundation().getPrettyPrint().split("\n");
+			export.currentTableau = export.userBoard.tableau.getPrettyPrint().split("\n");
+			export.currentStockPile = export.userBoard.stockPile.toString();
+			export.currentDiscardPile = export.userBoard.discardPile.toString();
+			return export;
 		}
 	}
 
