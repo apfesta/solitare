@@ -631,7 +631,7 @@ public class GameBoard {
 		}
 	}
 	
-	enum MoveType {
+	public enum MoveType {
 		TO_FOUNDATION,
 		TO_TABLEAU,
 		DISCARD

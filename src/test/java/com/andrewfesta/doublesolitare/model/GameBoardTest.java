@@ -3,11 +3,17 @@ package com.andrewfesta.doublesolitare.model;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 
+import org.junit.Ignore;
 import org.junit.Test;
+
+import com.andrewfesta.doublesolitare.model.GameBoard.Move;
 
 public class GameBoardTest {
 
+	@Ignore
 	@Test
 	public void test_import() throws IOException {
 		GameBoard.GameExport obj = GameBoard.GameExport.readFromFile("game10_user6.json");
@@ -19,9 +25,38 @@ public class GameBoardTest {
 //		for (String line:obj.userBoards.get(obj.generatedByUserId).currentTableau) {
 //			System.out.println(line);
 //		}
+	
 		System.out.println("---FRONTEND---");
 		System.out.println(obj.boardHtml);
 		
+		User user = new User(6);
+		GameBoard game = new GameBoard(user, 6, true);
+		
+		ArrayList<Card> cards = new ArrayList<>(obj.getUserBoards().get(6).getStartingDeck().getCards());
+		Collections.reverse(cards);
+		Card[] stackedDeck = new Card[52];
+		cards.toArray(stackedDeck);
+		game.setup(user, stackedDeck);
+		
+		for (Move move: obj.getMoves()) {
+			if (move.getUserId().equals(6)) {
+				switch (move.getMoveType()) {
+				case DISCARD:
+					game.discard(user);
+					break;
+				case TO_FOUNDATION:
+					game.moveToFoundation(user, move.getCardId(), 
+							move.getToFoundationId());
+					break;
+				case TO_TABLEAU:
+					game.moveToTableau(user, move.getCardId(), 
+							move.getToBuildId());
+					break;
+				default:
+					break;
+				}
+			}
+		}
 	}
 	
 	@Test
