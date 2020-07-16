@@ -437,7 +437,8 @@ public class MainController {
 	
 	@RequestMapping(value="/api/game/{gameId}/export", method = RequestMethod.POST)
 	public @ResponseBody void export(@PathVariable Integer gameId,
-			@RequestParam String boardHtml) throws IOException {
+			@RequestParam("description") String description,
+			@RequestParam("boardHtml") String boardHtml) throws IOException {
 		LOG.trace("POST /api/game/{}/export", gameId);
 		
 		GameBoard game = games.get(gameId);
@@ -447,6 +448,7 @@ public class MainController {
 		game.export()
 			.boardHtml(boardHtml)
 			.generatedByUserId(user.getId())
+			.description(description)
 			.build()
 			.writeAsFile();
 	}

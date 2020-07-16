@@ -37,6 +37,8 @@
 	<!-- CSRF -->
 	<meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
+    <title>Double Solitare</title>
 </head>
 <body onload="disconnect()">
 
@@ -206,6 +208,32 @@
 	      </div>
 	      <div class="modal-footer">
 	      	<button type="button" class="btn btn-primary mainMenuBtn" data-dismiss="modal">New Game</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	<div class="modal fade" id="bugFeedback" tabindex="-1" role="dialog" aria-labelledby="gameOverTitle" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title"><i class="fa fa-bug" aria-hidden="true"></i> Bug Report</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          		<span aria-hidden="true">&times;</span>
+        	</button>
+	      </div>
+	      <div class="modal-body">
+	        
+	        <div class="form-group">
+	        	<label>What's wrong and/or What were you trying to do?
+	        		<textarea rows="3" class="bugDescription form-control" name="bugDescription"></textarea>
+	        	</label>
+	        </div>
+	        
+	      </div>
+	      <div class="modal-footer">
+	      	<button type="button" class="btn btn-primary submitBugBtn" data-dismiss="modal">Submit Feedback</button>
+	      	<button type="button" class="btn btn-default cancelBugBtn" data-dismiss="modal">Cancel</button>
 	      </div>
 	    </div>
 	  </div>

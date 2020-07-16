@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -487,6 +489,7 @@ public class GameBoard {
 		Set<User> users;
 		String gameName;
 		String boardHtml;
+		String description;
 		Integer generatedByUserId;
 		Map<Integer, UserBoard.Export> userBoards;
 		List<Move> moves = new ArrayList<>();
@@ -546,6 +549,14 @@ public class GameBoard {
 			this.boardHtml = boardHtml;
 		}
 
+		public String getDescription() {
+			return description;
+		}
+
+		public void setDescription(String description) {
+			this.description = description;
+		}
+
 		public Integer getGeneratedByUserId() {
 			return generatedByUserId;
 		}
@@ -594,8 +605,14 @@ public class GameBoard {
 		}
 		
 		public void writeAsFile() throws IOException {
+			StringBuilder name = new StringBuilder();
+			name
+				.append("game").append(gameId).append("_")
+				.append("user").append(generatedByUserId).append("_")
+				.append(DateTimeFormatter.ISO_DATE_TIME.format(OffsetDateTime.now()))
+				.append(".json");
 			try {
-				getObjectWriter().writeValue(new File("game"+gameId+"_user"+generatedByUserId+".json"), this);
+				getObjectWriter().writeValue(new File(name.toString()), this);
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
@@ -617,6 +634,10 @@ public class GameBoard {
 		GameExportBuilder(GameBoard game) {
 			super();
 			this.gameExport = new GameExport(game);
+		}
+		public GameExportBuilder description(String description) {
+			gameExport.setDescription(description);
+			return this;
 		}
 		public GameExportBuilder boardHtml(String boardHtml) {
 			gameExport.setBoardHtml(boardHtml);

@@ -216,11 +216,15 @@ var app = {
 	}
 	
 	app.exportData = function(gameId) {
+		var data = {
+				'description':$('#bugFeedback [name=bugDescription]').val(), 
+				'boardHtml':$('#gameBoard').html()};
 		$.ajax({
 			type: 'POST', 
 			url: getRelativePath('/api/game/'+gameId+'/export'),
 			dataType: "json",
-			data: {'boardHtml':$('#gameBoard').html()}});	
+			data: data});	
+		$('#bugFeedback [name=bugDescription]').val("");
 	}
 	
 	app.newTest = function() {
@@ -999,7 +1003,10 @@ var app = {
 		}
 	});
 	
-	$('#bugBtn').on('click', function(){
+	$('#bugBtn')
+		.attr('data-toggle','modal')
+		.attr('data-target','#bugFeedback');
+	$('.submitBugBtn').on('click', function(){
 		app.exportData(app.gameId);
 	});
 	
