@@ -76,7 +76,8 @@ var menu = {
 			data: JSON.stringify(data),
 			success: function(data){
 				console.debug(data);
-				app.gameName = data.gameName
+				app.gameName = data.gameName;
+				document.title = 'Double Solitare - '+app.gameName;
 			}});
 	};
 	
@@ -216,11 +217,15 @@ var app = {
 	}
 	
 	app.exportData = function(gameId) {
+		var data = {
+				'description':$('#bugFeedback [name=bugDescription]').val(), 
+				'boardHtml':$('#gameBoard').html()};
 		$.ajax({
 			type: 'POST', 
 			url: getRelativePath('/api/game/'+gameId+'/export'),
 			dataType: "json",
-			data: {'boardHtml':$('#gameBoard').html()}});	
+			data: data});	
+		$('#bugFeedback [name=bugDescription]').val("");
 	}
 	
 	app.newTest = function() {
@@ -236,6 +241,7 @@ var app = {
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				app.gameName = app.gameboard.gameName;
+				document.title = 'Double Solitare - '+app.gameName;
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
 				$('#blockToggleButton').hide();
@@ -258,6 +264,7 @@ var app = {
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				app.gameName = app.gameboard.gameName;
+				document.title = 'Double Solitare - '+app.gameName;
 				$('#scoreBar').show();
 				$('#scoreBoard').hide();
 				$('#blockToggleButton').hide();
@@ -282,7 +289,7 @@ var app = {
 							$('<button class="btn btn-outline-primary" type="button" title="Share URL..."><i class="fa fa-share-alt"></i> Share</button>')
 							.on('click',function(){
 								navigator.share({
-									title: 'Double Solitare',
+									title: document.title,
 									text: 'Join me in a game of Double Solitare',
 									url: $(location).attr('href').split('#')[0]+'#'+app.gameId
 								}).then(()=> console.log('Successful share'));
@@ -313,6 +320,7 @@ var app = {
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				app.gameName = app.gameboard.gameName;
+				document.title = 'Double Solitare - '+app.gameName;
 				app.updateInviteLink();
 				connect(app.gameId);
 				$('#scoreBar').hide();
@@ -338,6 +346,7 @@ var app = {
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				app.gameName = app.gameboard.gameName;
+				document.title = 'Double Solitare - '+app.gameName;
 				app.updateInviteLink();
 				connect(app.gameId);
 				$('#scoreBar').hide();
@@ -368,6 +377,7 @@ var app = {
 				app.gameboard = app.userboard.game;
 				app.gameId = app.gameboard.gameId;
 				app.gameName = app.gameboard.gameName;
+				document.title = 'Double Solitare - '+app.gameName;
 				app.updateInviteLink();
 				app.setupStockAndDiscardPiles();
 				app.setupFoundation();
@@ -999,7 +1009,10 @@ var app = {
 		}
 	});
 	
-	$('#bugBtn').on('click', function(){
+	$('#bugBtn')
+		.attr('data-toggle','modal')
+		.attr('data-target','#bugFeedback');
+	$('.submitBugBtn').on('click', function(){
 		app.exportData(app.gameId);
 	});
 	

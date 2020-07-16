@@ -62,11 +62,13 @@ public class Deck extends Pile {
 		return new Export(new ArrayList<>(cards));
 	}
 	
-	public class Export {
-		final List<Card> cards;
+	public static class Export {
+		List<Card> cards;
+
+		public Export() {
+		}
 
 		public Export(List<Card> cards) {
-			super();
 			this.cards = cards;
 		}
 

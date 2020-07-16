@@ -1,7 +1,9 @@
 package com.andrewfesta.doublesolitare.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,7 +26,9 @@ import com.andrewfesta.doublesolitare.DoubleSolitareConfig.DoubleSolitareDebugPr
 import com.andrewfesta.doublesolitare.exception.GameInProgressException;
 import com.andrewfesta.doublesolitare.exception.GameNotFoundException;
 import com.andrewfesta.doublesolitare.model.Card;
+import com.andrewfesta.doublesolitare.model.Foundation;
 import com.andrewfesta.doublesolitare.model.GameBoard;
+import com.andrewfesta.doublesolitare.model.GameBoard.Move;
 import com.andrewfesta.doublesolitare.model.Suit;
 import com.andrewfesta.doublesolitare.model.User;
 import com.andrewfesta.doublesolitare.model.UserBoard;
@@ -81,11 +85,17 @@ public class MainController {
 	 * @param multiplayer
 	 * @param userId
 	 * @return
+	 * @throws IOException 
 	 */
 	@RequestMapping(value="/api/game/test", method = RequestMethod.POST)
 	public @ResponseBody UserBoard newTestGame(
-			@RequestParam("multiplayer") boolean multiplayer) {
+			@RequestParam("multiplayer") boolean multiplayer) throws IOException {
 		LOG.trace("POST /api/game?multiplayer={}",multiplayer);
+		
+		return testGame3("game11_user6.json", 6);
+	}
+	
+	UserBoard testGame1(boolean multiplayer) {
 		User user = userService.getUser();
 		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), multiplayer);
 		if (debugProperties!=null) {
@@ -121,6 +131,77 @@ public class MainController {
 				}
 			}
 		}
+		
+		return game.getUserBoard(user);
+	}
+	
+	UserBoard testGame2() {
+		User user = userService.getUser();
+		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), false);
+		games.put(game.getGameId(), game);
+		game.setFoundation(new Foundation());
+		game.getFoundation().addPlayer();
+		
+		UserBoard userBoard = UserBoard
+				.builder(game, user)
+				.tableau()
+					.stack(0)
+						.topCard(4, Suit.CLUBS)
+						.addToTableau()
+					.stack(1)
+						.topCard(5, Suit.SPADES)
+						.addToTableau()
+					.stack(2)
+						.topCard(6, Suit.CLUBS)
+						.addToTableau()
+					.addToBoard()
+				.stockPile()
+					.add(6, Suit.DIAMONDS)
+					.add(5, Suit.DIAMONDS)
+					.add(4, Suit.DIAMONDS)
+					.add(3, Suit.DIAMONDS)
+					.add(2, Suit.DIAMONDS)
+					.add(Card.ACE, Suit.DIAMONDS)
+					.addToParent()
+				.build();
+		
+		return userBoard;
+	}
+	UserBoard testGame3(String filename, Integer userId) throws IOException {
+		User user = userService.getUser();
+		GameBoard game = new GameBoard(user, gameIdSequence.incrementAndGet(), false);
+		GameBoard.GameExport obj = GameBoard.GameExport.readFromFile(filename);
+		
+		ArrayList<Card> cards = new ArrayList<>(obj.getUserBoards().get(userId).getStartingDeck().getCards());
+		Collections.reverse(cards);
+		Card[] stackedDeck = new Card[52];
+		cards.toArray(stackedDeck);
+		game.setup(user, stackedDeck);
+		
+		games.put(game.getGameId(), game);
+		
+		for (Move move: obj.getMoves()) {
+			if (move.getUserId().equals(userId)) {
+				switch (move.getMoveType()) {
+				case DISCARD:
+					discard(game.getGameId());
+					break;
+				case TO_FOUNDATION:
+					moveToFoundation(game.getGameId(), move.getCardId(), 
+							move.getToFoundationId());
+					break;
+				case TO_TABLEAU:
+					moveToTableau(game.getGameId(), move.getCardId(), 
+							move.getToBuildId());
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		
+		System.out.println("---FRONTEND---");
+		System.out.println(obj.getBoardHtml());
 		
 		return game.getUserBoard(user);
 	}
@@ -360,7 +441,8 @@ public class MainController {
 	
 	@RequestMapping(value="/api/game/{gameId}/export", method = RequestMethod.POST)
 	public @ResponseBody void export(@PathVariable Integer gameId,
-			@RequestParam String boardHtml) throws IOException {
+			@RequestParam("description") String description,
+			@RequestParam("boardHtml") String boardHtml) throws IOException {
 		LOG.trace("POST /api/game/{}/export", gameId);
 		
 		GameBoard game = games.get(gameId);
@@ -370,6 +452,8 @@ public class MainController {
 		game.export()
 			.boardHtml(boardHtml)
 			.generatedByUserId(user.getId())
+			.description(description)
+			.build()
 			.writeAsFile();
 	}
 	
