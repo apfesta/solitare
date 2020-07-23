@@ -573,13 +573,14 @@ var app = {
 		}
 		$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
 		$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
-		if (app.gameboard.multiPlayer && app.gameboard.gameOver) {
+		if (app.gameboard.gameOver && !app.gameboard.multiPlayer) {
 			console.log('game over');
 			$('#gameOverTitle').text('You Win!');
-			$('#gameOver .modal-body').html('Score: '+app.userboard.score.totalScore)
-			
+			$('#gameOver .modal-body').html('Score: '+app.userboard.score.totalScore+
+					'<br/>Moves: '+app.userboard.score.totalMoves)
 			$('#gameOver').modal('show');
 		}
+		
 	}
 	
 	
