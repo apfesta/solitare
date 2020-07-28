@@ -62,7 +62,8 @@ function setConnected(connected, gameId) {
 								$('<tr>').append(
 									$('<th>').html('User')).append(
 									$('<th>').html('Score')).append(
-									$('<th>').html('Moves'))
+									$('<th>').html('Moves')).append(
+									$('<th>').html('Time'))
 							)
 						).append($('<tbody>')));
 				for (i in app.gameboard.users) {	
@@ -71,7 +72,8 @@ function setConnected(connected, gameId) {
 						$('<tr>').append(
 							$('<td>').addClass('username').html(user.username)).append(
 							$('<td>').addClass('score').html(app.gameboard.userScores[user.id].toFoundation)).append(
-							$('<td>').addClass('moves').html(app.gameboard.userScores[user.id].totalMoves))
+							$('<td>').addClass('moves').html(app.gameboard.userScores[user.id].totalMoves)).append(
+							$('<td>').addClass('duration').html(data.duration))
 					);
 				}					
 				$('#gameOver').modal('show');
@@ -86,7 +88,8 @@ function setConnected(connected, gameId) {
 							$('<tr>').append(
 								$('<th>').html('User')).append(
 								$('<th>').html('Score')).append(
-								$('<th>').html('Moves'))
+								$('<th>').html('Moves')).append(
+								$('<th>').html('Time'))
 						)
 					).append($('<tbody>')));
 			for (i in app.gameboard.users) {	
@@ -95,7 +98,8 @@ function setConnected(connected, gameId) {
 					$('<tr>').append(
 						$('<td>').addClass('username').html(user.username)).append(
 						$('<td>').addClass('score').html(data.score[user.id].toFoundation)).append(
-						$('<td>').addClass('moves').html(data.score[user.id].totalMoves))
+						$('<td>').addClass('moves').html(data.score[user.id].totalMoves)).append(
+						$('<td>').addClass('duration').html(data.duration))
 				);
 			}					
 			$('#gameOver').modal('show');
