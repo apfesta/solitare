@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,46 +18,61 @@ public class GameBoardTest {
 	@Ignore
 	@Test
 	public void test_import() throws IOException {
-		GameBoard.GameExport obj = GameBoard.GameExport.readFromFile("game10_user6.json");
+		GameBoard.GameExport obj = GameBoard.GameExport.readFromFile("game116_user64.json");
 		assertNotNull(obj);
+		int creatingUserId = 64;
 		System.out.println("---BACKEND---");
-//		for (String line:obj.userBoards.get(obj.generatedByUserId).currentFoundation) {
-//			System.out.println(line);
-//		}
-//		for (String line:obj.userBoards.get(obj.generatedByUserId).currentTableau) {
-//			System.out.println(line);
-//		}
+		for (String line:obj.userBoards.get(obj.generatedByUserId).currentFoundation) {
+			System.out.println(line);
+		}
+		for (String line:obj.userBoards.get(obj.generatedByUserId).currentTableau) {
+			System.out.println(line);
+		}
 	
 		System.out.println("---FRONTEND---");
 		System.out.println(obj.boardHtml);
 		
-		User user = new User(6);
-		GameBoard game = new GameBoard(user, 6, true);
+		User user = new User(creatingUserId);
+		GameBoard game = new GameBoard(user, creatingUserId, true);
 		
-		ArrayList<Card> cards = new ArrayList<>(obj.getUserBoards().get(6).getStartingDeck().getCards());
+		ArrayList<Card> cards = new ArrayList<>(obj.getUserBoards().get(creatingUserId).getStartingDeck().getCards());
 		Collections.reverse(cards);
 		Card[] stackedDeck = new Card[52];
 		cards.toArray(stackedDeck);
 		game.setup(user, stackedDeck);
 		
+		Map<Integer, User> users = obj.getUsers().stream()
+			.collect(Collectors.toMap((u)->u.getId(), (u)->u));
+
+		obj.getUsers().stream()
+			.filter((u)->!u.getId().equals(creatingUserId))
+			.forEach((u)->{
+				ArrayList<Card> cards2 = new ArrayList<>(obj.getUserBoards().get(u.id).getStartingDeck().getCards());
+				Collections.reverse(cards2);
+				Card[] stackedDeck2 = new Card[52];
+				cards2.toArray(stackedDeck2);
+				game.join(u, stackedDeck2);
+			});
+		
+		int moveCounter = 0;
 		for (Move move: obj.getMoves()) {
-			if (move.getUserId().equals(6)) {
-				switch (move.getMoveType()) {
-				case DISCARD:
-					game.discard(user);
-					break;
-				case TO_FOUNDATION:
-					game.moveToFoundation(user, move.getCardId(), 
-							move.getToFoundationId());
-					break;
-				case TO_TABLEAU:
-					game.moveToTableau(user, move.getCardId(), 
-							move.getToBuildId());
-					break;
-				default:
-					break;
-				}
+			System.out.println("Move "+moveCounter);
+			switch (move.getMoveType()) {
+			case DISCARD:
+				game.discard(users.get(move.getUserId()));
+				break;
+			case TO_FOUNDATION:
+				game.moveToFoundation(users.get(move.getUserId()), move.getCardId(), 
+						move.getToFoundationId());
+				break;
+			case TO_TABLEAU:
+				game.moveToTableau(users.get(move.getUserId()), move.getCardId(), 
+						move.getToBuildId());
+				break;
+			default:
+				break;
 			}
+			moveCounter++;
 		}
 	}
 	
