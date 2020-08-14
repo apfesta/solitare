@@ -1,5 +1,6 @@
 package com.andrewfesta.doublesolitare.service.impl;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -257,6 +258,8 @@ public class SyncService {
 		final Integer numOfUsers;
 		final Map<Integer, Score> score;
 		Boolean gameWon;
+		Boolean gameOver;
+		String duration;
 		
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game) {
 			super(action, user);
@@ -265,6 +268,14 @@ public class SyncService {
 			this.score = game.getUserScores();
 			if (game.getUserBoard(user).isGameWon() || game.getDebugProperties().isAdditionalResponseOutput()) {
 				gameWon = game.getUserBoard(user).isGameWon();
+			}
+			if (game.isGameOver() || game.getDebugProperties().isAdditionalResponseOutput()) {
+				gameOver = game.isGameOver();
+				if (gameOver) {
+					long secs = Duration.between(game.getStartTime(), game.getEndTime()).getSeconds();
+					duration = String.format("%d:%02d:%02d", 
+							secs / 3600, (secs % 3600) / 60, (secs % 60));
+				}
 			}
 		}
 		public GameUpdate(GameUpdateAction action, User user, GameBoard game, 
@@ -301,11 +312,23 @@ public class SyncService {
 		public void setGameWon(Boolean gameWon) {
 			this.gameWon = gameWon;
 		}
+		public Boolean getGameOver() {
+			return gameOver;
+		}
+		public void setGameOver(Boolean gameOver) {
+			this.gameOver = gameOver;
+		}
 		public Integer getToBuildId() {
 			return toBuildId;
 		}
 		public void setToBuildId(Integer toBuildId) {
 			this.toBuildId = toBuildId;
+		}
+		public String getDuration() {
+			return duration;
+		}
+		public void setDuration(String duration) {
+			this.duration = duration;
 		}
 		
 		

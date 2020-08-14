@@ -515,7 +515,7 @@ var app = {
 			.attr('data-card-id',card.unicodeInt)
 			.append($('<img>')
 				.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
-				.attr('title',card.unicodeHtmlEntity));
+				.attr('title',card.name));
 		if (card.color=='RED') newCardDiv.addClass('red');
 		
 		if (cardDiv.length==0) {
@@ -573,13 +573,14 @@ var app = {
 		}
 		$('#scoreBar .score').html('Score: '+app.userboard.score.totalScore);
 		$('#scoreBar .moves').html('Moves: '+app.userboard.score.totalMoves);
-		if (app.gameboard.multiPlayer && app.gameboard.gameOver) {
+		if (app.gameboard.gameOver && !app.gameboard.multiPlayer) {
 			console.log('game over');
 			$('#gameOverTitle').text('You Win!');
-			$('#gameOver .modal-body').html('Score: '+app.userboard.score.totalScore)
-			
+			$('#gameOver .modal-body').html('Score: '+app.userboard.score.totalScore+
+					'<br/>Moves: '+app.userboard.score.totalMoves)
 			$('#gameOver').modal('show');
 		}
+		
 	}
 	
 	
@@ -666,7 +667,7 @@ var app = {
 				.attr('data-card-id',card.unicodeInt)
 				.append($('<img>')
 					.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
-					.attr('title',card.unicodeHtmlEntity));
+					.attr('title',card.name));
 			if (card.color=='RED') cardDiv.addClass('red');
 			cardDiv.addClass('fan-right');
 			if (c==(maxcards-1)) {
@@ -697,7 +698,7 @@ var app = {
 						.empty()
 						.append($('<img>')
 							.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
-							.attr('title',card.unicodeHtmlEntity)))
+							.attr('title',card.name)))
 					.append(subBuildDiv);
 		if (card.color=='RED') cardDiv.addClass('red');
 	}
@@ -842,7 +843,7 @@ var app = {
 					.attr('data-card-id',card.unicodeInt)
 					.append($('<img>')
 						.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
-						.attr('title',card.unicodeHtmlEntity));
+						.attr('title',card.name));
 				if (card.color=='RED') cardDiv.addClass('red');
 				if (c+pile.numberOfCards>0) cardDiv.addClass('fan-down');
 				

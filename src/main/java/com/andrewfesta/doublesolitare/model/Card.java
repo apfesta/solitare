@@ -91,6 +91,10 @@ public class Card {
 		int code=getUnicodeInt();
 		return "&#"+code+";";
 	}
+	
+	public String getName() {
+		return toString();
+	}
 
 	public String valueName() {
 		switch (value){
