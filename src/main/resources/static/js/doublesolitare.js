@@ -515,7 +515,7 @@ var app = {
 			.attr('data-card-id',card.unicodeInt)
 			.append($('<img>')
 				.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
-				.attr('title',card.unicodeHtmlEntity));
+				.attr('title',card.name));
 		if (card.color=='RED') newCardDiv.addClass('red');
 		
 		if (cardDiv.length==0) {
@@ -667,7 +667,7 @@ var app = {
 				.attr('data-card-id',card.unicodeInt)
 				.append($('<img>')
 					.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
-					.attr('title',card.unicodeHtmlEntity));
+					.attr('title',card.name));
 			if (card.color=='RED') cardDiv.addClass('red');
 			cardDiv.addClass('fan-right');
 			if (c==(maxcards-1)) {
@@ -698,7 +698,7 @@ var app = {
 						.empty()
 						.append($('<img>')
 							.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
-							.attr('title',card.unicodeHtmlEntity)))
+							.attr('title',card.name)))
 					.append(subBuildDiv);
 		if (card.color=='RED') cardDiv.addClass('red');
 	}
@@ -843,7 +843,7 @@ var app = {
 					.attr('data-card-id',card.unicodeInt)
 					.append($('<img>')
 						.attr('src',getRelativePath('/img/1'+card.unicodeHex+'.png'))
-						.attr('title',card.unicodeHtmlEntity));
+						.attr('title',card.name));
 				if (card.color=='RED') cardDiv.addClass('red');
 				if (c+pile.numberOfCards>0) cardDiv.addClass('fan-down');
 				
