@@ -2,9 +2,11 @@ package com.andrewfesta.doublesolitare.model;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import com.andrewfesta.doublesolitare.exception.MoveException;
 import com.andrewfesta.doublesolitare.model.Build.Sequence;
 
 public class BuildTest {
@@ -60,6 +62,28 @@ public class BuildTest {
 		assertFalse(build.canPush(c3));
 		assertFalse(build.canPush(c4));
 		
+	}
+	
+	@Test
+	public void testCanMoveRank() {
+		Card c1 = new Card(Card.ACE, Suit.HEARTS); 
+		
+		//In order to actually push the card must already be on a build or pile
+		Pile pile = new Pile();
+		c1.setCurrentPile(pile);
+		pile.push(c1); 
+				
+		//Push ACE onto foundation build
+		Build build = new Build(Sequence.RANK);
+		build.push(c1);
+		
+		//Try to move it off
+		Build build2 = new Build(Sequence.RANK);
+		assertTrue(build2.canPush(c1));
+		try {
+			build2.push(c1);
+			fail("Expected MoveException");
+		} catch (MoveException e) {}
 	}
 	
 	public void testCanPushSubBuilds() {

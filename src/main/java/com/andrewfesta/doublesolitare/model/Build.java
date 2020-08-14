@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.andrewfesta.doublesolitare.exception.MoveException;
 import com.andrewfesta.doublesolitare.exception.PushException;
 
 public class Build extends VisiblePile {
@@ -51,10 +52,12 @@ public class Build extends VisiblePile {
 	}
 	
 	private boolean canMove(Card card) {
-		return (card.getCurrentBuild()!=null && //Is in a build
+		return ((card.getCurrentBuild()!=null && //Is in a build
 				card.getCurrentBuild().contains(card)) ||
-				(card.getCurrentPile()!=null &&
-				card.getCurrentPile().contains(card));  //Is top of the discard pile
+				(card.getCurrentPile()!=null && //Is top of the discard pile
+				card.getCurrentPile().contains(card))) && 
+				!(card.getCurrentBuild()!=null && //Not in foundation
+				card.getCurrentBuild().getSequence().equals(Sequence.RANK));  
 	}
 		
 	public Build popBuild(Card card) {
@@ -97,7 +100,7 @@ public class Build extends VisiblePile {
 			} else {
 				LOG.error("Card:{} Currentbuild:{} Currentpile:{}",
 						c.abbrev(),c.getCurrentBuild(), c.getCurrentPile());
-				throw new PushException("Card "+c+" cannot move.");
+				throw new MoveException("Card "+c+" cannot move.");
 			}
 		} else {
 			throw new PushException("Cannot place card "+c+" on top of "+cards.peek()+" for this type of build");
