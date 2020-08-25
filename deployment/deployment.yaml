@@ -92,7 +92,7 @@ metadata:
     service.beta.kubernetes.io/do-loadbalancer-tls-ports: "443"
     service.beta.kubernetes.io/do-loadbalancer-redirect-http-to-https: "true"
     # Use "doctl compute certificate list" to get this ID
-    service.beta.kubernetes.io/do-loadbalancer-certificate-id: “a2e2e86d-45e7-43bd-a8e4-637937810fc7”
+    service.beta.kubernetes.io/do-loadbalancer-certificate-id: “eebb0af3-adcc-48de-a169-bfb0e9d24fba”
 spec:
   type: LoadBalancer
   ports:
