@@ -97,15 +97,11 @@ spec:
   type: LoadBalancer
   ports:
     - name: http
-      nodePort: 31907
       port: 80
-      protocol: TCP
-      targetPort: http
+      targetPort: 80
     - name: https
-      nodePort: 30508
       port: 443
-      protocol: TCP
-      targetPort: https
+      targetPort: 80
   selector:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
